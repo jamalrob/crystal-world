@@ -6,3 +6,5 @@ dependencies:
         github: icyleaf/markd
     poncho:
         github: icyleaf/poncho
+    front_matter:
+        github: chris-huxtable/front_matter.cr
