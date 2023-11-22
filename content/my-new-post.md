@@ -1,7 +1,8 @@
 ---
 title: 'TESTING A DRAFT AGAIN'
 date: '2010-07-05'
-tags: 
+tags:
+image: true
 imageClass: mainImageSmallest
 draft: true
 ---

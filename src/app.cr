@@ -5,27 +5,28 @@ require "front_matter"
 require "poncho"
 
 poncho = Poncho.from_file ".env"
+imgbucket = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-80/"
 #val = poncho["SECRET"]
 
 module CrystalWorld
 
-    def CrystalWorld.get_value(fm, name)
+    def self.get_value(fm, name)
         find = "#{name}:"
         value_start = fm.index(find).as(Int32) + find.size
         value_end = fm.index("\n", offset: value_start)
         if !value_end.nil?
-            value = fm[value_start..value_end].strip('\n').strip(' ').strip('\'')
+            value = fm[value_start..value_end].strip('\n').strip.strip('\'')
         end
         value
     end
 
-    def CrystalWorld.parse_frontmatter(fm)
+    def self.parse_frontmatter(fm)
 
-        title = CrystalWorld.get_value(fm, "title")
-        date = CrystalWorld.get_value(fm, "date")
-        tags = CrystalWorld.get_value(fm, "tags")
-        image = CrystalWorld.get_value(fm, "image")
-        imageclass = CrystalWorld.get_value(fm, "imageClass")
+        title = self.get_value(fm, "title")
+        date = self.get_value(fm, "date")
+        tags = self.get_value(fm, "tags")
+        image = self.get_value(fm, "image")
+        imageclass = self.get_value(fm, "imageClass")
 
         parsed = {
             "title" => title,
@@ -37,14 +38,20 @@ module CrystalWorld
         parsed
     end
 
-    macro render_template(ctx, page_template, title, html="")
-        page_title = {{title}}
-        if {{html}} == ""
-            content = ECR.render({{page_template}})
-        else
-            content = {{html}}
-        end
+    macro render(ctx, page_template, title)
+        title = {{title}}
+        content = ECR.render({{page_template}})
         header = ECR.render "src/templates/components/header.ecr"
+        populated_layout = ECR.render "src/templates/layouts/base.ecr"
+        ctx.response.content_type = "text/html; charset=UTF-8"
+        ctx.response.print populated_layout
+    end
+
+    macro render_article(ctx, page_template, title, html)
+        article = {{html}}
+        title = {{title}}
+        header = ECR.render "src/templates/components/header.ecr"
+        content = ECR.render "src/templates/components/article.ecr"
         populated_layout = ECR.render "src/templates/layouts/base.ecr"
         ctx.response.content_type = "text/html; charset=UTF-8"
         ctx.response.print populated_layout
@@ -57,22 +64,22 @@ module CrystalWorld
     ]) do |ctx|
         case ctx.request.path
         when "/"
-            render_template ctx, "src/templates/home.ecr", "The Crystal World"
+            d = Dir.new("content")
+            files = d.each_child
+            render ctx, "src/templates/home.ecr", "The Crystal World"
         when "/tags"
             #
         when "/about"
-            render_template(ctx, "src/templates/about.ecr", "About me")
-        else
+            render ctx, "src/templates/about.ecr", "About me"
+        when .match(/[a-zA-Z]/)
             urlbits = ctx.request.path.split('/', limit: 2, remove_empty: true)
             resource    = urlbits[0]?
             FrontMatter.open("content/#{resource}.md", skip_newlines: false) { |front_matter, content_io|
-                #front_matter
-                #p! front_matter
                 fm = parse_frontmatter(front_matter)
                 md = content_io.gets_to_end.as(String)
                 options = Markd::Options.new(smart: true, safe: true)
-                html = Markd.to_html(md, options)
-                render_template ctx, "src/templates/home.ecr", fm["title"], html: html
+                html = Markd.to_html(md, options).gsub("/bucket/", imgbucket)
+                render_article ctx, "src/templates/home.ecr", fm["title"], html
             }
 
         end

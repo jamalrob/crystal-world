@@ -1,22 +1,18 @@
 html,
 body {
-    background: #fffdf8;
-    color: #323232;
+    background: #323232;
+    color: #fffdf8;
     padding: 0;
     margin: 0;
-    font-family: -apple-system,BlinkMacSystemFont,'avenir next',avenir,'helvetica neue',helvetica,ubuntu,roboto,noto,'segoe ui',arial,sans-serif;
+    font-family: Ubuntu, -apple-system,BlinkMacSystemFont,'avenir next',avenir,'helvetica neue',helvetica,ubuntu,roboto,noto,'segoe ui',arial,sans-serif;
     line-height: 1.62;
-    font-size: 19px;
+    font-size: 22px;
     height: 100%;
 }
 
 body.dark {
     background: #333131;
-    color: #f0eaea;
-}
-
-body.dark a {
-    color: #9cc8fa;
+    color: #e1dddd;
 }
 
 * {
@@ -24,7 +20,7 @@ body.dark a {
 }
 
 a {
-    color: #0070f3;
+    color: #9cc4f2;
     text-decoration: none;
 }
 
@@ -33,19 +29,39 @@ a:hover {
 }
 
 main {
-    width: 100%;
+    width: 95%;
     margin: auto;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
 }
+h1 {
+    font-size: 1.6rem;
+    line-height: 1.9rem;
+}
+h2 {
+    font-size: 1.4rem;
+    line-height: 1.6rem;
+}
+h3 {
+    font-size: 1.2rem;
+    line-height: 1.4rem;
+}
 @media (min-width: 600px) {
+    h1 {
+        font-size: 2rem;
+        line-height: 2.4rem;
+    }
     main {
         width: 80%;
-        max-width: 1000px;
     }
 }
-
+@media (min-width: 1000px) {
+    main {
+        width: 60%;
+        max-width: 800px;
+    }
+}
 
 .col {
     display: flex;

@@ -33,6 +33,6 @@ This is essential to successful activity. We must be geared into the world to be
 
 When I saw the trees as bright yellow birches, I was seeing things in a specific kind of way, that is, I was geared into the world in a way that made sense as a whole. This is not the same as saying, and it does not entail, that I was not seeing real trees but merely a mental or neural model. I was seeing real trees under an aspect that my perceptual system made possible, partly thanks to my memory of bright yellow birch trees. I wasn’t seeing birch trees, but simply because both aspects seemed equally strong at the time it doesn’t follow that I also wasn’t seeing pine trees. I was seeing pine trees _as_ birch trees.
 
-### Further reading
+## Further reading
 
 [The sensorimotor theory of consciousness](https://whatfeelingislike.net/?page_id=17)
