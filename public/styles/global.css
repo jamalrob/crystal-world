@@ -1,0 +1,128 @@
+html,
+body {
+    background: #fffdf8;
+    color: #323232;
+    padding: 0;
+    margin: 0;
+    font-family: -apple-system,BlinkMacSystemFont,'avenir next',avenir,'helvetica neue',helvetica,ubuntu,roboto,noto,'segoe ui',arial,sans-serif;
+    line-height: 1.62;
+    font-size: 19px;
+    height: 100%;
+}
+
+body.dark {
+    background: #333131;
+    color: #f0eaea;
+}
+
+body.dark a {
+    color: #9cc8fa;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+a {
+    color: #0070f3;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+main {
+    width: 100%;
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+@media (min-width: 600px) {
+    main {
+        width: 80%;
+        max-width: 1000px;
+    }
+}
+
+
+.col {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 20px 20px;
+    width: 50%;
+}
+
+
+button {
+    background-color:#1d638f;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    padding: 10px 25px 8px;
+    min-height: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    font-family: -apple-system,BlinkMacSystemFont,'avenir next',avenir,'helvetica neue',helvetica,ubuntu,roboto,noto,'segoe ui',arial,sans-serif;
+}
+
+button:hover {
+    cursor: pointer;
+    background-color:#188cd4;
+}
+
+button.delete {
+    background-color:#b1403a;
+}
+
+button.delete:hover {
+    background-color:#ea2419;
+}
+
+@keyframes spin {
+    to { -webkit-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+    to { -webkit-transform: rotate(360deg); }
+}
+
+.spinner {
+    display: inline-block;
+}
+
+.htmx-request {
+    width: 24px;
+    height: 24px;
+    border: 4px solid #134463b9;
+    border-radius: 50%;
+    border-top-color: #87a1b06f;
+    animation: spin 1s linear infinite;
+    -webkit-animation: spin 1s linear infinite;
+    margin: auto
+}
+
+button .htmx-request {
+    border: 3px solid rgba(140, 195, 212, 0.3);
+    border-top-color: #e1dddc;
+}
+
+input[type="checkbox"] {
+    margin-top: 15px;
+}
+
+input[type='text'], input[type='date'] {
+    display: block;
+    padding: 10px;
+    width: 100%;
+    margin: 0 0 10px 0;
+}
+
+input, textarea, #editBox {
+    border-radius: 5px;
+    border: 1px solid #eee;
+    font-size: 18px;
+    box-shadow: inset 1px 1px 2px #a9a296;
+    background: white;
+}

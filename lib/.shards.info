@@ -1,0 +1,9 @@
+---
+version: 1.0
+shards:
+  markd:
+    git: https://github.com/icyleaf/markd.git
+    version: 0.5.0
+  poncho:
+    git: https://github.com/icyleaf/poncho.git
+    version: 0.4.0

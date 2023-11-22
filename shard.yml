@@ -1,0 +1,8 @@
+name: CrystalWorld
+version: 0.1.0
+
+dependencies:
+    markd:
+        github: icyleaf/markd
+    poncho:
+        github: icyleaf/poncho
