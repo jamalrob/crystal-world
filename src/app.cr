@@ -21,13 +21,15 @@ module CrystalWorld
 
         case context.request.path
         when "/createarticle"
-            # 
+            #
         when "/"
             articles = DataLib.get_articles
             content = ECR.render("src/templates/home.ecr")
             self.render_and_out(context, "The Crystal World", content)
         when "/tags"
-            # get tags from a tags table
+            tags = DataLib.get_tags
+            content = ECR.render("src/templates/tags.ecr")
+            self.render_and_out(context, "Tags", content)
         when "/about"
             content = ECR.render("src/templates/about.ecr")
             self.render_and_out(context, "About me", content)

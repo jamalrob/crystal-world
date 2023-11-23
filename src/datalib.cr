@@ -1,7 +1,8 @@
 module CrystalWorld
     module DataLib
+        extend self
 
-        def self.create_article(slug, title, tags, date, image, imageClass, draft, content)
+        def create_article(slug, title, tags, date, image, imageClass, draft, content)
             # insert into articles (slug, title, tags, date, image, imageClass, draft, content
             DB.open "sqlite3://./crystalworld.db" do |db|
                 db.exec "INSERT INTO articles " \
@@ -11,9 +12,18 @@ module CrystalWorld
             end
         end
 
-        #def self.get_tags
+        def get_tags
+            all_tags = [] of String
+            DB.open "sqlite3://./crystalworld.db" do |db|
+                tag_vals = db.query_all "SELECT tags from articles WHERE draft = 0", as: {String}
+                tag_vals.each do |row|
+                    all_tags = all_tags | row.gsub(", ", ",").split(",")
+                end
+            end
+            all_tags
+        end
 
-        def self.get_articles
+        def get_articles
             DB.open "sqlite3://./crystalworld.db" do |db|
                 articles = [] of Hash(String, String)
                 begin
@@ -37,7 +47,7 @@ module CrystalWorld
             end
         end
 
-        def self.get_article(slug)
+        def get_article(slug)
             DB.open "sqlite3://./crystalworld.db" do |db|
                 begin
                     slug, title, tags, date, image, imageclass, draft, md =

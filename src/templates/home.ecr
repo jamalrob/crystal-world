@@ -3,7 +3,8 @@
 <ul class="article-list">
     <%- articles.each do |a| -%>
     <li>
-        <a href='/<%= a["slug"] %>'><%= a["title"] %></a></li>
+        <a href='/<%= a["slug"] %>'><%= a["title"] %></a>
+    </li>
     <%- end -%>
 </ul>
 

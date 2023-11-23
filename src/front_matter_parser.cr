@@ -1,7 +1,8 @@
 module CrystalWorld
     module FrontMatterParser
+        extend self
 
-        private def self.get_value(fm, name)
+        private def get_value(fm, name)
             find = "#{name}:"
             if !fm.index(find)
                 return nil
@@ -14,7 +15,7 @@ module CrystalWorld
             value
         end
 
-        def self.parse_frontmatter(fm)
+        def parse_frontmatter(fm)
             title = self.get_value(fm, "title")
             date = self.get_value(fm, "date")
             tags = self.get_value(fm, "tags")
