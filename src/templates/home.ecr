@@ -1,8 +1,15 @@
 <h1>This is the Home Page</h1>
 
-<ul>
-<%- files.each do |file| -%>
-<li>
-    <a href='/<%= file[0, file.index(".md").as(Int32)] %>'><%= file[0, file.index(".md").as(Int32)] %></a></li>
-<%- end -%>
+<ul class="article-list">
+    <%- articles.each do |a| -%>
+    <li>
+        <a href='/<%= a["slug"] %>'><%= a["title"] %></a></li>
+    <%- end -%>
 </ul>
+
+<style>
+ul.article-list {
+    list-style-type: none;
+    padding-left: 0;
+}
+</style>

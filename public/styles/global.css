@@ -1,18 +1,13 @@
 html,
 body {
     background: #323232;
-    color: #fffdf8;
+    color: #e3dfd4;
     padding: 0;
     margin: 0;
-    font-family: Ubuntu, -apple-system,BlinkMacSystemFont,'avenir next',avenir,'helvetica neue',helvetica,ubuntu,roboto,noto,'segoe ui',arial,sans-serif;
+    font-family: 'Roboto', Ubuntu, -apple-system,BlinkMacSystemFont,'avenir next',avenir,'helvetica neue',helvetica,ubuntu,roboto,noto,'segoe ui',arial,sans-serif;
     line-height: 1.62;
     font-size: 22px;
     height: 100%;
-}
-
-body.dark {
-    background: #333131;
-    color: #e1dddd;
 }
 
 * {
@@ -20,7 +15,7 @@ body.dark {
 }
 
 a {
-    color: #9cc4f2;
+    color: #a3cdfd;
     text-decoration: none;
 }
 
@@ -32,6 +27,10 @@ main {
     width: 95%;
     margin: auto;
     display: block;
+}
+
+h1, h2, h3, h4 {
+    font-family: 'Roboto Condensed', Ubuntu, sans-serif;
 }
 h1 {
     font-size: 1.6rem;

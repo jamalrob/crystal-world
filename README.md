@@ -1,0 +1,1 @@
+A website written in Crystal without a framework. Basic server-side rendering of Markdown held in a SQLite database.

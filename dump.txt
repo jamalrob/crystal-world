@@ -1,6 +1,20 @@
-
-
 # Requesting a url
+# ---------------------------------
 response = HTTP::Client.get "https://www.commissioncrowd.com"
 response.status_code      # => 200
 puts response.body.lines.first # => "<!doctype html>"
+
+
+# Serving posts from markdown files
+# ---------------------------------
+if File.exists?("content/#{resource}.md")
+    FrontMatter.open("content/#{resource}.md", skip_newlines: false) { |front_matter, content_io|
+        fm = parse_frontmatter(front_matter)
+        md = content_io.gets_to_end.as(String)
+        options = Markd::Options.new(smart: true, safe: true)
+        html = Markd.to_html(md, options).gsub("/bucket/", imgbucket)
+        render_article ctx, resource, fm["title"], html
+    }
+else
+    error ctx, "Page not found", HTTP::Status.new(404)
+end
