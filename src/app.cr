@@ -5,74 +5,63 @@ require "front_matter"
 require "poncho"
 require "sqlite3"
 require "./datalib.cr"
-require "./renderlib.cr"
+require "./front_matter_parser.cr"
 
 poncho = Poncho.from_file ".env"
 imgbucket = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-70/"
-#val = poncho["SECRET"]
 
 module CrystalWorld
 
     server = HTTP::Server.new([
         HTTP::StaticFileHandler.new(public_dir = "./public", fallthrough = true, directory_listing = false),
         HTTP::CompressHandler.new,
-    ]) do |ctx|
+    ]) do |context|
 
-        case ctx.request.path
+        # ROUTES
+
+        case context.request.path
         when "/createarticle"
-
-            # TESTING DB CREATE ARTICLE
-            # ONLY GETS THE DATA FROM A FILE FOR TESTING PURPOSES
-            FrontMatter.open("content/crash-by-jg-ballard.md", skip_newlines: false) { |front_matter, content_io|
-                fm = RenderLib.parse_frontmatter(front_matter)
-                md = content_io.gets_to_end.as(String)
-                #options = Markd::Options.new(smart: true, safe: true)
-                #html = Markd.to_html(md, options).gsub("/bucket/", imgbucket)
-                #render_article ctx, "src/templates/home.ecr", resource, fm["title"], html
-
-                DataLib.create_article(
-                    slug: "crash-by-jg-ballard",
-                    title: fm["title"],
-                    tags: fm["tags"],
-                    date: "2023-10-10 00:00:00.000",
-                    image: true,
-                    imageClass: "mainImageSmaller",
-                    draft: true,
-                    content: md
-                )
-            }
+            # 
         when "/"
-            # FOR FILES
-            #d = Dir.new("content")
-            #files = d.each_child
-            #render ctx, "src/templates/home.ecr", "The Crystal World"
-
-            # FOR DB
             articles = DataLib.get_articles
-            RenderLib.render_page ctx, "src/templates/home.ecr", "The Crystal World"
+            content = ECR.render("src/templates/home.ecr")
+            self.render_and_out(context, "The Crystal World", content)
         when "/tags"
-            #
+            # get tags from a tags table
         when "/about"
-            RenderLib.render_page ctx, "src/templates/about.ecr", "About me"
+            content = ECR.render("src/templates/about.ecr")
+            self.render_and_out(context, "About me", content)
         when .match(/[a-zA-Z]/)
-            urlbits = ctx.request.path.split('/', limit: 2, remove_empty: true)
-            resource    = urlbits[0]?
-
-            # USING DB:
+            urlbits = context.request.path.split('/', limit: 2, remove_empty: true)
+            resource = urlbits[0]?
             article = DataLib.get_article(resource)
-            options = Markd::Options.new(smart: true, safe: true)
             if article
-                md = article["md"].as(String)
-                html = Markd.to_html(md, options).gsub("/bucket/", imgbucket)
-                #render_article ctx: ctx, slug: resource, title: article["title"], html: html
-                article["html"] = html
-                RenderLib.render_article ctx: ctx, article: article
+                options = Markd::Options.new(smart: true, safe: true)
+                html = Markd.to_html(article["md"].as(String), options)
+                article["html"] = html.gsub("/bucket/", imgbucket)
+                content = ECR.render "src/templates/components/article.ecr"
+                self.render_and_out(context, article["title"], content)
             else
-                RenderLib.render_error ctx, "Page not found", HTTP::Status.new(404)
+                context.response.status = HTTP::Status.new(404)
+                content = "Sorry about that."
+                self.render_and_out(
+                    context: context,
+                    title: "Page not found",
+                    content: content,
+                    error_msg: "Page not found"
+                )
             end
         end
     end
 
+    def self.render_and_out(context, title, content, error_msg=nil)
+        header = ECR.render "src/templates/components/header.ecr"
+        populated_layout = ECR.render "src/templates/layouts/base.ecr"
+        context.response.content_type = "text/html; charset=UTF-8"
+        context.response.print populated_layout
+    end
+
+    # RUN SERVER
     address = server.bind_tcp 8080
     puts "Listening on http://#{address}"
     server.listen

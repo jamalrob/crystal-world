@@ -11,11 +11,18 @@ module CrystalWorld
             end
         end
 
-        def self.get_articles()
+        #def self.get_tags
+
+        def self.get_articles
             DB.open "sqlite3://./crystalworld.db" do |db|
                 articles = [] of Hash(String, String)
-                results =  db.query_all "SELECT slug, title, date, tags FROM articles ORDER BY date DESC",
+                begin
+                    results =  db.query_all "SELECT slug, title, date, tags FROM articles ORDER BY date DESC",
                             as: {String, String, String, String}
+                rescue DB::NoResultsError
+                    puts "No articles found"
+                    return [] of String
+                end
 
                 results.each do |result|
                     this_row = {
@@ -32,7 +39,6 @@ module CrystalWorld
 
         def self.get_article(slug)
             DB.open "sqlite3://./crystalworld.db" do |db|
-                #slug, title, tags, date, image, imageclass, draft, content
                 begin
                     slug, title, tags, date, image, imageclass, draft, md =
                                         db.query_one "SELECT slug, title, tags, date, image, imageClass, draft, content " \
@@ -49,14 +55,14 @@ module CrystalWorld
                     "title" => title,
                     "date" => date,
                     "tags" => tags,
-                    "image" => image, # casts to bool
+                    "image" => image,
                     "imageclass" => imageclass,
-                    "draft" => draft, # casts to bool
+                    "draft" => draft,
                     "md" => md,
                 }
 
             end
         end
-        
+
     end
 end

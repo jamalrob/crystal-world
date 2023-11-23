@@ -18,3 +18,32 @@ if File.exists?("content/#{resource}.md")
 else
     error ctx, "Page not found", HTTP::Status.new(404)
 end
+
+# List of files
+# -----------------------------------
+d = Dir.new("content")
+files = d.each_child
+render ctx, "src/templates/home.ecr", "The Crystal World"
+
+
+# POST params
+# -----------------------------------
+if context.request.body
+    params = HTTP::Params.parse(context.request.body)
+    context.response.print "Hello #{params["user"]? || "Anonymous"}!"
+end
+
+
+
+# DB create
+# -----------------------------------
+DataLib.create_article(
+    slug: "there-are-ghosts-in-this-room",
+    title: fm["title"],
+    tags: fm["tags"],
+    date: "2015-04-25 00:00:00.000",
+    image: false,
+    imageClass: fm["imageclass"],
+    draft: true,
+    content: md
+)

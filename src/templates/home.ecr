@@ -1,4 +1,4 @@
-<h1>This is the Home Page</h1>
+<h1>Articles</h1>
 
 <ul class="article-list">
     <%- articles.each do |a| -%>
@@ -11,5 +11,18 @@
 ul.article-list {
     list-style-type: none;
     padding-left: 0;
+}
+ul.article-list li {
+    margin-bottom: 0.7rem;
+}
+@media (min-width: 600px) {
+    ul.article-list li {
+        margin-bottom: 0.3rem;
+    }
+}
+ul.article-list a {
+    font-weight: 900;
+    font-size: 1.1rem;
+    line-height: 0.1rem;
 }
 </style>
