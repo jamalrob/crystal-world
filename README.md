@@ -1,1 +1,1 @@
-A website written in Crystal without a framework. Basic server-side rendering of Markdown held in a SQLite database.
+A blog application written in Crystal, without a framework, in line with the [Frameworkless movement](https://www.frameworklessmovement.org/). Main objectives are testing different patterns and architectures, and re-estrablishing my solid grounding in the basics of web development, programming, etc.
