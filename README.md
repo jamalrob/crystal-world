@@ -1,1 +1,8 @@
-A blog application written in Crystal, without a framework, in line with the [Frameworkless movement](https://www.frameworklessmovement.org/). Main objectives are testing different patterns and architectures, and learning a new programming language that's as nice to read as Python or Ruby, but fast.
+# The Crystal World
+
+A blog application written in Crystal without a framework, inspired by the [Frameworkless Manifesto](https://github.com/frameworkless-movement/manifesto). The main objectives here are testing different patterns and architectures, and learning a new programming language that's as nice to read as Python or Ruby, but _fast_.
+
+### Coming soon
+
+- HTMX active search
+- CRUD for articles using HTMX and API endpoints in Crystal
