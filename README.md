@@ -5,4 +5,4 @@ A blog application written in Crystal without a framework, inspired by the [Fram
 ### Coming soon
 
 - HTMX active search
-- CRUD for articles using HTMX and API endpoints in Crystal
+- CRUD for articles using HTMX <=> API endpoints in Crystal
