@@ -31,9 +31,7 @@ a:hover {
 main {
     width: 95%;
     margin: auto;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    display: block;
 }
 h1 {
     font-size: 1.6rem;

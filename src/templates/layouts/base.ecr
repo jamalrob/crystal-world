@@ -9,10 +9,11 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
 </head>
 <body>
-    <header>
-        <%= header %>
-    </header>
+    <%= header %>
     <main>
+        <%- if error_msg -%>
+            <h1><%= error_msg %></h1>
+        <%- end -%>
         <%= content %>
     </main>
 </body>

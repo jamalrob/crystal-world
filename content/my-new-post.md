@@ -1,5 +1,4 @@
 ---
-title: 'TESTING A DRAFT AGAIN'
 date: '2010-07-05'
 tags:
 image: true

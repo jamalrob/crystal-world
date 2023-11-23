@@ -3,6 +3,8 @@ require "ecr"
 require "markd"
 require "front_matter"
 require "poncho"
+require "sqlite3"
+require "./datalib.cr"
 
 poncho = Poncho.from_file ".env"
 imgbucket = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-80/"
@@ -12,6 +14,9 @@ module CrystalWorld
 
     def self.get_value(fm, name)
         find = "#{name}:"
+        if !fm.index(find)
+            return nil
+        end
         value_start = fm.index(find).as(Int32) + find.size
         value_end = fm.index("\n", offset: value_start)
         if !value_end.nil?
@@ -47,13 +52,25 @@ module CrystalWorld
         ctx.response.print populated_layout
     end
 
-    macro render_article(ctx, page_template, title, html)
+    macro render_article(ctx, slug, title, html)
         article = {{html}}
         title = {{title}}
+        slug = {{slug}}
         header = ECR.render "src/templates/components/header.ecr"
         content = ECR.render "src/templates/components/article.ecr"
         populated_layout = ECR.render "src/templates/layouts/base.ecr"
         ctx.response.content_type = "text/html; charset=UTF-8"
+        ctx.response.print populated_layout
+    end
+
+    macro error(ctx, msg, status)
+        title = {{msg}}
+        error_msg = {{msg}}
+        content = "Sorry about that."
+        header = ECR.render "src/templates/components/header.ecr"
+        populated_layout = ECR.render "src/templates/layouts/base.ecr"
+        ctx.response.content_type = "text/html; charset=UTF-8"
+        ctx.response.status = {{status}}
         ctx.response.print populated_layout
     end
 
@@ -62,7 +79,31 @@ module CrystalWorld
         HTTP::StaticFileHandler.new(public_dir = "./public", fallthrough = true, directory_listing = false),
         HTTP::CompressHandler.new,
     ]) do |ctx|
+
+        error_msg = nil
         case ctx.request.path
+        when "/createarticle"
+
+            # TESTING DB CREATE ARTICLE
+            # ONLY GETS THE DATA FROM A FILE FOR TESTING PURPOSES
+            FrontMatter.open("content/nova-by-samuel-r-delany-1968.md", skip_newlines: false) { |front_matter, content_io|
+                fm = parse_frontmatter(front_matter)
+                md = content_io.gets_to_end.as(String)
+                #options = Markd::Options.new(smart: true, safe: true)
+                #html = Markd.to_html(md, options).gsub("/bucket/", imgbucket)
+                #render_article ctx, "src/templates/home.ecr", resource, fm["title"], html
+
+                DataLib.create_article(
+                    slug: "nova-by-samuel-r-delany-1968",
+                    title: fm["title"],
+                    tags: fm["tags"],
+                    date: "2023-11-23 00:00:00.000",
+                    image: true,
+                    imageClass: "mainImageSmaller",
+                    draft: true,
+                    content: md
+                )
+            }
         when "/"
             d = Dir.new("content")
             files = d.each_child
@@ -74,14 +115,26 @@ module CrystalWorld
         when .match(/[a-zA-Z]/)
             urlbits = ctx.request.path.split('/', limit: 2, remove_empty: true)
             resource    = urlbits[0]?
-            FrontMatter.open("content/#{resource}.md", skip_newlines: false) { |front_matter, content_io|
-                fm = parse_frontmatter(front_matter)
-                md = content_io.gets_to_end.as(String)
-                options = Markd::Options.new(smart: true, safe: true)
-                html = Markd.to_html(md, options).gsub("/bucket/", imgbucket)
-                render_article ctx, "src/templates/home.ecr", fm["title"], html
-            }
 
+            # USING MARKDOWN FILES:
+            #if File.exists?("content/#{resource}.md")
+            #    FrontMatter.open("content/#{resource}.md", skip_newlines: false) { |front_matter, content_io|
+            #        fm = parse_frontmatter(front_matter)
+            #        md = content_io.gets_to_end.as(String)
+            #        options = Markd::Options.new(smart: true, safe: true)
+            #        html = Markd.to_html(md, options).gsub("/bucket/", imgbucket)
+            #        render_article ctx, resource, fm["title"], html
+            #    }
+            #else
+            #    error ctx, "Page not found", HTTP::Status.new(404)
+            #end
+
+            # USING DB:
+            article = DataLib.get_article(resource)
+            options = Markd::Options.new(smart: true, safe: true)
+            #md = article["md"]
+            #html = Markd.to_html(md, options).gsub("/bucket/", imgbucket)
+            #render_article ctx: ctx, slug: resource, title: article["title"], html: html
         end
     end
 

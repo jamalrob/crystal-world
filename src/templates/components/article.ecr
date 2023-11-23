@@ -1,5 +1,6 @@
 <h1><%= title %></h1>
 <article>
+    <img src="https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-80/<%= slug %>.jpg" alt="Image representing <%= title %>">
     <%= article %>
 </article>
 
@@ -9,18 +10,20 @@ blockquote {
     border-radius: 5px;
     padding: 5px 25px;
     margin-left: 0;
+    margin-right: 3px;
 }
 article img {
-    max-width: 90vw;
+    max-width: 95vw;
+    display: block;
 }
 @media (min-width: 600px) {
     article img {
-        max-width: 70vw;
+        max-width: 75vw;
     }
 }
-@media (min-width: 1100px) {
+@media (min-width: 960px) {
     article img {
-        max-width: 55vw;
+        max-width: 60vw;
     }
 }
 </style>
