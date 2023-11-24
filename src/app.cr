@@ -9,16 +9,22 @@ require "./front_matter_parser.cr"
 require "crinja"
 
 
-poncho = Poncho.from_file ".env"
-imgbucket = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-70/"
-
-
 module CrystalWorld
+    extend self
+
+    poncho = Poncho.from_file ".env"
+    imgbucket = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-70/"
+
+    # Get a fresh string to append to static
+    # file URLs on at least every compile
+    cachebust = Time.monotonic.to_s().split(".")[-1]
 
     server = HTTP::Server.new([
         HTTP::StaticFileHandler.new(public_dir = "./public", fallthrough = true, directory_listing = false),
         HTTP::CompressHandler.new,
     ]) do |context|
+
+        is_running_local = poncho["ENV"] == "local" || false
 
         # ROUTES
 
@@ -28,11 +34,16 @@ module CrystalWorld
             #
         when "/"
             articles = DataLib.get_articles
-            data = {
-                "articles" => articles,
-                "title" => "My Crystal World",
-            }
-            self.render_and_out(context: context, data: data, template: "home.html")
+            self.render_and_out(
+                context: context,
+                data: {
+                    "articles" => articles,
+                    "title" => "My Crystal World",
+                    "cachebust" => cachebust
+                },
+                template: "home.html",
+                local: is_running_local
+            )
 
         when "/tags"
             tags = DataLib.get_tags
@@ -41,15 +52,22 @@ module CrystalWorld
                 data: {
                     "tags" => tags,
                     "title" => "Tags",
+                    "cachebust" => cachebust
                 },
-                template: "tags.html")
+                template: "tags.html",
+                local: is_running_local
+            )
 
         when "/about"
             tags = DataLib.get_tags
             self.render_and_out(
                 context: context,
-                data: { "title" => "About me" },
-                template: "about.html"
+                data: {
+                    "title" => "About me",
+                    "cachebust" => cachebust
+                },
+                template: "about.html",
+                local: is_running_local
             )
 
         when .match(/[a-zA-Z]/)
@@ -65,26 +83,38 @@ module CrystalWorld
                     data: {
                         "article" => article,
                         "title" => article["title"],
+                        "cachebust" => cachebust
                     },
-                    template: "article.html"
+                    template: "article.html",
+                    local: is_running_local
                 )
             else
                 context.response.status = HTTP::Status.new(404)
                 self.render_and_out(
                     context: context,
-                    data: {"error_msg" => "Page not found"},
-                    template: "errors/404.html"
+                    data: {
+                        "error_msg" => "Page not found",
+                        "cachebust" => cachebust
+                    },
+                    template: "errors/404.html",
+                    local: is_running_local
                 )
             end
         end
     end
 
-    def self.render_and_out(context, data, template)
+    def render_and_out(context, data, template, local=false)
         tengine = Crinja.new
         tengine.loader = Crinja::Loader::FileSystemLoader.new("src/templates/")
         template = tengine.get_template(template)
         template.render(data)
-        data.put("cachebust", Time.monotonic.to_s().split(".")[-1]) {"ok"}
+
+        if local
+            # In development, get a fresh string to append
+            # to static file URLs on every request
+            data.put("cachebust", Time.monotonic.to_s().split(".")[-1]) {"update"}
+        end
+
         context.response.content_type = "text/html; charset=UTF-8"
         context.response.print template.render(data)
     end
