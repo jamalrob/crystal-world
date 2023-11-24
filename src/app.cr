@@ -12,7 +12,6 @@ module CrystalWorld
     extend self
 
     IMGBUCKET = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-70/"
-
     PONCHO = Poncho.from_file ".env"
     LOCAL = PONCHO["ENV"] == "local" || false
     CACHEBUST = Time.monotonic.to_s().split(".")[-1]
@@ -52,6 +51,19 @@ module CrystalWorld
                 template: "tags.html"
             )
 
+        when .index("/tag/")
+            urlbits = context.request.path.split('/', limit: 3, remove_empty: true)
+            tag = urlbits[1]?
+            articles = DataLib.get_articles_for_tag(tag)
+            self.render_and_out(
+                context: context,
+                data: {
+                    "articles" => articles,
+                    "tag" => tag,
+                    "title" => "Articles tagged with " + tag.to_s
+                },
+                template: "tag.html"
+            )
         when "/about"
             tags = DataLib.get_tags
             self.render_and_out(

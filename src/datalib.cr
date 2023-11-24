@@ -23,6 +23,31 @@ module CrystalWorld
             all_tags
         end
 
+        def get_articles_for_tag(tag)
+            DB.open "sqlite3://./crystalworld.db" do |db|
+                articles = [] of Hash(String, String)
+                begin
+                    results =   db.query_all "SELECT slug, title, date, tags FROM articles WHERE tags LIKE '%' || ? || '%' ORDER BY date DESC",
+                                tag,
+                                as: {String, String, String, String}
+                rescue DB::NoResultsError
+                    puts "No articles found"
+                    return [] of String
+                end
+
+                results.each do |result|
+                    this_row = {
+                        "slug" => result[0],
+                        "title" => result[1],
+                        "date" => result[2],
+                        "tags" => result[3],
+                    }
+                    articles.<<(this_row)
+                end
+                return articles
+            end
+        end
+
         def get_articles
             DB.open "sqlite3://./crystalworld.db" do |db|
                 articles = [] of Hash(String, String)

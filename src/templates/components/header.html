@@ -1,47 +1,6 @@
 <header>
-    <a href="/" class="logo" title="Home"></a>
+    <a href="/" class="logo" title="Home" hx-boost="true"></a>
     <a href="/">Home</a>
     <a href="/tags">Tags</a>
     <a href="/about">About</a>
 </header>
-
-<style>
-header {
-    font-size: 0.8rem;
-    padding: 6px 15px;
-    display: flex;
-    justify-content: right;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    background: #0a4775;
-
-    /* Glassmorphism */
-    background: rgba(255, 255, 255, 0);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.06);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    border-bottom: 1px solid rgba(84, 143, 211, 0.3);
-}
-header .logo {
-    height: 25px;
-    width: 25px;
-    background-color: #ffedcb; /* #f9f871 */
-    border-radius: 50%;
-    display: inline-block;
-    margin-top: 1px;
-    position: absolute;
-    left: 10px;
-    margin-left: 0;
-
-}
-
-header a {
-    margin-left: 1.1rem;
-}
-header a.sitename {
-    position: absolute;
-    left: 10px;
-    margin-left: 0;
-}
-</style>

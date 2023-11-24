@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 {% block content %}
-<h1>Articles</h1>
+<h1>Articles tagged with “{{ tag }}”</h1>
 
 <ul class="article-list" hx-boost="true">
     {% for a in articles %}
