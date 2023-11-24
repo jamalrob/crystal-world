@@ -8,25 +8,23 @@ require "./datalib.cr"
 require "./front_matter_parser.cr"
 require "crinja"
 
-
 module CrystalWorld
     extend self
 
-    poncho = Poncho.from_file ".env"
-    imgbucket = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-70/"
+    IMGBUCKET = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-70/"
 
-    # Get a fresh string to append to static
-    # file URLs on at least every compile
-    cachebust = Time.monotonic.to_s().split(".")[-1]
+    PONCHO = Poncho.from_file ".env"
+    LOCAL = PONCHO["ENV"] == "local" || false
+    CACHEBUST = Time.monotonic.to_s().split(".")[-1]
 
     server = HTTP::Server.new([
         HTTP::StaticFileHandler.new(public_dir = "./public", fallthrough = true, directory_listing = false),
         HTTP::CompressHandler.new,
     ]) do |context|
 
-        is_running_local = poncho["ENV"] == "local" || false
-
+        # -------------------------------------------
         # ROUTES
+        # -------------------------------------------
 
         case context.request.path
 
@@ -38,11 +36,9 @@ module CrystalWorld
                 context: context,
                 data: {
                     "articles" => articles,
-                    "title" => "My Crystal World",
-                    "cachebust" => cachebust
+                    "title" => "My Crystal World"
                 },
-                template: "home.html",
-                local: is_running_local
+                template: "home.html"
             )
 
         when "/tags"
@@ -51,11 +47,9 @@ module CrystalWorld
                 context: context,
                 data: {
                     "tags" => tags,
-                    "title" => "Tags",
-                    "cachebust" => cachebust
+                    "title" => "Tags"
                 },
-                template: "tags.html",
-                local: is_running_local
+                template: "tags.html"
             )
 
         when "/about"
@@ -63,11 +57,9 @@ module CrystalWorld
             self.render_and_out(
                 context: context,
                 data: {
-                    "title" => "About me",
-                    "cachebust" => cachebust
+                    "title" => "About me"
                 },
-                template: "about.html",
-                local: is_running_local
+                template: "about.html"
             )
 
         when .match(/[a-zA-Z]/)
@@ -77,16 +69,14 @@ module CrystalWorld
             if article
                 options = Markd::Options.new(smart: true, safe: true)
                 html = Markd.to_html(article["md"].as(String), options)
-                article["html"] = html.gsub("/bucket/", imgbucket)
+                article["html"] = html.gsub("/bucket/", IMGBUCKET)
                 self.render_and_out(
                     context: context,
                     data: {
                         "article" => article,
                         "title" => article["title"],
-                        "cachebust" => cachebust
                     },
                     template: "article.html",
-                    local: is_running_local
                 )
             else
                 context.response.status = HTTP::Status.new(404)
@@ -94,32 +84,32 @@ module CrystalWorld
                     context: context,
                     data: {
                         "error_msg" => "Page not found",
-                        "cachebust" => cachebust
                     },
                     template: "errors/404.html",
-                    local: is_running_local
                 )
             end
         end
     end
 
-    def render_and_out(context, data, template, local=false)
+    def render_and_out(context, data, template)
+        # Used by every web route
         tengine = Crinja.new
         tengine.loader = Crinja::Loader::FileSystemLoader.new("src/templates/")
         template = tengine.get_template(template)
         template.render(data)
-
-        if local
+        if LOCAL
             # In development, get a fresh string to append
             # to static file URLs on every request
             data.put("cachebust", Time.monotonic.to_s().split(".")[-1]) {"update"}
+        else
+            # Or, for production, use the value generated
+            # at compile time
+            data.put("cachebust", CACHEBUST) {"update"}
         end
-
         context.response.content_type = "text/html; charset=UTF-8"
         context.response.print template.render(data)
     end
 
-    # RUN SERVER
     address = server.bind_tcp 8080
     puts "Listening on http://#{address}"
     server.listen
