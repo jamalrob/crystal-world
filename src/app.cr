@@ -6,9 +6,12 @@ require "poncho"
 require "sqlite3"
 require "./datalib.cr"
 require "./front_matter_parser.cr"
+require "crinja"
+
 
 poncho = Poncho.from_file ".env"
 imgbucket = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-70/"
+
 
 module CrystalWorld
 
@@ -20,19 +23,35 @@ module CrystalWorld
         # ROUTES
 
         case context.request.path
+
         when "/createarticle"
             #
         when "/"
             articles = DataLib.get_articles
-            content = ECR.render("src/templates/home.ecr")
-            self.render_and_out(context, "The Crystal World", content)
+            data = {
+                "articles" => articles,
+                "title" => "My Crystal World",
+            }
+            self.render_and_out(context: context, data: data, template: "home.html")
+
         when "/tags"
             tags = DataLib.get_tags
-            content = ECR.render("src/templates/tags.ecr")
-            self.render_and_out(context, "Tags", content)
+            self.render_and_out(
+                context: context,
+                data: {
+                    "tags" => tags,
+                    "title" => "Tags",
+                },
+                template: "tags.html")
+
         when "/about"
-            content = ECR.render("src/templates/about.ecr")
-            self.render_and_out(context, "About me", content)
+            tags = DataLib.get_tags
+            self.render_and_out(
+                context: context,
+                data: { "title" => "About me" },
+                template: "about.html"
+            )
+
         when .match(/[a-zA-Z]/)
             urlbits = context.request.path.split('/', limit: 2, remove_empty: true)
             resource = urlbits[0]?
@@ -41,26 +60,33 @@ module CrystalWorld
                 options = Markd::Options.new(smart: true, safe: true)
                 html = Markd.to_html(article["md"].as(String), options)
                 article["html"] = html.gsub("/bucket/", imgbucket)
-                content = ECR.render "src/templates/components/article.ecr"
-                self.render_and_out(context, article["title"], content)
-            else
-                context.response.status = HTTP::Status.new(404)
-                content = "Sorry about that."
                 self.render_and_out(
                     context: context,
-                    title: "Page not found",
-                    content: content,
-                    error_msg: "Page not found"
+                    data: {
+                        "article" => article,
+                        "title" => article["title"],
+                    },
+                    template: "article.html"
+                )
+            else
+                context.response.status = HTTP::Status.new(404)
+                self.render_and_out(
+                    context: context,
+                    data: {"error_msg" => "Page not found"},
+                    template: "errors/404.html"
                 )
             end
         end
     end
 
-    def self.render_and_out(context, title, content, error_msg=nil)
-        header = ECR.render "src/templates/components/header.ecr"
-        populated_layout = ECR.render "src/templates/layouts/base.ecr"
+    def self.render_and_out(context, data, template)
+        tengine = Crinja.new
+        tengine.loader = Crinja::Loader::FileSystemLoader.new("src/templates/")
+        template = tengine.get_template(template)
+        template.render(data)
+        data.put("cachebust", Time.monotonic.to_s().split(".")[-1]) {"ok"}
         context.response.content_type = "text/html; charset=UTF-8"
-        context.response.print populated_layout
+        context.response.print template.render(data)
     end
 
     # RUN SERVER

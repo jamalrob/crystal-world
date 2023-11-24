@@ -1,0 +1,22 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+<h1>Tags</h1>
+
+<ul class="tag-list">
+    {% for t in tags %}
+    <li>
+        <a href='/tag/{{ t }}'>{{ t }}</a>
+    </li>
+    {% endfor %}
+</ul>
+
+<style>
+ul.tag-list {
+    list-style-type: none;
+    padding-left: 0;
+}
+ul.tag-list li {
+    display: inline-block;
+}
+</style>
+{% endblock %}

@@ -10,3 +10,5 @@ dependencies:
         github: chris-huxtable/front_matter.cr
     sqlite3:
         github: crystal-lang/crystal-sqlite3
+    crinja:
+        github: straight-shoota/crinja

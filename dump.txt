@@ -47,3 +47,19 @@ DataLib.create_article(
     draft: true,
     content: md
 )
+
+# Crinja
+            template = tengine.get_template("base.html")
+            puts template.render({
+                "foo" => "jo"
+            })
+
+
+# OLD ECR RENDERING
+def self.render_and_out(context, title, content, error_msg=nil)
+    cachebust = Time.monotonic.to_s().split(".")[-1]
+    header = ECR.render "src/templates/components/header.ecr"
+    populated_layout = ECR.render "src/templates/layouts/base.ecr"
+    context.response.content_type = "text/html; charset=UTF-8"
+    context.response.print populated_layout
+end

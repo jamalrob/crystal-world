@@ -1,0 +1,9 @@
+<h1>Crinja Examples Server</h1>
+
+<a href="/play">Crinja Playground</a>
+
+<ul>
+{% for name in crinja.server.templates %}
+  <li><a href="{{ name }}">{{ name }}</a></li>
+{% endfor %}
+</ul>

@@ -1,0 +1,48 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+<h1>{{ article.title }}</h1>
+<article>
+    {% if article.image == 1 %}
+    <img
+        src='https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-80/{{ article.slug }}.jpg'
+        alt='Image representing {{ article.title }}'
+        class='{{ article.imageclass }}'
+    >
+    {% endif %}
+    {{ article.html|safe }}
+</article>
+
+<style>
+blockquote {
+    background: #1f232b;
+    border-radius: 5px;
+    padding: 5px 25px;
+    margin-left: 0;
+    margin-right: 3px;
+}
+article {
+    margin-bottom: 200px;
+}
+article img {
+    max-width: 95vw;
+    display: block;
+}
+.mainImageSmallest {
+    width: 95vw;
+    max-width: 240px;
+}
+@media (min-width: 600px) {
+    article img {
+        max-width: 75vw;
+    }
+}
+@media (min-width: 960px) {
+    article img {
+        max-width: 700px;
+    }
+    .mainImageSmaller {
+        max-width: 640px;
+    }
+}
+</style>
+{% endblock %}
