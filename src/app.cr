@@ -55,17 +55,27 @@ module CrystalWorld
             urlbits = context.request.path.split('/', limit: 3, remove_empty: true)
             tag = urlbits[1]?
             articles = DataLib.get_articles_for_tag(tag)
-            self.render_and_out(
-                context: context,
-                data: {
-                    "articles" => articles,
-                    "tag" => tag,
-                    "title" => "Articles tagged with " + tag.to_s
-                },
-                template: "tag.html"
-            )
+            if !articles.empty?
+                self.render_and_out(
+                    context: context,
+                    data: {
+                        "articles" => articles,
+                        "tag" => tag,
+                        "title" => "Articles tagged with " + tag.to_s
+                    },
+                    template: "tag.html"
+                )
+            else
+                context.response.status = HTTP::Status.new(404)
+                self.render_and_out(
+                    context: context,
+                    data: {
+                        "error_msg" => "Nothing found for that tag",
+                    },
+                    template: "errors/404.html",
+                )
+            end
         when "/about"
-            tags = DataLib.get_tags
             self.render_and_out(
                 context: context,
                 data: {
