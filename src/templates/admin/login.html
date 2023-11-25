@@ -1,0 +1,16 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+<h1>Sign in to admin</h1>
+<form class="login">
+    <label>Username</label>
+    <input type="text">
+    <label>Password</label>
+    <input type="password">
+    <div class="button-row">
+        <button _=" on click fetch /admin/login as json
+                    if result.status is 'ok'
+                        go to url '/about'
+                    ">Sign in</button>
+    </div>
+</form>
+{% endblock %}

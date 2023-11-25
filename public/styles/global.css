@@ -77,10 +77,14 @@ h3 {
     padding: 20px 20px;
     width: 50%;
 }
-
-
+.button-row {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: right;
+}
 button {
-    background-color:#1d638f;
+    /*background-color:#1d638f;*/
+    background-color: #2f837d;
     color: #fff;
     border: none;
     border-radius: 3px;
@@ -93,7 +97,7 @@ button {
 
 button:hover {
     cursor: pointer;
-    background-color:#188cd4;
+    background-color: #24b3a9;
 }
 
 button.delete {
@@ -135,7 +139,7 @@ input[type="checkbox"] {
     margin-top: 15px;
 }
 
-input[type='text'], input[type='date'] {
+input[type='text'], input[type='date'], input[type='password'] {
     display: block;
     padding: 10px;
     width: 100%;
@@ -144,10 +148,11 @@ input[type='text'], input[type='date'] {
 
 input, textarea, #editBox {
     border-radius: 5px;
-    border: 1px solid #eee;
+    /*border: 1px solid #eee;*/
     font-size: 18px;
-    box-shadow: inset 1px 1px 2px #a9a296;
-    background: white;
+    box-shadow: inset 1px 1px 0 #a9a296;
+    box-shadow: inset 2px 2px 6px rgba(0, 0, 0, 0.297);
+    background: rgb(232, 229, 229);
 }
 
 
@@ -171,14 +176,13 @@ header {
 header .logo {
     height: 25px;
     width: 25px;
-    background-color: #dcf2ff;
+    background-color: #ffff97; /*#dcf2ff;*/
     border-radius: 50%;
     display: inline-block;
-    margin-top: 1px;
+    margin-top: 2px;
     position: absolute;
     left: 10px;
     margin-left: 0;
-
 }
 header a {
     margin-left: 1.1rem;
@@ -250,4 +254,14 @@ ul.tag-list {
 }
 ul.tag-list li {
     display: inline-block;
+}
+
+/* admin */
+form.login {
+    width: 100%;
+}
+@media (min-width: 800px) {
+    form.login {
+        width: 60%;
+    }
 }

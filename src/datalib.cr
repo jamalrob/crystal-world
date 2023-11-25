@@ -2,8 +2,10 @@ module CrystalWorld
     module DataLib
         extend self
 
+        # NOTE: Without an ORM, there is no column name -> column index mapping,
+        # so it has to be done manually
+
         def create_article(slug, title, tags, date, image, imageClass, draft, content)
-            # insert into articles (slug, title, tags, date, image, imageClass, draft, content
             DB.open "sqlite3://./crystalworld.db" do |db|
                 db.exec "INSERT INTO articles " \
                         "(slug, title, tags, date, image, imageClass, draft, content) VALUES " \
