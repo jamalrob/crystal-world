@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,94 +9,12 @@
     <link rel="icon" href="favicon.ico?v={{ cachebust }}" type="image/x-icon" />
     <script src="/scripts/htmx.min.js" defer></script>
     <script src="/scripts/_hyperscript.min.js" defer></script>
-    <style>
-        header {
-            font-size: 0.8rem;
-            padding: 6px 15px;
-            display: flex;
-            justify-content: right;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            background: #0a4775;
-
-            /* Glassmorphism */
-            background: rgba(255, 255, 255, 0);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.06);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            border-bottom: 1px solid rgba(84, 143, 211, 0.3);
-        }
-        header .logo {
-            height: 25px;
-            width: 25px;
-            background-color: #dcf2ff; /*#ffedcb; #f9f871 */
-            border-radius: 50%;
-            display: inline-block;
-            margin-top: 1px;
-            position: absolute;
-            left: 10px;
-            margin-left: 0;
-
-        }
-
-        header a {
-            margin-left: 1.1rem;
-        }
-        header a.sitename {
-            position: absolute;
-            left: 10px;
-            margin-left: 0;
-        }
-        article blockquote {
-            background: #1f232b;
-            border-radius: 5px;
-            padding: 5px 25px;
-            margin-left: 0;
-            margin-right: 3px;
-        }
-        article {
-            margin-bottom: 200px;
-        }
-        article img {
-            max-width: 95%;
-            display: block;
-        }
-        @media (min-width: 960px) {
-            article img.mainImageSmaller {
-                max-width: 640px;
-            }
-        }
-        article img.mainImageSmallest {
-            width: 95vw;
-            max-width: 240px;
-        }
-        ul.article-list {
-            list-style-type: none;
-            padding-left: 0;
-        }
-        ul.article-list li {
-            margin-bottom: 0.7rem;
-        }
-        @media (min-width: 600px) {
-            ul.article-list li {
-                margin-bottom: 0.3rem;
-            }
-        }
-        ul.article-list a {
-            font-weight: 900;
-            font-size: 1.1rem;
-            line-height: 0.1rem;
-        }
-    </style>
-    {% block localstyle %}
-    {% endblock %}
 </head>
 <body>
     {% include "components/header.html" %}
     <main>
         {% if error_message %}
-            <h1>{{ error_msg }}</h1>
+        <h1>{{ error_msg }}</h1>
         {% endif %}
         {% block content %}{% endblock %}
     </main>

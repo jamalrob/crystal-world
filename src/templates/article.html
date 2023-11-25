@@ -1,7 +1,7 @@
 {% extends "layouts/base.html" %}
 {% block content %}
 <h1>{{ article.title }}</h1>
-<article class="article">
+<article class="blog-article">
     {% if article.image == 1 %}
     <img
         src='https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-80/{{ article.slug }}.jpg'

@@ -75,6 +75,7 @@ module CrystalWorld
                     template: "errors/404.html",
                 )
             end
+            
         when "/about"
             self.render_and_out(
                 context: context,
