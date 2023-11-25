@@ -9,6 +9,9 @@
     <link rel="icon" href="favicon.ico?v={{ cachebust }}" type="image/x-icon" />
     <script src="/scripts/htmx.min.js" defer></script>
     <script src="/scripts/_hyperscript.min.js" defer></script>
+    <meta name="htmx-config" content='{
+        "selfRequestsOnly": true
+    }'>
 </head>
 <body>
     {% include "components/header.html" %}
