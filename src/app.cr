@@ -75,7 +75,7 @@ module CrystalWorld
                     template: "errors/404.html",
                 )
             end
-            
+
         when "/about"
             self.render_and_out(
                 context: context,
@@ -115,11 +115,6 @@ module CrystalWorld
     end
 
     def render_and_out(context, data, template)
-        # Used by every web route
-        tengine = Crinja.new
-        tengine.loader = Crinja::Loader::FileSystemLoader.new("src/templates/")
-        template = tengine.get_template(template)
-        template.render(data)
         if LOCAL
             # In development, get a fresh string to append
             # to static file URLs on every request
@@ -129,8 +124,12 @@ module CrystalWorld
             # at compile time
             data.put("cachebust", CACHEBUST) {"update"}
         end
+        tengine = Crinja.new
+        tengine.loader = Crinja::Loader::FileSystemLoader.new("src/templates/")
+        template = tengine.get_template(template)
+        final_html = template.render(data)
         context.response.content_type = "text/html; charset=UTF-8"
-        context.response.print template.render(data)
+        context.response.print final_html
     end
 
     address = server.bind_tcp 8080
