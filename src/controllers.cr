@@ -56,16 +56,16 @@ module CrystalWorld
           },
           template: "article.html",
         )
-      else
-        ctx.response.status = HTTP::Status.new(404)
-        self.render_and_out(
-          ctx: ctx,
-          data: {
-            "error_msg" => "Page not found",
-          },
-          template: "errors/404.html",
-        )
+        return
       end
+      ctx.response.status = HTTP::Status.new(404)
+      self.render_and_out(
+        ctx: ctx,
+        data: {
+          "error_msg" => "Page not found",
+        },
+        template: "errors/404.html",
+      )
     end
 
     def tags_page(ctx)
@@ -90,20 +90,20 @@ module CrystalWorld
           data: {
             "articles" => articles,
             "tag"      => tag,
-            "title"    => "Articles tagged with " + tag.to_s,
+            "title"    => "Articles tagged with #{tag.to_s}",
           },
           template: "tag.html"
         )
-      else
-        ctx.response.status = HTTP::Status.new(404)
-        self.render_and_out(
-          ctx: ctx,
-          data: {
-            "error_msg" => "Nothing found for that tag",
-          },
-          template: "errors/404.html",
-        )
+        return
       end
+      ctx.response.status = HTTP::Status.new(404)
+      self.render_and_out(
+        ctx: ctx,
+        data: {
+          "error_msg" => "Nothing found for that tag",
+        },
+        template: "errors/404.html",
+      )
     end
 
     def admin_dashboard(ctx)
@@ -144,19 +144,19 @@ module CrystalWorld
               new_csrf_token: csrftoken,
             )
             ctx.response.cookies["sessionid"] = HTTP::Cookie.new(
-              "sessionid",
-              sessionid,
-              "/admin",
-              Time.utc + 12.hours,
+              name: "sessionid",
+              value: sessionid,
+              path: "/admin",
+              max_age: Time::Span.new(hours: 12),
               secure: false,
               samesite: HTTP::Cookie::SameSite.new(1),
               http_only: true
             )
             ctx.response.cookies["csrftoken"] = HTTP::Cookie.new(
-              "csrftoken",
-              csrftoken,
-              "/admin",
-              Time.utc + 12.hours,
+              name: "csrftoken",
+              value: csrftoken,
+              path: "/admin",
+              max_age: Time::Span.new(hours: 12),
               secure: false,
               samesite: HTTP::Cookie::SameSite.new(1),
               http_only: true,
