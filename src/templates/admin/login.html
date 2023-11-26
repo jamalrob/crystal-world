@@ -1,14 +1,28 @@
 {% extends "layouts/base.html" %}
 {% block content %}
-<h1>Sign in to admin</h1>
-<form class="login" hx-post="/quicktestapi">
+<h1>{{ title }}</h1>
+<form   class="login"
+        hx-post="/admin/login/auth"
+        hx-on::before-request="hideForm()"
+        hx-on::after-request="showForm()"
+        hx-target=".error" hx-swap="innerHTML"
+>
     <label>Username</label>
     <input type="text" name="username">
     <label>Password</label>
     <input type="password" name="password">
     <div class="button-row">
-        <!--<button _="on click call login()">Sign in</button>-->
         <button>Sign in</button>
     </div>
+    <div class="error"></div>
 </form>
+<script type="text/hyperscript">
+    def hideForm()
+        hide .login with opacity
+    end
+
+    def showForm()
+        transition .login's opacity to 1 over 0.5s
+    end
+</script>
 {% endblock %}

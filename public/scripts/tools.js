@@ -11,16 +11,3 @@ function b64DecodeUnicode(str) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
     }).join(''))
 }
-
-document.body.addEventListener('htmx:configRequest', function(evt) {
-    let target = evt.detail.target
-    let headers = evt.detail.headers
-    let params = evt.detail.parameters
-
-    if(target.tagName === 'FORM' && target.classList.contains("login")) {
-        headers['Authorization'] = "Basic " + b64EncodeUnicode(params.username + ":" + params.password);
-        params.username = '';
-        params.password = '';
-    }
-    //evt.detail.parameters.password = b64EncodeUnicode(evt.detail.parameters.password); // add a new parameter into the mix
-});

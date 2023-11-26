@@ -148,7 +148,7 @@ input[type='text'], input[type='date'], input[type='password'] {
 
 input, textarea, #editBox {
     border-radius: 5px;
-    /*border: 1px solid #eee;*/
+    border: none;
     font-size: 18px;
     box-shadow: inset 1px 1px 0 #a9a296;
     box-shadow: inset 2px 2px 6px rgba(0, 0, 0, 0.297);
@@ -264,4 +264,8 @@ form.login {
     form.login {
         width: 60%;
     }
+}
+form .error {
+    color: rgb(255, 160, 160);
+    margin-top: 20px;
 }

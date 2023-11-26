@@ -31,55 +31,9 @@ module CrystalWorld
         # ---------------------
         # ROUTES
         # ---------------------
+        #p! context.request
+
         case context.request.path
-
-            when "/quicktestapi"
-                username = ""
-                if context.request.body
-                    if hd = context.request.headers["Authorization"]?
-                        credstring = hd.split("Basic ")[1]?
-                        if credstring
-                            creds = Base64.decode_string(credstring).split(":")
-                            puts creds
-                        end
-                    end
-                end
-                context.response.status_code = 200
-                #context.response.headers["HX-Redirect"] = "/about"
-            when "/testapi"
-                if hd = context.request.headers["Authorization"]?
-                    credstring = hd.split("Basic ")[1]?
-                    if credstring
-                        creds = Base64.decode_string(credstring).split(":")
-                        if creds[0] == env["USERNAME"] && creds[1] == env["PASSWORD"]
-                            context.response.status_code = 200
-                            context.response.print "ok"
-                            context.response.headers["HX-Redirect"] = "/about"
-                            context.response.redirect "/admin"
-                            next
-                        end
-                    end
-                end
-                context.response.status_code = 401
-                context.response.headers["WWW-Authenticate"] = "Basic realm=\"Login Required\""
-
-
-                #context.response.content_type = "application/json"
-                #context.response.headers["Access-Control-Request-Headers"] = "Content-Type, application/json"
-                #context.response.headers["Access-Control-Allow-Origin"] = "http://127.0.0.1:8080"
-                #context.response.headers["Access-Control-Allow-Credentials"] = "true"
-                #context.response.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
-                #context.response.headers["Access-Control-Allow-Content-Type"] = "application/json"
-                #context.response.headers["Access-Control-Allow-Headers"] = "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
-
-                #if context.request.method == "POST"# && context.request.headers["HX-Request"]?
-                #    context.response.status_code = 200
-                #    context.response.print json_text = %({"status": "ok"})
-                #end
-
-                #next
-
-
 
             when "/admin/login"
                 # The login page
@@ -92,30 +46,21 @@ module CrystalWorld
                     template: "admin/login.html"
                 )
             when "/admin/login/auth"
-                # The API authentication route
-
-                context.response.content_type                                   = "application/json"
-                context.response.headers["Access-Control-Request-Headers"]      = "Content-Type, application/json"
-                context.response.headers["Access-Control-Allow-Origin"]         = "http://127.0.0.1:8080"
-                context.response.headers["Access-Control-Allow-Credentials"]    = "true"
-                context.response.headers["Access-Control-Allow-Methods"]        = "POST, GET, OPTIONS"
-                context.response.headers["Access-Control-Allow-Content-Type"]   = "application/json"
-                context.response.headers["Access-Control-Allow-Headers"]        = "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
-
-                if hd = context.request.headers["Authorization"]?
-                    credstring = hd.split("Basic ")[1]?
-                    if credstring
-                        creds = Base64.decode_string(credstring).split(":")
-                        if creds[0] == env["USERNAME"] && creds[1] == env["PASSWORD"]
-                            context.response.status_code = 200
-                            context.response.print "ok"
-                            context.response.redirect "/admin"
-                            next
-                        end
+                if context.request.body
+                    params = URI::Params.parse(context.request.body.not_nil!.gets_to_end)
+                    username = params["username"]?
+                    password = params["password"]?
+                    if username == "jamal" && password == "jamaladmin"
+                        context.response.status_code = 200
+                        context.response.headers["HX-Redirect"] = "/about"
+                    else
+                        # Adding an error status to the response here trips up
+                        # the HTMX replacement, so we don't do it
+                        context.response.content_type = "text/html; charset=UTF-8"
+                        context.response.print "Your credentials were not recognized."
                     end
                 end
-                context.response.status_code = 401
-                context.response.headers["WWW-Authenticate"] = "Basic realm=\"Login Required\""
+
             when "/admin"
                 # Admin dashboard
             when "/createarticle"
@@ -250,7 +195,7 @@ module CrystalWorld
         context.response.print final_html
     end
 
-    address = server.bind_tcp 8080
+    address = server.bind_tcp 8123
     puts "Listening on http://#{address}"
     server.listen
 
