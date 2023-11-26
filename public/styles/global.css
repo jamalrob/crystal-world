@@ -173,11 +173,11 @@ header {
     border-bottom: 1px solid rgba(84, 143, 211, 0.3);
 }
 header .logo {
+    display: flex;
     height: 25px;
     width: 25px;
     background-color: #ffff97; /*#dcf2ff;*/
     border-radius: 50%;
-    display: inline-block;
     margin-top: 2px;
     position: absolute;
     left: 10px;
