@@ -55,62 +55,57 @@ module CrystalWorld
                     template: "admin/login.html"
                 )
             when "/admin/login/auth"
-                if ctx.request.body
-                    params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
-                    username = params["username"]?
-                    password = params["password"]?
-                    if username && password
-                        u = DataLib.get_user(username)
-                        if u
-                            begin
-                                p! u["password"]
-                                res = Argon2::Password.verify_password(password, u["password"].to_s)
-                            rescue ex
-                                puts ex
-                                next
-                            end
-
-                            if res == Argon2::Response::ARGON2_OK
-                                puts "OK"
-                            end
-
-                            # Set a new CSRF for this session
-                            sessionid = Random::Secure.hex(16)
-                            csrftoken = Random::Secure.hex(16)
-                            DataLib.update_user_session(
-                                id: u["id"],
-                                sessionid: sessionid,
-                                new_csrf_token: csrftoken,
-                            )
-                            ctx.response.cookies["sessionid"] = HTTP::Cookie.new(
-                                "sessionid",
-                                sessionid,
-                                "/admin",
-                                Time.utc + 12.hours,
-                                secure: false,
-                                samesite: HTTP::Cookie::SameSite.new(1),
-                                http_only: true
-                            )
-                            ctx.response.cookies["csrftoken"] = HTTP::Cookie.new(
-                                "csrftoken",
-                                csrftoken,
-                                "/admin",
-                                Time.utc + 12.hours,
-                                secure: false,
-                                samesite: HTTP::Cookie::SameSite.new(1),
-                                http_only: true,
-                            )
-                            ctx.response.status_code = 200
-                            ctx.response.content_type = "text/html; charset=UTF-8"
-                            ctx.response.headers["HX-Redirect"] = "/admin/dashboard"
-                            #ctx.response.close # ****** WHEN IS THIS NEEDED?? ******
-                        end
-                    else
-                        # Adding an error status to the response here trips up
-                        # the HTMX replacement, so we don't do it
-                        ctx.response.content_type = "text/html; charset=UTF-8"
-                        ctx.response.print "Your credentials were not recognized."
+                params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
+                username = params["username"]?
+                password = params["password"]?
+                #if username && password
+                u = DataLib.get_user(username)
+                if u
+                    begin
+                        p! u["password"]
+                        res = Argon2::Password.verify_password(password, u["password"].to_s)
+                    rescue ex
+                        next
                     end
+
+                    if res == Argon2::Response::ARGON2_OK
+                        puts "OK"
+                        # Set new sessionid and CSRF for this session
+                        sessionid = Random::Secure.hex(16)
+                        csrftoken = Random::Secure.hex(16)
+                        DataLib.update_user_session(
+                            id: u["id"],
+                            sessionid: sessionid,
+                            new_csrf_token: csrftoken,
+                        )
+                        ctx.response.cookies["sessionid"] = HTTP::Cookie.new(
+                            "sessionid",
+                            sessionid,
+                            "/admin",
+                            Time.utc + 12.hours,
+                            secure: false,
+                            samesite: HTTP::Cookie::SameSite.new(1),
+                            http_only: true
+                        )
+                        ctx.response.cookies["csrftoken"] = HTTP::Cookie.new(
+                            "csrftoken",
+                            csrftoken,
+                            "/admin",
+                            Time.utc + 12.hours,
+                            secure: false,
+                            samesite: HTTP::Cookie::SameSite.new(1),
+                            http_only: true,
+                        )
+                        ctx.response.status_code = 200
+                        ctx.response.content_type = "text/html; charset=UTF-8"
+                        ctx.response.headers["HX-Redirect"] = "/admin/dashboard"
+                        #ctx.response.close # ****** WHEN IS THIS NEEDED?? ******
+                    end
+                else
+                    # Adding an error status to the response here trips up
+                    # the HTMX replacement, so we don't do it
+                    ctx.response.content_type = "text/html; charset=UTF-8"
+                    ctx.response.print "Your credentials were not recognized."
                 end
             when "/admin/dashboard"
                 self.render_and_out(
@@ -252,8 +247,6 @@ module CrystalWorld
         ctx.response.print final_html
     end
 
-    #securepwd = Argon2::Password.create("jamalrob")
-    #p! securepwd
     address = server.bind_tcp 8123
     puts "Listening on http://#{address}"
     server.listen
