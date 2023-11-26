@@ -98,3 +98,14 @@ def self.render_and_out(context, title, content, error_msg=nil)
     context.response.content_type = "text/html; charset=UTF-8"
     context.response.print populated_layout
 end
+
+
+# SIGNUP
+
+when "admin/signup"
+    # On successful signup:
+    sessionid = Random::Secure.hex(16)
+    csrf_token = Random::Secure.hex(16)
+    # TO STORE THE PASSWORD:
+    securepwd = Argon2::Password.create("mypwd")
+    # create database user
