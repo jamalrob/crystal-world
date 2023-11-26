@@ -26,6 +26,8 @@ module CrystalWorld
         HTTP::CompressHandler.new,
     ]) do |context|
 
+        puts "REQUEST"
+
         # ---------------------
         # ROUTES
         # ---------------------
@@ -53,7 +55,7 @@ module CrystalWorld
                             context.response.status_code = 200
                             context.response.print "ok"
                             context.response.headers["HX-Redirect"] = "/about"
-                            #context.response.redirect "/admin"
+                            context.response.redirect "/admin"
                             next
                         end
                     end
@@ -81,6 +83,7 @@ module CrystalWorld
 
             when "/admin/login"
                 # The login page
+                puts "admin/login"
                 self.render_and_out(
                     context: context,
                     data: {
@@ -200,7 +203,7 @@ module CrystalWorld
                 )
 
             when .match(/[a-zA-Z]/)
-                puts "2"
+                puts ".match(/[a-zA-Z]/)"
                 urlbits = context.request.path.split('/', limit: 2, remove_empty: true)
                 slug = urlbits[0]?
                 article = DataLib.get_article(slug: slug)
