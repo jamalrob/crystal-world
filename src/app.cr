@@ -44,7 +44,7 @@ module CrystalWorld
                 # create database user
             when "/admin/login"
                 # The login page
-                puts "admin/login"
+                ctx.response.cookies["sessionid"] = "HELLO"
                 self.render_and_out(
                     ctx: ctx,
                     data: {
@@ -57,10 +57,27 @@ module CrystalWorld
                     params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
                     username = params["username"]?
                     password = params["password"]?
-                    if username == env["USERNAME"] && password == env["PASSWORD"]
+                    u = DataLib.get_user(username, password)
+                    if u
+                        # Set a new CSRF for this session
+                        sessionid = Random::Secure.hex(16)
+                        csrftoken = Random::Secure.hex(16)
+                        DataLib.update_user_session(
+                            id: u["id"],
+                            sessionid: sessionid,
+                            new_csrf_token: csrftoken,
+                        )
+                        ctx.response.cookies["sessionid"] = sessionid
+                        ctx.response.cookies["csrftoken"] = csrftoken
+                        ctx.response.cookies["sessionid"].http_only = true
+                        ctx.response.cookies["csrftoken"].http_only = true
+                        #usercookie = HTTP::Cookie.new("usertoken", result["data"]["sessionid"].to_s, "/", Time.utc + 24.hours)
+                        #usercookie.http_only = true
+                        #ctx.response.headers["Set-Cookie"] = usercookie.to_set_cookie_header
                         ctx.response.status_code = 200
-                        ctx.response.headers["HX-Redirect"] = "/about"
-                        # set
+                        ctx.response.content_type = "text/html; charset=UTF-8"
+                        ctx.response.headers["HX-Redirect"] = "/admin/dashboard"
+                        #ctx.response.close # ****** WHEN IS THIS NEEDED?? ******
                     else
                         # Adding an error status to the response here trips up
                         # the HTMX replacement, so we don't do it
@@ -68,9 +85,14 @@ module CrystalWorld
                         ctx.response.print "Your credentials were not recognized."
                     end
                 end
-
-            when "/admin"
-                # Admin dashboard
+            when "/admin/dashboard"
+                self.render_and_out(
+                    ctx: ctx,
+                    data: {
+                        "title" => "Admin dashboard"
+                    },
+                    template: "admin/dashboard.html"
+                )
             when "/createarticle"
                 #headers = HTTP::Headers.new
                 if hd = ctx.request.headers["Authorization"]?

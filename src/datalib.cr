@@ -5,6 +5,38 @@ module CrystalWorld
         # NOTE: Without an ORM, there is no column name -> column index mapping,
         # so it has to be done manually
 
+        def update_user_session(id, sessionid, new_csrf_token)
+            DB.open "sqlite3://./crystalworld.db" do |db|
+                db.exec "UPDATE users " \
+                        "SET csrf_token = ?, sessionid = ? " \
+                        "WHERE id = ?",
+                        new_csrf_token, sessionid, id
+            end
+        end
+
+        def get_user(username, password)
+            DB.open "sqlite3://./crystalworld.db" do |db|
+                puts username, password
+                begin
+                    userid, first_name, last_name, sessionid =
+                        db.query_one "SELECT id, first_name, last_name, sessionid " \
+                        "FROM users WHERE username = ? AND password = ? LIMIT 1",
+                        username, password,
+                        as: {Int32, String?, String?, String?}
+                rescue DB::NoResultsError
+                    puts "No user found"
+                    return nil
+                end
+
+                return {
+                    "id" => userid,
+                    "first_name" => first_name,
+                    "last_name" => last_name,
+                    "sessionid" => sessionid,
+                }
+            end
+        end
+
         def create_article(slug, title, tags, date, image, imageClass, draft, content)
             DB.open "sqlite3://./crystalworld.db" do |db|
                 db.exec "INSERT INTO articles " \
@@ -78,10 +110,10 @@ module CrystalWorld
             DB.open "sqlite3://./crystalworld.db" do |db|
                 begin
                     slug, title, tags, date, image, imageclass, draft, md =
-                                        db.query_one "SELECT slug, title, tags, date, image, imageClass, draft, content " \
-                                        "FROM articles WHERE slug = ? LIMIT 1",
-                                        slug,
-                                        as: {String, String, String, String, Int32, String, Int32, String}
+                        db.query_one "SELECT slug, title, tags, date, image, imageClass, draft, content " \
+                        "FROM articles WHERE slug = ? LIMIT 1",
+                        slug,
+                        as: {String, String, String, String, Int32, String, Int32, String}
                 rescue DB::NoResultsError
                     puts "No article found"
                     return nil
