@@ -150,8 +150,7 @@ input, textarea, #editBox {
     border-radius: 5px;
     border: none;
     font-size: 18px;
-    box-shadow: inset 1px 1px 0 #a9a296;
-    box-shadow: inset 2px 2px 6px rgba(0, 0, 0, 0.297);
+    box-shadow: inset 1px 1px 10px #454d605c;
     background: rgb(232, 229, 229);
 }
 

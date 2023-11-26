@@ -9,6 +9,7 @@ require "./datalib.cr"
 require "./front_matter_parser.cr"
 require "crinja"
 
+
 module CrystalWorld
     extend self
 
@@ -24,40 +25,47 @@ module CrystalWorld
     server = HTTP::Server.new([
         HTTP::StaticFileHandler.new(public_dir = "./public", fallthrough = true, directory_listing = false),
         HTTP::CompressHandler.new,
-    ]) do |context|
+    ]) do |ctx|
 
-        puts "REQUEST"
+        puts "REQUEST at " + Time.local.to_s("%H:%M:%S")
 
         # ---------------------
         # ROUTES
         # ---------------------
-        #p! context.request
+        #p! ctx.request
 
-        case context.request.path
+        case ctx.request.path
 
+            when "admin/signup"
+                # Probably not implementing here
+                # On successful signup:
+                # sessionid = Random::Secure.hex(16)
+                # csrf_token = Random::Secure.hex(16)
+                # create database user
             when "/admin/login"
                 # The login page
                 puts "admin/login"
                 self.render_and_out(
-                    context: context,
+                    ctx: ctx,
                     data: {
                         "title" => "Sign in to admin"
                     },
                     template: "admin/login.html"
                 )
             when "/admin/login/auth"
-                if context.request.body
-                    params = URI::Params.parse(context.request.body.not_nil!.gets_to_end)
+                if ctx.request.body
+                    params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
                     username = params["username"]?
                     password = params["password"]?
-                    if username == "jamal" && password == "jamaladmin"
-                        context.response.status_code = 200
-                        context.response.headers["HX-Redirect"] = "/about"
+                    if username == env["USERNAME"] && password == env["PASSWORD"]
+                        ctx.response.status_code = 200
+                        ctx.response.headers["HX-Redirect"] = "/about"
+                        # set
                     else
                         # Adding an error status to the response here trips up
                         # the HTMX replacement, so we don't do it
-                        context.response.content_type = "text/html; charset=UTF-8"
-                        context.response.print "Your credentials were not recognized."
+                        ctx.response.content_type = "text/html; charset=UTF-8"
+                        ctx.response.print "Your credentials were not recognized."
                     end
                 end
 
@@ -65,14 +73,14 @@ module CrystalWorld
                 # Admin dashboard
             when "/createarticle"
                 #headers = HTTP::Headers.new
-                if hd = context.request.headers["Authorization"]?
+                if hd = ctx.request.headers["Authorization"]?
                     credstring = hd.split("Basic ")[1]?
                     if credstring
                         creds = Base64.decode_string(credstring).split(":")
                         if creds[0] == env["USERNAME"] && creds[1] == env["PASSWORD"]
-                            context.response.status_code = 200
+                            ctx.response.status_code = 200
                             self.render_and_out(
-                                context: context,
+                                ctx: ctx,
                                 data: {
                                     "title" => "About me"
                                 },
@@ -82,10 +90,10 @@ module CrystalWorld
                         end
                     end
                 end
-                context.response.status_code = 401
-                context.response.headers["WWW-Authenticate"] = "Basic realm=\"Login Required\""
+                ctx.response.status_code = 401
+                ctx.response.headers["WWW-Authenticate"] = "Basic realm=\"Login Required\""
                 self.render_and_out(
-                    context: context,
+                    ctx: ctx,
                     data: {
                         "error_msg" => "Login required"
                     },
@@ -94,7 +102,7 @@ module CrystalWorld
             when "/"
                 articles = DataLib.get_articles
                 self.render_and_out(
-                    context: context,
+                    ctx: ctx,
                     data: {
                         "articles" => articles,
                         "title" => "My Crystal World"
@@ -105,7 +113,7 @@ module CrystalWorld
             when "/tags"
                 tags = DataLib.get_tags
                 self.render_and_out(
-                    context: context,
+                    ctx: ctx,
                     data: {
                         "tags" => tags,
                         "title" => "Tags"
@@ -114,12 +122,12 @@ module CrystalWorld
                 )
 
             when .index("/tag/")
-                urlbits = context.request.path.split('/', limit: 3, remove_empty: true)
+                urlbits = ctx.request.path.split('/', limit: 3, remove_empty: true)
                 tag = urlbits[1]?
                 articles = DataLib.get_articles_for_tag(tag)
                 if !articles.empty?
                     self.render_and_out(
-                        context: context,
+                        ctx: ctx,
                         data: {
                             "articles" => articles,
                             "tag" => tag,
@@ -128,9 +136,9 @@ module CrystalWorld
                         template: "tag.html"
                     )
                 else
-                    context.response.status = HTTP::Status.new(404)
+                    ctx.response.status = HTTP::Status.new(404)
                     self.render_and_out(
-                        context: context,
+                        ctx: ctx,
                         data: {
                             "error_msg" => "Nothing found for that tag",
                         },
@@ -140,7 +148,7 @@ module CrystalWorld
 
             when "/about"
                 self.render_and_out(
-                    context: context,
+                    ctx: ctx,
                     data: {
                         "title" => "About me"
                     },
@@ -149,7 +157,7 @@ module CrystalWorld
 
             when .match(/[a-zA-Z]/)
                 puts ".match(/[a-zA-Z]/)"
-                urlbits = context.request.path.split('/', limit: 2, remove_empty: true)
+                urlbits = ctx.request.path.split('/', limit: 2, remove_empty: true)
                 slug = urlbits[0]?
                 article = DataLib.get_article(slug: slug)
                 if article
@@ -157,7 +165,7 @@ module CrystalWorld
                     html = Markd.to_html(article["md"].as(String), options)
                     article["html"] = html.gsub("/bucket/", IMGBUCKET)
                     self.render_and_out(
-                        context: context,
+                        ctx: ctx,
                         data: {
                             "article" => article,
                             "title" => article["title"],
@@ -165,9 +173,9 @@ module CrystalWorld
                         template: "article.html",
                     )
                 else
-                    context.response.status = HTTP::Status.new(404)
+                    ctx.response.status = HTTP::Status.new(404)
                     self.render_and_out(
-                        context: context,
+                        ctx: ctx,
                         data: {
                             "error_msg" => "Page not found",
                         },
@@ -177,7 +185,7 @@ module CrystalWorld
         end # case
     end
 
-    def render_and_out(context, data, template)
+    def render_and_out(ctx, data, template)
         if LOCAL
             # In development, get a fresh string to append
             # to static file URLs on every request
@@ -191,8 +199,8 @@ module CrystalWorld
         tengine.loader = Crinja::Loader::FileSystemLoader.new("src/templates/")
         template = tengine.get_template(template)
         final_html = template.render(data)
-        context.response.content_type = "text/html; charset=UTF-8"
-        context.response.print final_html
+        ctx.response.content_type = "text/html; charset=UTF-8"
+        ctx.response.print final_html
     end
 
     address = server.bind_tcp 8123
