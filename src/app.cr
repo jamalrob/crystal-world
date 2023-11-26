@@ -29,22 +29,55 @@ module CrystalWorld
         # ---------------------
         # ROUTES
         # ---------------------
-
         case context.request.path
 
-            when "/testapi"
-                context.response.content_type                                   = "application/json"
-                context.response.headers["Access-Control-Request-Headers"]      = "Content-Type, application/json"
-                context.response.headers["Access-Control-Allow-Origin"]         = "http://127.0.0.1:8080"
-                context.response.headers["Access-Control-Allow-Credentials"]    = "true"
-                context.response.headers["Access-Control-Allow-Methods"]        = "POST, GET, OPTIONS"
-                context.response.headers["Access-Control-Allow-Content-Type"]   = "application/json"
-                context.response.headers["Access-Control-Allow-Headers"]        = "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
-
-                if context.request.method == "GET"# && context.request.headers["HX-Request"]?
-                    context.response.status_code = 200
-                    context.response.print json_text = %({"status": "ok"})
+            when "/quicktestapi"
+                username = ""
+                if context.request.body
+                    if hd = context.request.headers["Authorization"]?
+                        credstring = hd.split("Basic ")[1]?
+                        if credstring
+                            creds = Base64.decode_string(credstring).split(":")
+                            puts creds
+                        end
+                    end
                 end
+                context.response.status_code = 200
+                #context.response.headers["HX-Redirect"] = "/about"
+            when "/testapi"
+                if hd = context.request.headers["Authorization"]?
+                    credstring = hd.split("Basic ")[1]?
+                    if credstring
+                        creds = Base64.decode_string(credstring).split(":")
+                        if creds[0] == env["USERNAME"] && creds[1] == env["PASSWORD"]
+                            context.response.status_code = 200
+                            context.response.print "ok"
+                            context.response.headers["HX-Redirect"] = "/about"
+                            #context.response.redirect "/admin"
+                            next
+                        end
+                    end
+                end
+                context.response.status_code = 401
+                context.response.headers["WWW-Authenticate"] = "Basic realm=\"Login Required\""
+
+
+                #context.response.content_type = "application/json"
+                #context.response.headers["Access-Control-Request-Headers"] = "Content-Type, application/json"
+                #context.response.headers["Access-Control-Allow-Origin"] = "http://127.0.0.1:8080"
+                #context.response.headers["Access-Control-Allow-Credentials"] = "true"
+                #context.response.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
+                #context.response.headers["Access-Control-Allow-Content-Type"] = "application/json"
+                #context.response.headers["Access-Control-Allow-Headers"] = "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
+
+                #if context.request.method == "POST"# && context.request.headers["HX-Request"]?
+                #    context.response.status_code = 200
+                #    context.response.print json_text = %({"status": "ok"})
+                #end
+
+                #next
+
+
 
             when "/admin/login"
                 # The login page
@@ -167,6 +200,7 @@ module CrystalWorld
                 )
 
             when .match(/[a-zA-Z]/)
+                puts "2"
                 urlbits = context.request.path.split('/', limit: 2, remove_empty: true)
                 slug = urlbits[0]?
                 article = DataLib.get_article(slug: slug)

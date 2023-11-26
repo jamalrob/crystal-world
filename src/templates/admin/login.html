@@ -1,16 +1,14 @@
 {% extends "layouts/base.html" %}
 {% block content %}
 <h1>Sign in to admin</h1>
-<form class="login">
+<form class="login" hx-post="/quicktestapi">
     <label>Username</label>
-    <input type="text">
+    <input type="text" name="username">
     <label>Password</label>
-    <input type="password">
+    <input type="password" name="password">
     <div class="button-row">
-        <button _=" on click fetch /admin/login as json
-                    if result.status is 'ok'
-                        go to url '/about'
-                    ">Sign in</button>
+        <!--<button _="on click call login()">Sign in</button>-->
+        <button>Sign in</button>
     </div>
 </form>
 {% endblock %}
