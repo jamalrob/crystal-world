@@ -19,3 +19,6 @@ shards:
   crinja:
     git: https://github.com/straight-shoota/crinja.git
     version: 0.8.1
+  crystal-argon2:
+    git: https://github.com/sushichain/crystal-argon2.git
+    version: 0.1.3

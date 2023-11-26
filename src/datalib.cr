@@ -6,23 +6,22 @@ module CrystalWorld
         # so it has to be done manually
 
         def update_user_session(id, sessionid, new_csrf_token)
-            DB.open "sqlite3://./crystalworld.db" do |db|
+            DB.open "sqlite3://./crw.db" do |db|
                 db.exec "UPDATE users " \
-                        "SET csrf_token = ?, sessionid = ? " \
+                        "SET csrftoken = ?, sessionid = ? " \
                         "WHERE id = ?",
                         new_csrf_token, sessionid, id
             end
         end
 
-        def get_user(username, password)
-            DB.open "sqlite3://./crystalworld.db" do |db|
-                puts username, password
+        def get_user(username)
+            DB.open "sqlite3://./crw.db" do |db|
                 begin
-                    userid, first_name, last_name, sessionid =
-                        db.query_one "SELECT id, first_name, last_name, sessionid " \
-                        "FROM users WHERE username = ? AND password = ? LIMIT 1",
-                        username, password,
-                        as: {Int32, String?, String?, String?}
+                    userid, password, first_name, last_name, sessionid =
+                        db.query_one "SELECT id, password, first_name, last_name, sessionid " \
+                        "FROM users WHERE username = ? LIMIT 1",
+                        username,
+                        as: {Int32, String, String?, String?, String?}
                 rescue DB::NoResultsError
                     puts "No user found"
                     return nil
@@ -30,6 +29,7 @@ module CrystalWorld
 
                 return {
                     "id" => userid,
+                    "password" => password,
                     "first_name" => first_name,
                     "last_name" => last_name,
                     "sessionid" => sessionid,
@@ -38,7 +38,7 @@ module CrystalWorld
         end
 
         def create_article(slug, title, tags, date, image, imageClass, draft, content)
-            DB.open "sqlite3://./crystalworld.db" do |db|
+            DB.open "sqlite3://./crw.db" do |db|
                 db.exec "INSERT INTO articles " \
                         "(slug, title, tags, date, image, imageClass, draft, content) VALUES " \
                         "(?, ?, ?, ?, ?, ?, ?, ?)",
@@ -48,7 +48,7 @@ module CrystalWorld
 
         def get_tags
             all_tags = [] of String
-            DB.open "sqlite3://./crystalworld.db" do |db|
+            DB.open "sqlite3://./crw.db" do |db|
                 tag_vals = db.query_all "SELECT tags from articles WHERE draft = 0", as: {String}
                 tag_vals.each do |row|
                     all_tags = all_tags | row.gsub(", ", ",").split(",")
@@ -58,7 +58,7 @@ module CrystalWorld
         end
 
         def get_articles_for_tag(tag)
-            DB.open "sqlite3://./crystalworld.db" do |db|
+            DB.open "sqlite3://./crw.db" do |db|
                 articles = [] of Hash(String, String)
                 begin
                     results =   db.query_all "SELECT slug, title, date, tags FROM articles WHERE tags LIKE '%' || ? || '%' ORDER BY date DESC",
@@ -83,7 +83,7 @@ module CrystalWorld
         end
 
         def get_articles
-            DB.open "sqlite3://./crystalworld.db" do |db|
+            DB.open "sqlite3://./crw.db" do |db|
                 articles = [] of Hash(String, String)
                 begin
                     results =  db.query_all "SELECT slug, title, date, tags FROM articles ORDER BY date DESC",
@@ -107,7 +107,7 @@ module CrystalWorld
         end
 
         def get_article(slug)
-            DB.open "sqlite3://./crystalworld.db" do |db|
+            DB.open "sqlite3://./crw.db" do |db|
                 begin
                     slug, title, tags, date, image, imageclass, draft, md =
                         db.query_one "SELECT slug, title, tags, date, image, imageClass, draft, content " \
