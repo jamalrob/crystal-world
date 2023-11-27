@@ -10,10 +10,10 @@ body {
     height: 100%;
 }
 
-body {
+/*body {
     position: absolute;
     width: 100%;
-}
+}*/
 
 * {
     box-sizing: border-box;
@@ -106,33 +106,6 @@ button.delete {
 
 button.delete:hover {
     background-color:#ea2419;
-}
-
-@keyframes spin {
-    to { -webkit-transform: rotate(360deg); }
-}
-@-webkit-keyframes spin {
-    to { -webkit-transform: rotate(360deg); }
-}
-
-.spinner {
-    display: inline-block;
-}
-
-.htmx-request {
-    width: 24px;
-    height: 24px;
-    border: 4px solid #134463b9;
-    border-radius: 50%;
-    border-top-color: #87a1b06f;
-    animation: spin 1s linear infinite;
-    -webkit-animation: spin 1s linear infinite;
-    margin: auto
-}
-
-button .htmx-request {
-    border: 3px solid rgba(140, 195, 212, 0.3);
-    border-top-color: #e1dddc;
 }
 
 input[type="checkbox"] {

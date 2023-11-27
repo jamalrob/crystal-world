@@ -162,10 +162,15 @@ module CrystalWorld
               http_only: true,
             )
             ctx.response.status_code = 200
-            ctx.response.content_type = "text/html; charset=UTF-8"
-            ctx.response.headers["HX-Redirect"] = "/admin/dashboard"
-            # This would be good instead but it causes the jump:
-            #ctx.response.headers["HX-Location"] = %({"path": "/admin/dashboard", "target": "body"})
+
+            # Headers for HTMX
+
+            # The following is for a basic redirect
+            #ctx.response.headers["HX-Redirect"] = "/admin/dashboard"
+
+            # The following is to replace just a part of the page
+            # (new url pushed to the history automatically)
+            ctx.response.headers["HX-Location"] = %({"path": "/admin/dashboard", "target": "body"})
             return
           end
         rescue ex
@@ -175,7 +180,6 @@ module CrystalWorld
 
       # Adding an error status to the response here trips up
       # the HTMX replacement, so we don't do it
-      ctx.response.content_type = "text/html; charset=UTF-8"
       ctx.response.print "Your credentials were not recognized."
     end
 

@@ -20,7 +20,6 @@ module CrystalWorld
       tengine.loader = Crinja::Loader::FileSystemLoader.new("src/templates/")
       template = tengine.get_template(template_path)
       final_html = template.render(data)
-      ctx.response.content_type = "text/html; charset=UTF-8"
       ctx.response.print final_html
     end
 

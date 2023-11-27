@@ -53,9 +53,10 @@ module CrystalWorld
       DB.open "sqlite3://./crw.db" do |db|
         tag_vals = db.query_all "SELECT tags from articles WHERE draft = 0", as: {String}
         tag_vals.each do |row|
-          all_tags = all_tags | row.gsub(", ", ",").split(",")
+          all_tags = all_tags | row.delete(' ').split(",")
         end
       end
+      p! all_tags
       all_tags
     end
 

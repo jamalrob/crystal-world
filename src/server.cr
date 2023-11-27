@@ -1,5 +1,6 @@
 require "http/server"
 require "./controllers.cr"
+require "./handlers.cr"
 
 module CrystalWorld
   extend self
@@ -7,10 +8,11 @@ module CrystalWorld
   server = HTTP::Server.new([
     HTTP::StaticFileHandler.new(public_dir = "./public", fallthrough = true, directory_listing = false),
     HTTP::CompressHandler.new,
+    CrystalWorld::HttpHandler.new,
   ]) do |ctx|
 
     # DEV
-    puts "REQUEST at " + Time.local.to_s("%H:%M:%S")
+    puts "Request for #{ctx.request.path}"
 
     # ---------------------
     # ROUTES
