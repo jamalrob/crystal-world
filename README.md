@@ -4,7 +4,11 @@ A blog application written in Crystal without a framework, inspired by the [Fram
 
 The main objectives here are:
 
-- Implementng the basics without a framework: routing, authentication, template rendering, etc.
+- Implementing the basics without a framework:
+  - routing
+  - authentication
+  - template rendering
+  - data access
 - Testing different patterns and architectures
 - Learning a new programming language that's as nice to read as Python or Ruby, and yet _fast_
 - Building a groundwork for small real-world projects that's easy and enjoyable to use
