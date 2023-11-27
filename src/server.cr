@@ -1,6 +1,6 @@
 require "http/server"
 require "./controllers.cr"
-require "./handlers.cr"
+require "./lib/handlers.cr"
 
 module CrystalWorld
   extend self
@@ -11,12 +11,7 @@ module CrystalWorld
     CrystalWorld::HttpHandler.new,
   ]) do |ctx|
 
-    # DEV
     puts "Request for #{ctx.request.path}"
-
-    # ---------------------
-    # ROUTES
-    # ---------------------
 
     case ctx.request.path
     when "admin/signup"

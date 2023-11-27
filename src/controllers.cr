@@ -2,28 +2,14 @@ require "http/client"
 require "markd"
 require "front_matter"
 require "poncho"
-require "./datalib.cr"
+require "./lib/datalib.cr"
 require "crinja"
 require "crystal-argon2"
-require "./views.cr"
+require "./renderer.cr"
+require "./models.cr"
 
 module CrystalWorld
   extend self
-
-  class User
-
-    def self.is_authenticated(ctx, username=nil)
-      begin
-        sessionid = ctx.request.cookies["sessionid"].value
-        if DataLib.get_user(sessionid: sessionid)
-          return true
-        end
-      rescue KeyError
-        puts "User has no sessionid cookie"
-      end
-      return false
-    end
-  end
 
   @@env : Poncho::Parser
   @@env = Poncho.from_file ".env"
@@ -122,15 +108,18 @@ module CrystalWorld
     end
 
     def admin_dashboard(ctx)
-      if User.is_authenticated(ctx)
-        TemplateRenderer.render_and_out(
-          ctx: ctx,
-          data: {
-            "title" => "Admin dashboard",
-          },
-          template_path: "admin/dashboard.html"
-        )
-        return
+      if ctx.request.cookies.has_key?("sessionid")
+        sessionid = ctx.request.cookies["sessionid"].value
+        if User.is_authenticated(sessionid: sessionid)
+          TemplateRenderer.render_and_out(
+            ctx: ctx,
+            data: {
+              "title" => "Admin dashboard",
+            },
+            template_path: "admin/dashboard.html"
+          )
+          return
+        end
       end
       ctx.response.redirect "/"
     end
@@ -146,19 +135,17 @@ module CrystalWorld
     end
 
     def do_logout(ctx)
-      if User.is_authenticated(ctx)
-        # Setting a cookie's expires in the past prompts the browser to delete it
+      if ctx.request.cookies.has_key?("sessionid")
         sessionid = ctx.request.cookies["sessionid"].value
-        DataLib.update_user_session(
-          id: nil,
-          sessionid: sessionid,
-          new_csrf_token: "",
-        )
-        session_cookie = HTTP::Cookie.new("sessionid", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
-        csrf_cookie = HTTP::Cookie.new("csrftoken", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
-        ctx.response.headers["Set-Cookie"] = [session_cookie.to_set_cookie_header, csrf_cookie.to_set_cookie_header]
-        ctx.response.headers["HX-Location"] = %({"path": "/", "target": "body"})
-        return
+        if User.is_authenticated(sessionid: sessionid)
+          # Setting a cookie's expires in the past prompts the browser to delete it
+          session_cookie = HTTP::Cookie.new("sessionid", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
+          csrf_cookie = HTTP::Cookie.new("csrftoken", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
+          ctx.response.headers["Set-Cookie"] = [session_cookie.to_set_cookie_header, csrf_cookie.to_set_cookie_header]
+          ctx.response.headers["HX-Location"] = %({"path": "/", "target": "body"})
+          User.logout(sessionid)
+          return
+        end
       end
       ctx.response.redirect "/"
     end
@@ -175,11 +162,6 @@ module CrystalWorld
             # Set new sessionid and CSRF for this session
             sessionid = Random::Secure.hex(16)
             csrftoken = Random::Secure.hex(16)
-            DataLib.update_user_session(
-              id: u["id"],
-              sessionid: sessionid,
-              new_csrf_token: csrftoken,
-            )
             ctx.response.cookies["sessionid"] = HTTP::Cookie.new(
               name: "sessionid",
               value: sessionid,
@@ -198,9 +180,10 @@ module CrystalWorld
               samesite: HTTP::Cookie::SameSite.new(1),
               http_only: true,
             )
-            ctx.response.status_code = 200
+            User.login(u["id"], sessionid, csrftoken)
 
-            # Header for HTMX redirect. Obvs only applies when it's an HTMX-only route
+            # Header for HTMX redirect
+            # Obvs only applies when it's an HTMX-only route
 
             # The following is for a basic redirect
             #ctx.response.headers["HX-Redirect"] = "/admin/dashboard"

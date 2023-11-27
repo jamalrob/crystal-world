@@ -13,13 +13,17 @@ module CrystalWorld
           db.exec "UPDATE users " \
                   "SET csrftoken = ?, sessionid = ? " \
                   "WHERE id = ?",
-            new_csrf_token, sessionid, id
-        else
-          db.exec "UPDATE users " \
-                  "SET csrftoken = ?, sessionid = '' " \
-                  "WHERE sessionid = ?",
-            new_csrf_token, sessionid
+                  new_csrf_token, sessionid, id
         end
+      end
+    end
+
+    def delete_user_session(sessionid)
+      DB.open "sqlite3://./crw.db" do |db|
+        db.exec "UPDATE users " \
+        "SET csrftoken = '', sessionid = '' " \
+        "WHERE sessionid = ?",
+        sessionid
       end
     end
 
@@ -44,7 +48,6 @@ module CrystalWorld
           puts "No user found"
           return nil
         end
-
 
         return {
           "id"         => userid,
