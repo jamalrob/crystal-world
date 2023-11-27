@@ -6,7 +6,6 @@ require "./datalib.cr"
 require "crinja"
 require "crystal-argon2"
 require "./lib/renderer.cr"
-require "./models.cr"
 
 module CrystalWorld
   extend self
