@@ -6,7 +6,12 @@ module CrystalWorld
   module TemplateRenderer
     extend self
 
-    def render_and_out(ctx : HTTP::Server::Context, data : Hash, template_path : String)
+    def render_and_out(
+      ctx : HTTP::Server::Context,
+      data : Hash,
+      template_path : String,
+      csrftoken=""
+    )
       if LOCAL
         # In development, get a fresh string to append
         # to static file URLs on every request
@@ -15,6 +20,9 @@ module CrystalWorld
         # Or, for production, use the value generated
         # at compile time
         data.put("cachebust", CACHEBUST) { "update" }
+      end
+      if !csrftoken.empty?
+        data.put("csrftoken", csrftoken) { "update " }
       end
       tengine = Crinja.new
       tengine.loader = Crinja::Loader::FileSystemLoader.new("src/templates/")

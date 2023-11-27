@@ -27,7 +27,7 @@ module CrystalWorld
       end
     end
 
-    def get_user(username=nil, sessionid=nil)
+    def get_user(username=nil, sessionid=nil, csrftoken=nil)
       DB.open "sqlite3://./crw.db" do |db|
         begin
           if username
@@ -35,6 +35,12 @@ module CrystalWorld
               db.query_one "SELECT id, password, first_name, last_name, sessionid " \
                           "FROM users WHERE username = ? LIMIT 1",
                 username,
+                as: {Int32, String, String?, String?, String?}
+          elsif sessionid && csrftoken
+            userid, password, first_name, last_name, sessionid =
+              db.query_one "SELECT id, password, first_name, last_name, sessionid " \
+                          "FROM users WHERE sessionid = ? AND csrftoken = ? LIMIT 1",
+                sessionid, csrftoken,
                 as: {Int32, String, String?, String?, String?}
           elsif sessionid
             userid, password, first_name, last_name, sessionid =

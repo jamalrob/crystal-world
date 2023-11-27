@@ -18,11 +18,9 @@ module CrystalWorld
   module Controllers
     extend self
 
-    def is_authenticated(sessionid=nil)
+    def is_authenticated(sessionid, csrftoken)
       if sessionid
-        if DataLib.get_user(sessionid: sessionid)
-          return true
-        end
+        return DataLib.get_user(sessionid: sessionid, csrftoken: csrftoken)
       end
       return false
     end
@@ -116,15 +114,17 @@ module CrystalWorld
     end
 
     def admin_dashboard(ctx)
-      if ctx.request.cookies.has_key?("sessionid")
+      if ctx.request.cookies.has_key?("sessionid") && ctx.request.cookies.has_key?("csrftoken")
         sessionid = ctx.request.cookies["sessionid"].value
-        if self.is_authenticated(sessionid: sessionid)
+        csrftoken = ctx.request.cookies["csrftoken"].value
+        if self.is_authenticated(sessionid: sessionid, csrftoken: csrftoken)
           TemplateRenderer.render_and_out(
             ctx: ctx,
             data: {
               "title" => "Admin dashboard",
             },
-            template_path: "admin/dashboard.html"
+            template_path: "admin/dashboard.html",
+            csrftoken: csrftoken
           )
           return
         end
@@ -143,9 +143,10 @@ module CrystalWorld
     end
 
     def do_logout(ctx)
-      if ctx.request.cookies.has_key?("sessionid")
+      if ctx.request.cookies.has_key?("sessionid")  && ctx.request.cookies.has_key?("csrftoken")
         sessionid = ctx.request.cookies["sessionid"].value
-        if self.is_authenticated(sessionid: sessionid)
+        csrftoken = ctx.request.cookies["csrftoken"].value
+        if self.is_authenticated(sessionid: sessionid, csrftoken: csrftoken)
           # Setting a cookie's expires in the past prompts the browser to delete it
           session_cookie = HTTP::Cookie.new("sessionid", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
           csrf_cookie = HTTP::Cookie.new("csrftoken", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))

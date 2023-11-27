@@ -14,7 +14,7 @@
         "selfRequestsOnly": true
     }'>
 </head>
-<body>
+<body hx-headers='{"X-CSRFToken": "{{ csrftoken }}"}'>
     {% include "components/header.html" %}
     <main>
         {% if error_message %}
