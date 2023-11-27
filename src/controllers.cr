@@ -163,8 +163,9 @@ module CrystalWorld
             )
             ctx.response.status_code = 200
             ctx.response.content_type = "text/html; charset=UTF-8"
-            #ctx.response.headers["HX-Redirect"] = "/admin/dashboard"
-            ctx.response.headers["HX-Location"] = %({"path": "/admin/dashboard", "target": "body"})
+            ctx.response.headers["HX-Redirect"] = "/admin/dashboard"
+            # This would be good instead but it causes the jump:
+            #ctx.response.headers["HX-Location"] = %({"path": "/admin/dashboard", "target": "body"})
             return
           end
         rescue ex
