@@ -9,25 +9,42 @@ module CrystalWorld
 
     def update_user_session(id, sessionid, new_csrf_token)
       DB.open "sqlite3://./crw.db" do |db|
-        db.exec "UPDATE users " \
-                "SET csrftoken = ?, sessionid = ? " \
-                "WHERE id = ?",
-          new_csrf_token, sessionid, id
+        if id
+          db.exec "UPDATE users " \
+                  "SET csrftoken = ?, sessionid = ? " \
+                  "WHERE id = ?",
+            new_csrf_token, sessionid, id
+        else
+          db.exec "UPDATE users " \
+                  "SET csrftoken = ?, sessionid = '' " \
+                  "WHERE sessionid = ?",
+            new_csrf_token, sessionid
+        end
       end
     end
 
-    def get_user(username)
+    def get_user(username=nil, sessionid=nil)
       DB.open "sqlite3://./crw.db" do |db|
+
         begin
-          userid, password, first_name, last_name, sessionid =
-            db.query_one "SELECT id, password, first_name, last_name, sessionid " \
-                         "FROM users WHERE username = ? LIMIT 1",
-              username,
-              as: {Int32, String, String?, String?, String?}
+          if username
+            userid, password, first_name, last_name, sessionid =
+              db.query_one "SELECT id, password, first_name, last_name, sessionid " \
+                          "FROM users WHERE username = ? LIMIT 1",
+                username,
+                as: {Int32, String, String?, String?, String?}
+          elsif sessionid
+            userid, password, first_name, last_name, sessionid =
+              db.query_one "SELECT id, password, first_name, last_name, sessionid " \
+                          "FROM users WHERE sessionid = ? LIMIT 1",
+                sessionid,
+                as: {Int32, String, String?, String?, String?}
+          end
         rescue DB::NoResultsError
           puts "No user found"
           return nil
         end
+
 
         return {
           "id"         => userid,
@@ -56,8 +73,7 @@ module CrystalWorld
           all_tags = all_tags | row.delete(' ').split(",")
         end
       end
-      p! all_tags
-      all_tags
+      return all_tags
     end
 
     def get_articles_for_tag(tag)

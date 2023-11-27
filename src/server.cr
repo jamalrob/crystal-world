@@ -24,6 +24,8 @@ module CrystalWorld
       # See dump
     when "/admin/login"
       Controllers.login_page(ctx)
+    when "/admin/logout"
+      Controllers.do_logout(ctx)
     when "/admin/login/auth"
       Controllers.do_login(ctx)
     when "/admin/dashboard"

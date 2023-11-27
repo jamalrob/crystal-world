@@ -1,5 +1,5 @@
 {% extends "layouts/base.html" %}
 {% block content %}
 <h1>Your dashboard</h1>
-<button>Sign out</button>
+<button hx-get="/admin/logout">Sign out</button>
 {% endblock %}

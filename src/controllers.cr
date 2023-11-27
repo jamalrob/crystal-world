@@ -10,6 +10,21 @@ require "./views.cr"
 module CrystalWorld
   extend self
 
+  class User
+
+    def self.is_authenticated(ctx, username=nil)
+      begin
+        sessionid = ctx.request.cookies["sessionid"].value
+        if DataLib.get_user(sessionid: sessionid)
+          return true
+        end
+      rescue KeyError
+        puts "User has no sessionid cookie"
+      end
+      return false
+    end
+  end
+
   @@env : Poncho::Parser
   @@env = Poncho.from_file ".env"
 
@@ -107,13 +122,17 @@ module CrystalWorld
     end
 
     def admin_dashboard(ctx)
-      TemplateRenderer.render_and_out(
-        ctx: ctx,
-        data: {
-          "title" => "Admin dashboard",
-        },
-        template_path: "admin/dashboard.html"
-      )
+      if User.is_authenticated(ctx)
+        TemplateRenderer.render_and_out(
+          ctx: ctx,
+          data: {
+            "title" => "Admin dashboard",
+          },
+          template_path: "admin/dashboard.html"
+        )
+        return
+      end
+      ctx.response.redirect "/"
     end
 
     def login_page(ctx)
@@ -124,6 +143,24 @@ module CrystalWorld
         },
         template_path: "admin/login.html"
       )
+    end
+
+    def do_logout(ctx)
+      if User.is_authenticated(ctx)
+        # Setting a cookie's expires in the past prompts the browser to delete it
+        sessionid = ctx.request.cookies["sessionid"].value
+        DataLib.update_user_session(
+          id: nil,
+          sessionid: sessionid,
+          new_csrf_token: "",
+        )
+        session_cookie = HTTP::Cookie.new("sessionid", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
+        csrf_cookie = HTTP::Cookie.new("csrftoken", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
+        ctx.response.headers["Set-Cookie"] = [session_cookie.to_set_cookie_header, csrf_cookie.to_set_cookie_header]
+        ctx.response.headers["HX-Location"] = %({"path": "/", "target": "body"})
+        return
+      end
+      ctx.response.redirect "/"
     end
 
     def do_login(ctx)
@@ -163,7 +200,7 @@ module CrystalWorld
             )
             ctx.response.status_code = 200
 
-            # Headers for HTMX
+            # Header for HTMX redirect. Obvs only applies when it's an HTMX-only route
 
             # The following is for a basic redirect
             #ctx.response.headers["HX-Redirect"] = "/admin/dashboard"
