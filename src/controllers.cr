@@ -2,10 +2,10 @@ require "http/client"
 require "markd"
 require "front_matter"
 require "poncho"
-require "./lib/datalib.cr"
+require "./datalib.cr"
 require "crinja"
 require "crystal-argon2"
-require "./renderer.cr"
+require "./lib/renderer.cr"
 require "./models.cr"
 
 module CrystalWorld
@@ -18,6 +18,15 @@ module CrystalWorld
 
   module Controllers
     extend self
+
+    def is_authenticated(sessionid=nil)
+      if sessionid
+        if DataLib.get_user(sessionid: sessionid)
+          return true
+        end
+      end
+      return false
+    end
 
     def home_page(ctx)
       articles = DataLib.get_articles
@@ -110,7 +119,7 @@ module CrystalWorld
     def admin_dashboard(ctx)
       if ctx.request.cookies.has_key?("sessionid")
         sessionid = ctx.request.cookies["sessionid"].value
-        if User.is_authenticated(sessionid: sessionid)
+        if self.is_authenticated(sessionid: sessionid)
           TemplateRenderer.render_and_out(
             ctx: ctx,
             data: {
@@ -137,13 +146,15 @@ module CrystalWorld
     def do_logout(ctx)
       if ctx.request.cookies.has_key?("sessionid")
         sessionid = ctx.request.cookies["sessionid"].value
-        if User.is_authenticated(sessionid: sessionid)
+        if self.is_authenticated(sessionid: sessionid)
           # Setting a cookie's expires in the past prompts the browser to delete it
           session_cookie = HTTP::Cookie.new("sessionid", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
           csrf_cookie = HTTP::Cookie.new("csrftoken", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
           ctx.response.headers["Set-Cookie"] = [session_cookie.to_set_cookie_header, csrf_cookie.to_set_cookie_header]
           ctx.response.headers["HX-Location"] = %({"path": "/", "target": "body"})
-          User.logout(sessionid)
+          DataLib.delete_user_session(
+            sessionid: sessionid
+          )
           return
         end
       end
@@ -180,7 +191,11 @@ module CrystalWorld
               samesite: HTTP::Cookie::SameSite.new(1),
               http_only: true,
             )
-            User.login(u["id"], sessionid, csrftoken)
+            DataLib.update_user_session(
+              id: u["id"],
+              sessionid: sessionid,
+              new_csrf_token: csrftoken,
+            )
 
             # Header for HTMX redirect
             # Obvs only applies when it's an HTMX-only route

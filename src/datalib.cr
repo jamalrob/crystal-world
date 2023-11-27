@@ -29,7 +29,6 @@ module CrystalWorld
 
     def get_user(username=nil, sessionid=nil)
       DB.open "sqlite3://./crw.db" do |db|
-
         begin
           if username
             userid, password, first_name, last_name, sessionid =
