@@ -1,3 +1,7 @@
+# JSON
+json_text = %({"x": 1, "y": 2})
+
+
 # Requesting a url
 # ---------------------------------
 response = HTTP::Client.get "https://www.commissioncrowd.com"

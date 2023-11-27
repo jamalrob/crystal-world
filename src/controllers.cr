@@ -5,38 +5,38 @@ require "poncho"
 require "./datalib.cr"
 require "crinja"
 require "crystal-argon2"
+require "./views.cr"
 
 module CrystalWorld
+  extend self
+
+  @@env : Poncho::Parser
+  @@env = Poncho.from_file ".env"
+
+  IMGBUCKET = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-70/"
+
   module Controllers
     extend self
 
-    def env
-      return Poncho.from_file ".env"
-    end
-
-    IMGBUCKET = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-70/"
-    LOCAL     = env["ENV"] == "local" || false
-    CACHEBUST = Time.monotonic.to_s.split(".")[-1]
-
     def home_page(ctx)
       articles = DataLib.get_articles
-      self.render_and_out(
+      TemplateRenderer.render_and_out(
         ctx: ctx,
         data: {
           "articles" => articles,
           "title"    => "My Crystal World",
         },
-        template: "home.html"
+        template_path: "home.html"
       )
     end
 
     def about_page(ctx)
-      self.render_and_out(
+      TemplateRenderer.render_and_out(
         ctx: ctx,
         data: {
           "title" => "About me",
         },
-        template: "about.html"
+        template_path: "about.html"
       )
     end
 
@@ -48,35 +48,35 @@ module CrystalWorld
         options = Markd::Options.new(smart: true, safe: true)
         html = Markd.to_html(article["md"].as(String), options)
         article["html"] = html.gsub("/bucket/", IMGBUCKET)
-        self.render_and_out(
+        TemplateRenderer.render_and_out(
           ctx: ctx,
           data: {
             "article" => article,
             "title"   => article["title"],
           },
-          template: "article.html",
+          template_path: "article.html",
         )
         return
       end
       ctx.response.status = HTTP::Status.new(404)
-      self.render_and_out(
+      TemplateRenderer.render_and_out(
         ctx: ctx,
         data: {
           "error_msg" => "Page not found",
         },
-        template: "errors/404.html",
+        template_path: "errors/404.html",
       )
     end
 
     def tags_page(ctx)
       tags = DataLib.get_tags
-      self.render_and_out(
+      TemplateRenderer.render_and_out(
         ctx: ctx,
         data: {
           "tags"  => tags,
           "title" => "Tags",
         },
-        template: "tags.html"
+        template_path: "tags.html"
       )
     end
 
@@ -85,44 +85,44 @@ module CrystalWorld
       tag = urlbits[1]?
       articles = DataLib.get_articles_for_tag(tag)
       if !articles.empty?
-        self.render_and_out(
+        TemplateRenderer.render_and_out(
           ctx: ctx,
           data: {
             "articles" => articles,
             "tag"      => tag,
             "title"    => "Articles tagged with #{tag.to_s}",
           },
-          template: "tag.html"
+          template_path: "tag.html"
         )
         return
       end
       ctx.response.status = HTTP::Status.new(404)
-      self.render_and_out(
+      TemplateRenderer.render_and_out(
         ctx: ctx,
         data: {
           "error_msg" => "Nothing found for that tag",
         },
-        template: "errors/404.html",
+        template_path: "errors/404.html",
       )
     end
 
     def admin_dashboard(ctx)
-      self.render_and_out(
+      TemplateRenderer.render_and_out(
         ctx: ctx,
         data: {
           "title" => "Admin dashboard",
         },
-        template: "admin/dashboard.html"
+        template_path: "admin/dashboard.html"
       )
     end
 
     def login_page(ctx)
-      self.render_and_out(
+      TemplateRenderer.render_and_out(
         ctx: ctx,
         data: {
           "title" => "Sign in to admin",
         },
-        template: "admin/login.html"
+        template_path: "admin/login.html"
       )
     end
 
@@ -163,7 +163,8 @@ module CrystalWorld
             )
             ctx.response.status_code = 200
             ctx.response.content_type = "text/html; charset=UTF-8"
-            ctx.response.headers["HX-Redirect"] = "/admin/dashboard"
+            #ctx.response.headers["HX-Redirect"] = "/admin/dashboard"
+            ctx.response.headers["HX-Location"] = %({"path": "/admin/dashboard", "target": "body"})
             return
           end
         rescue ex
@@ -175,24 +176,6 @@ module CrystalWorld
       # the HTMX replacement, so we don't do it
       ctx.response.content_type = "text/html; charset=UTF-8"
       ctx.response.print "Your credentials were not recognized."
-    end
-
-    def render_and_out(ctx, data, template)
-      if LOCAL
-        # In development, get a fresh string to append
-        # to static file URLs on every request
-        data.put("cachebust", Time.monotonic.to_s.split(".")[-1]) { "update" }
-      else
-        # Or, for production, use the value generated
-        # at compile time
-        data.put("cachebust", CACHEBUST) { "update" }
-      end
-      tengine = Crinja.new
-      tengine.loader = Crinja::Loader::FileSystemLoader.new("src/templates/")
-      template = tengine.get_template(template)
-      final_html = template.render(data)
-      ctx.response.content_type = "text/html; charset=UTF-8"
-      ctx.response.print final_html
     end
 
   end
