@@ -1,21 +1,30 @@
 {% extends "layouts/base.html" %}
 {% block admin_sidebar %}
 <div id="sidebar">
-  <button id="toggle-sidebar" _="on click call collapseSidebar()">
+  <button id="toggle-sidebar"
+    _=" on click toggle .collapsed on #sidebar
+        toggle .hidden on <svg.feather-chevron-right/>
+        toggle .hidden on <svg.feather-chevron-left/>
+        toggle the *display of <a span.text/>
+        wait 150ms
+        toggle .hidden on <a span.text/>
+        "
+  >
     <span data-feather="chevron-left"></span>
+    <span class="hidden" data-feather="chevron-right"></span>
   </button>
   <nav>
-    <a href="/admin/articles" id="articles" title="Articles" {% if title == 'Admin: articles' %}class="active"{% endif %}>
-      <span data-feather="edit-3" style="color: white;"></span> Articles
+    <a href="/admin/articles" class="admin-section {% if title == 'Admin: articles' %}active{% endif %}" id="articles" title="Articles">
+      <span data-feather="edit-3" style="color: white;"></span><span class="text">Articles</span>
     </a>
-    <a href="/admin/pages"    id="pages" title="Pages" {% if title == 'Admin: pages' %}class="active"{% endif %}>
-      <span data-feather="book-open" style="color: white;"></span> Pages
+    <a href="/admin/pages"    class="admin-section {% if title == 'Admin: pages' %}active{% endif %}" id="pages" title="Pages">
+      <span data-feather="book-open" style="color: white;"></span><span class="text">Pages</span>
     </a>
-    <a href="/admin/customize"id="customize" title="Customize" {% if title == 'Admin: customize' %}class="active"{% endif %}>
-      <span data-feather="image" style="color: white;"></span> Customize
+    <a href="/admin/customize" class="admin-section {% if title == 'Admin: customize' %}active{% endif %}" id="customize" title="Customize">
+      <span data-feather="image" style="color: white;"></span><span class="text">Customize</span>
     </a>
-    <a href="/admin/authors"  id="authors" title="Authors" {% if title == 'Admin: authors' %}class="active"{% endif %}>
-      <span data-feather="users" style="color: white;"></span> Authors
+    <a href="/admin/authors"  class="admin-section {% if title == 'Admin: authors' %}active{% endif %}" id="authors" title="Authors">
+      <span data-feather="users" style="color: white;"></span><span class="text">Authors</span>
     </a>
   </nav>
 </div>
@@ -35,6 +44,7 @@ button#toggle-sidebar {
   height: 100%;
   position: fixed;
   background-color: #08426f;
+  transition: width 0.15s ease;
 }
 #sidebar h3 {
   margin-top: 0;
@@ -62,18 +72,13 @@ button#toggle-sidebar {
   width: 45px;
   opacity: 1;
   transition: width 0.15s ease;
-  padding-left: 12px;
+  padding-left: 0;
+}
+#sidebar.collapsed nav a {
+  padding-left: 9px;
+}
+.hidden {
+  display: none;
 }
 </style>
-<script type="text/hyperscript">
-  def collapseSidebar()
-    add .collapsed to #sidebar
-    put "🖊️" into #articles
-    put "📃" into #pages
-    put "🎨" into #customize
-    put "🧑‍🤝‍🧑" into #authors
-    hide <#sidebar>h3/>
-    ---🖊️
-  end
-</script>
 {% endblock %}
