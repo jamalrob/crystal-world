@@ -6,10 +6,26 @@
     <textarea id="article-edit-box">{{ article.md }}</textarea>
   </section>
   <section class="preview">
+    <a href="/admin/edit/{{ article.slug }}/preview" title="Preview in a new tab" target="previewArticle">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+    </a>
+    <div class="preview1">
     {{ article.html|safe }}
+    </div>
   </section>
 </div>
 <script type="text/hyperscript">
+  js
+    function tstZ() {
+      window.open("/", "newtab");
+    }
+    return { tstZ }
+  end
+
+  def openPreview()
+    ---window.open("/", "newtab")
+  end
+
   def getHtmlFromMarkdown(md_text)
     make a showdown.Converter called converter
     return converter.makeHtml(md_text.replaceAll('/bucket/', '{{ imagekit_bucket }}/'))
@@ -24,11 +40,7 @@
   width: 50%;
 }
 .edit-container section:first-child {
-  margin-right: 35px;
-}
-.edit-container section.preview {
-  font-size: 0.84rem;
-  line-height: 1.39rem;
+  margin-right: 25px;
 }
 #article-edit-box {
   background: rgb(232, 229, 229);
@@ -39,6 +51,25 @@
   width: 100%;
   height: 70vh;
   /*white-space: pre;*/
+}
+section.preview svg {
+  float: right;
+  margin-top: -30px
+}
+div.preview1 {
+  font-size: 0.84rem;
+  line-height: 1.38rem;
+  background-color: #08416d;
+  padding: 10px 15px 0 15px;
+  border-radius: 3px;
+}
+div.preview1 blockquote {
+  background-color: #135b93;
+  padding: 2px 25px;
+  margin: 0 15px;
+}
+div.preview1 p:first-child {
+  margin-top: 0;
 }
 </style>
 {% endblock %}

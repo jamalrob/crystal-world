@@ -220,13 +220,13 @@ module CrystalWorld
               new_csrf_token: csrftoken,
             )
 
-            # Header for HTMX redirect
-            # Obvs only applies when it's an HTMX-only route
+            # BASIC REDIRECT
+            # ctx.response.redirect "/admin/articles"
 
-            # The following is for a basic redirect
-            #ctx.response.headers["HX-Redirect"] = "/admin/articles"
+            # BASIC REDIRECT FOR HTMX REQUEST
+            # ctx.response.headers["HX-Redirect"] = "/admin/articles"
 
-            # The following is to replace just a part of the page
+            # REDIRECT FOR HTMX REQUEST, REPLACING ONLY A PART OF THE PAGE
             # (new url pushed to the history automatically)
             ctx.response.headers["HX-Location"] = %({"path": "/admin/articles", "target": "body"})
             return
