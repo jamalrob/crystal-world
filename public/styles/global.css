@@ -118,7 +118,7 @@ input[type='text'], input[type='date'], input[type='password'] {
 }
 
 input, textarea, #editBox {
-    border-radius: 5px;
+    border-radius: 3px;
     border: none;
     font-size: 18px;
     box-shadow: inset 1px 1px 10px #454d605c;

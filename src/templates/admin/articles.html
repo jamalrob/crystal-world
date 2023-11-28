@@ -1,11 +1,11 @@
 {% extends "admin/layouts/base.html" %}
 {% block content %}
-<table class="admin-table" _="on load call colourTheRows()">
+<table class="admin-table" _="on load call colourTheRows()" hx-boost="true">
   <caption>Articles</caption>
   <tbody>
     {% for a in articles %}
     <tr class="showing">
-      <td>{{ a.title }}</td>
+      <td><a href="/admin/edit/{{ a.slug }}/">{{ a.title }}</a></td>
       <td>
         <button hx-get="/admin/edit/{{ a.slug }}/" hx-target="body" hx-push-url="true">Edit</button>
         <button class="delete">Delete</button>

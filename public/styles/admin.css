@@ -16,16 +16,21 @@ h2 {
   position: fixed;
   background-color: #08426f;
 }
-#sidebar h3:first-child {
+#sidebar h3 {
   margin-top: 0;
 }
 #sidebar nav a {
   display: block;
   font-size: 0.9rem;
 }
+#sidebar nav a svg {
+  height: 1rem;
+  vertical-align: text-top;
+  margin-right: 3px;
+}
 #sidebar nav a.active {
-  text-decoration: underline;
-  text-underline-offset: 4px;
+  /*text-decoration: underline;
+  text-underline-offset: 4px;*/
 }
 
 table.admin-table {

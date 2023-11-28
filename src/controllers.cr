@@ -163,20 +163,17 @@ module CrystalWorld
     end
 
     def do_logout(ctx)
-      if ctx.request.cookies.has_key?("sessionid")  && ctx.request.cookies.has_key?("csrftoken")
-        sessionid = ctx.request.cookies["sessionid"].value
-        csrftoken = ctx.request.cookies["csrftoken"].value
-        if DataLib.get_authenticated_user(sessionid, csrftoken)
-          # Setting a cookie's expires in the past prompts the browser to delete it
-          session_cookie = HTTP::Cookie.new("sessionid", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
-          csrf_cookie = HTTP::Cookie.new("csrftoken", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
-          ctx.response.headers["Set-Cookie"] = [session_cookie.to_set_cookie_header, csrf_cookie.to_set_cookie_header]
-          ctx.response.headers["HX-Location"] = %({"path": "/", "target": "body"})
-          DataLib.delete_user_session(
-            sessionid: sessionid
-          )
-          return
-        end
+      u = self.authenticated_user(ctx)
+      if u
+        # Setting a cookie's expires in the past prompts the browser to delete it
+        session_cookie = HTTP::Cookie.new("sessionid", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
+        csrf_cookie = HTTP::Cookie.new("csrftoken", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
+        ctx.response.headers["Set-Cookie"] = [session_cookie.to_set_cookie_header, csrf_cookie.to_set_cookie_header]
+        ctx.response.headers["HX-Location"] = %({"path": "/", "target": "body"})
+        DataLib.delete_user_session(
+          sessionid: u["sessionid"]
+        )
+        return
       end
       ctx.response.redirect "/"
     end
