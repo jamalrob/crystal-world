@@ -119,27 +119,29 @@ module CrystalWorld
     end
 
     def admin_edit_preview(ctx)
-      urlbits = ctx.request.path.split('/', remove_empty: true)
-      slug = urlbits[-2]?
-      article = DataLib.get_article(slug)
-      if article
-        TemplateRenderer.render_and_out(
-          ctx: ctx,
-          data: {
-            "article" => article,
-            "title"   => article["title"],
-          },
-          template_path: "admin/article_preview.html",
-        )
-        return
+      if u = self.authenticated_user(ctx)
+        urlbits = ctx.request.path.split('/', remove_empty: true)
+        slug = urlbits[-2]?
+        article = DataLib.get_article(slug)
+        if article
+          TemplateRenderer.render_and_out(
+            ctx: ctx,
+            data: {
+              "article" => article,
+              "title"   => article["title"],
+            },
+            template_path: "admin/article_preview.html",
+          )
+          return
+        end
+        self.error_404 ctx
       end
-      self.error_404 ctx
     end
 
     def admin_edit_article(ctx)
-      urlbits = ctx.request.path.split('/', remove_empty: true)
-      slug = urlbits[-1]?
       if u = self.authenticated_user(ctx)
+        urlbits = ctx.request.path.split('/', remove_empty: true)
+        slug = urlbits[-1]?
         article = DataLib.get_article(slug)
         if article
           options = Markd::Options.new(smart: true, safe: true)
@@ -173,8 +175,7 @@ module CrystalWorld
     end
 
     def do_logout(ctx)
-      u = self.authenticated_user(ctx)
-      if u
+      if u = self.authenticated_user(ctx)
         # Setting a cookie's expires in the past prompts the browser to delete it
         session_cookie = HTTP::Cookie.new("sessionid", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
         csrf_cookie = HTTP::Cookie.new("csrftoken", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
@@ -192,8 +193,7 @@ module CrystalWorld
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
       username = params["username"] || ""
       password = params["password"] || ""
-      u = DataLib.get_user(username)
-      if u
+      if u = DataLib.get_user(username)
         begin
           res = Argon2::Password.verify_password(password, u["password"].to_s)
           if res == Argon2::Response::ARGON2_OK

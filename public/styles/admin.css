@@ -3,13 +3,13 @@ main.admin {
   max-width: 73%;
   margin-left: 21%;
 }
+main.admin h2 {
+  margin-top: 5px;
+}
 main.admin.expanded {
   margin: 0 0 0 90px;
   width: 88%;
   max-width: 88%;
-}
-h2 {
-  margin-top: 5px;
 }
 table.admin-table {
   width: 100%;
