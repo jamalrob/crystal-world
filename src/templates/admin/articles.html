@@ -1,0 +1,29 @@
+{% extends "admin/layouts/base.html" %}
+{% block content %}
+<table class="admin-table" _="on load call colourTheRows()">
+  <caption>Articles</caption>
+  <tbody>
+    {% for a in articles %}
+    <tr class="showing">
+      <td>{{ a.title }}</td>
+      <td>
+        <button hx-get="/admin/edit/{{ a.slug }}/" hx-target="body" hx-push-url="true">Edit</button>
+        <button class="delete">Delete</button>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot></tfoot> <!-- tfoot optional -->
+</table>
+<script type="text/hyperscript">
+  def colourTheRows()
+    repeat for tr in <table.admin-table tr.showing/> index i
+        if i mod 2 == 0
+            add .oddrow to it
+        else
+            remove .oddrow from it
+        end
+    end
+  end
+</script>
+{% endblock %}

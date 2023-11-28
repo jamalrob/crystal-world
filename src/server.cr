@@ -23,8 +23,10 @@ module CrystalWorld
       Controllers.do_logout(ctx)
     when "/admin/login/auth"
       Controllers.do_login(ctx)
-    when "/admin/dashboard"
-      Controllers.admin_dashboard(ctx)
+    when "/admin", "/admin/articles"
+      Controllers.admin_articles(ctx)
+    when .match(/\/admin\/edit\/[a-zA-Z0-9]/)
+      Controllers.admin_edit_article(ctx)
     when "/"
       Controllers.home_page(ctx)
     when "/tags"
@@ -33,7 +35,7 @@ module CrystalWorld
       Controllers.tag_page(ctx)
     when "/about"
       Controllers.about_page(ctx)
-    when .match(/[a-zA-Z]/)
+    when .match(/[a-zA-Z0-9]/)
       Controllers.article_page(ctx)
     end
   end

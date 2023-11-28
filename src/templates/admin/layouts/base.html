@@ -1,0 +1,12 @@
+{% extends "layouts/base.html" %}
+{% block admin_sidebar %}
+<div id="sidebar">
+  <nav>
+    <h3>Admin</h3>
+    <a href="" {% if title == 'Admin: articles' %}class="active"{% endif %}>Articles</a>
+    <a href="" {% if title == 'Admin: pages' %}class="active"{% endif %}>Pages</a>
+    <a href="" {% if title == 'Admin: themes' %}class="active"{% endif %}>Theme</a>
+    <a href="" {% if title == 'Admin: authors' %}class="active"{% endif %}>Authors</a>
+  </nav>
+</div>
+{% endblock %}

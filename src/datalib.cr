@@ -30,11 +30,11 @@ module CrystalWorld
     def get_authenticated_user(sessionid, csrftoken)
       DB.open "sqlite3://./crw.db" do |db|
         begin
-          userid, password, first_name, last_name, sessionid =
-              db.query_one "SELECT id, password, first_name, last_name, sessionid " \
+          userid, password, first_name, last_name, sessionid, csrftoken =
+              db.query_one "SELECT id, password, first_name, last_name, sessionid, csrftoken " \
                           "FROM users WHERE sessionid = ? AND csrftoken = ? LIMIT 1",
                 sessionid, csrftoken,
-                as: {Int32, String, String?, String?, String?}
+                as: {Int32, String, String?, String?, String?, String?}
         rescue DB::NoResultsError
           return nil
         end
@@ -44,6 +44,7 @@ module CrystalWorld
           "first_name" => first_name,
           "last_name"  => last_name,
           "sessionid"  => sessionid,
+          "csrftoken"  => csrftoken,
         }
       end
     end
@@ -52,17 +53,17 @@ module CrystalWorld
       DB.open "sqlite3://./crw.db" do |db|
         begin
           if username
-            userid, password, first_name, last_name, sessionid =
-              db.query_one "SELECT id, password, first_name, last_name, sessionid " \
+            userid, password, first_name, last_name, sessionid, csrftoken =
+              db.query_one "SELECT id, password, first_name, last_name, sessionid, csrftoken " \
                           "FROM users WHERE username = ? LIMIT 1",
                 username,
-                as: {Int32, String, String?, String?, String?}
+                as: {Int32, String, String?, String?, String?, String?}
           elsif sessionid
-            userid, password, first_name, last_name, sessionid =
-              db.query_one "SELECT id, password, first_name, last_name, sessionid " \
+            userid, password, first_name, last_name, sessionid, csrftoken =
+              db.query_one "SELECT id, password, first_name, last_name, sessionid, csrftoken " \
                           "FROM users WHERE sessionid = ? LIMIT 1",
                 sessionid,
-                as: {Int32, String, String?, String?, String?}
+                as: {Int32, String, String?, String?, String?, String?}
           end
         rescue DB::NoResultsError
           puts "No user found"

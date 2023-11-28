@@ -4,6 +4,7 @@ module CrystalWorld
       include HTTP::Handler
 
       def call(context)
+          context.request.path = context.request.path.rstrip("/") # Remove trailing slash
           if context.request.path.starts_with?("/api/")
               context.response.content_type = "application/json"
               context.response.headers["Access-Control-Request-Headers"] = "Content-Type, application/json"

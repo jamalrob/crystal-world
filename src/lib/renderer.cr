@@ -9,8 +9,7 @@ module CrystalWorld
     def render_and_out(
       ctx : HTTP::Server::Context,
       data : Hash,
-      template_path : String,
-      csrftoken=""
+      template_path : String
     )
       if LOCAL
         # In development, get a fresh string to append
@@ -21,8 +20,14 @@ module CrystalWorld
         # at compile time
         data.put("cachebust", CACHEBUST) { "update" }
       end
-      if !csrftoken.empty?
-        data.put("csrftoken", csrftoken) { "update " }
+      if ctx.request.cookies.has_key?("csrftoken")
+        data.put("csrftoken", ctx.request.cookies["csrftoken"].value) { "update" }
+      end
+      if !data.has_key?("user_authenticated")
+        u = Controllers.authenticated_user(ctx)
+        if u
+          data.put("user_authenticated", "true") { "update" }
+        end
       end
       tengine = Crinja.new
       tengine.loader = Crinja::Loader::FileSystemLoader.new("src/templates/")

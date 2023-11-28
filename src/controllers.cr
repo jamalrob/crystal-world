@@ -18,13 +18,21 @@ module CrystalWorld
   module Controllers
     extend self
 
+    def authenticated_user(ctx)
+      if ctx.request.cookies.has_key?("sessionid") && ctx.request.cookies.has_key?("csrftoken")
+        sessionid = ctx.request.cookies["sessionid"].value
+        csrftoken = ctx.request.cookies["csrftoken"].value
+        return DataLib.get_authenticated_user(sessionid, csrftoken)
+      end
+    end
+
     def home_page(ctx)
       articles = DataLib.get_articles
       TemplateRenderer.render_and_out(
         ctx: ctx,
         data: {
           "articles" => articles,
-          "title"    => "My Crystal World",
+          "title"    => "My Crystal World"
         },
         template_path: "home.html"
       )
@@ -41,7 +49,7 @@ module CrystalWorld
     end
 
     def article_page(ctx)
-      urlbits = ctx.request.path.split('/', limit: 2, remove_empty: true)
+      urlbits = ctx.request.path.split('/', remove_empty: true)
       slug = urlbits[0]?
       article = DataLib.get_article(slug: slug)
       if article
@@ -81,7 +89,7 @@ module CrystalWorld
     end
 
     def tag_page(ctx)
-      urlbits = ctx.request.path.split('/', limit: 3, remove_empty: true)
+      urlbits = ctx.request.path.split('/', remove_empty: true)
       tag = urlbits[1]?
       articles = DataLib.get_articles_for_tag(tag)
       if !articles.empty?
@@ -106,22 +114,40 @@ module CrystalWorld
       )
     end
 
-    def admin_dashboard(ctx)
-      if ctx.request.cookies.has_key?("sessionid") && ctx.request.cookies.has_key?("csrftoken")
-        sessionid = ctx.request.cookies["sessionid"].value
-        csrftoken = ctx.request.cookies["csrftoken"].value
-        u = DataLib.get_authenticated_user(sessionid, csrftoken)
-        if u
-          TemplateRenderer.render_and_out(
-            ctx: ctx,
-            data: {
-              "title" => "Admin dashboard",
-            },
-            template_path: "admin/dashboard.html",
-            csrftoken: csrftoken
-          )
-          return
-        end
+    def admin_articles(ctx)
+      if u = self.authenticated_user(ctx)
+        articles = DataLib.get_articles
+        TemplateRenderer.render_and_out(
+          ctx: ctx,
+          data: {
+            "title" => "Admin: articles",
+            "articles" => articles,
+            "user_authenticated" => true,
+            "admin" => true
+          },
+          template_path: "admin/articles.html"
+        )
+        return
+      end
+      ctx.response.redirect "/"
+    end
+
+    def admin_edit_article(ctx)
+      urlbits = ctx.request.path.split('/', remove_empty: true)
+      slug = urlbits[-1]?
+      if u = self.authenticated_user(ctx)
+        article = DataLib.get_article(slug)
+        TemplateRenderer.render_and_out(
+          ctx: ctx,
+          data: {
+            "title" => "Admin: articles",
+            "article" => article,
+            "user_authenticated" => true,
+            "admin" => true
+          },
+          template_path: "admin/edit-article.html"
+        )
+        return
       end
       ctx.response.redirect "/"
     end
@@ -170,7 +196,7 @@ module CrystalWorld
             ctx.response.cookies["sessionid"] = HTTP::Cookie.new(
               name: "sessionid",
               value: sessionid,
-              path: "/admin",
+              path: "/",
               max_age: Time::Span.new(hours: 12),
               secure: false,
               samesite: HTTP::Cookie::SameSite.new(1),
@@ -179,7 +205,7 @@ module CrystalWorld
             ctx.response.cookies["csrftoken"] = HTTP::Cookie.new(
               name: "csrftoken",
               value: csrftoken,
-              path: "/admin",
+              path: "/",
               max_age: Time::Span.new(hours: 12),
               secure: false,
               samesite: HTTP::Cookie::SameSite.new(1),
@@ -195,11 +221,11 @@ module CrystalWorld
             # Obvs only applies when it's an HTMX-only route
 
             # The following is for a basic redirect
-            #ctx.response.headers["HX-Redirect"] = "/admin/dashboard"
+            #ctx.response.headers["HX-Redirect"] = "/admin/articles"
 
             # The following is to replace just a part of the page
             # (new url pushed to the history automatically)
-            ctx.response.headers["HX-Location"] = %({"path": "/admin/dashboard", "target": "body"})
+            ctx.response.headers["HX-Location"] = %({"path": "/admin/articles", "target": "body"})
             return
           end
         rescue ex

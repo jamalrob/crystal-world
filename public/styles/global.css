@@ -37,7 +37,7 @@ main {
 }
 
 h1, h2, h3, h4 {
-    font-family: 'Roboto Condensed', Ubuntu, sans-serif;
+    font-family: 'Roboto Condensed', Ubuntu, Helvetica, Arial, sans-serif;
 }
 h2, h3, h4 {
     margin-top: 2rem;
@@ -83,13 +83,11 @@ h3 {
     justify-content: right;
 }
 button {
-    /*background-color:#1d638f;*/
     background-color: #2f837d;
     color: #fff;
     border: none;
     border-radius: 3px;
     padding: 10px 25px 8px;
-    min-height: 30px;
     font-size: 16px;
     font-weight: bold;
     font-family: -apple-system,BlinkMacSystemFont,'avenir next',avenir,'helvetica neue',helvetica,ubuntu,roboto,noto,'segoe ui',arial,sans-serif;
@@ -156,13 +154,16 @@ header .logo {
     left: 10px;
     margin-left: 0;
 }
-header a {
-    margin-left: 1.1rem;
+header nav a {
+    margin-left: 0.6rem;
 }
-header a.sitename {
-    position: absolute;
-    left: 10px;
-    margin-left: 0;
+header nav button {
+  margin-left: 0.6rem;
+  font-size: 0.62rem;
+  padding: 5px 17px 3px;
+  font-weight: normal;
+  position: relative;
+  top: -2px
 }
 
 /* blog article */
