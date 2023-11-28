@@ -18,13 +18,6 @@ module CrystalWorld
   module Controllers
     extend self
 
-    def is_authenticated(sessionid, csrftoken)
-      if sessionid
-        return DataLib.get_user(sessionid: sessionid, csrftoken: csrftoken)
-      end
-      return false
-    end
-
     def home_page(ctx)
       articles = DataLib.get_articles
       TemplateRenderer.render_and_out(
@@ -117,7 +110,7 @@ module CrystalWorld
       if ctx.request.cookies.has_key?("sessionid") && ctx.request.cookies.has_key?("csrftoken")
         sessionid = ctx.request.cookies["sessionid"].value
         csrftoken = ctx.request.cookies["csrftoken"].value
-        if self.is_authenticated(sessionid: sessionid, csrftoken: csrftoken)
+        if DataLib.get_authenticated_user(sessionid, csrftoken)
           TemplateRenderer.render_and_out(
             ctx: ctx,
             data: {
@@ -146,7 +139,7 @@ module CrystalWorld
       if ctx.request.cookies.has_key?("sessionid")  && ctx.request.cookies.has_key?("csrftoken")
         sessionid = ctx.request.cookies["sessionid"].value
         csrftoken = ctx.request.cookies["csrftoken"].value
-        if self.is_authenticated(sessionid: sessionid, csrftoken: csrftoken)
+        if DataLib.get_authenticated_user(sessionid, csrftoken)
           # Setting a cookie's expires in the past prompts the browser to delete it
           session_cookie = HTTP::Cookie.new("sessionid", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
           csrf_cookie = HTTP::Cookie.new("csrftoken", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
