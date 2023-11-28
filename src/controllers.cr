@@ -66,14 +66,7 @@ module CrystalWorld
         )
         return
       end
-      ctx.response.status = HTTP::Status.new(404)
-      TemplateRenderer.render_and_out(
-        ctx: ctx,
-        data: {
-          "error_msg" => "Page not found",
-        },
-        template_path: "errors/404.html",
-      )
+      self.error_404 ctx
     end
 
     def tags_page(ctx)
@@ -104,14 +97,7 @@ module CrystalWorld
         )
         return
       end
-      ctx.response.status = HTTP::Status.new(404)
-      TemplateRenderer.render_and_out(
-        ctx: ctx,
-        data: {
-          "error_msg" => "Nothing found for that tag",
-        },
-        template_path: "errors/404.html",
-      )
+      self.error_404 ctx
     end
 
     def admin_articles(ctx)
@@ -135,7 +121,19 @@ module CrystalWorld
     def admin_edit_preview(ctx)
       urlbits = ctx.request.path.split('/', remove_empty: true)
       slug = urlbits[-2]?
-      p! slug
+      article = DataLib.get_article(slug)
+      if article
+        TemplateRenderer.render_and_out(
+          ctx: ctx,
+          data: {
+            "article" => article,
+            "title"   => article["title"],
+          },
+          template_path: "admin/article_preview.html",
+        )
+        return
+      end
+      self.error_404 ctx
     end
 
     def admin_edit_article(ctx)
