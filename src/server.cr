@@ -5,6 +5,8 @@ require "./lib/handlers.cr"
 module CrystalWorld
   extend self
 
+  SLUG_PATTERN = "[a-z0-9]+(?:[_-][a-z0-9]+)*"
+
   server = HTTP::Server.new([
     HTTP::StaticFileHandler.new(public_dir = "./public", fallthrough = true, directory_listing = false),
     HTTP::CompressHandler.new,
@@ -12,8 +14,6 @@ module CrystalWorld
   ]) do |ctx|
 
     puts "Request for #{ctx.request.path}"
-
-    slug_pattern = "[a-z0-9]+(?:[_-][a-z0-9]+)*"
 
     case ctx.request.path
     when "admin/signup"
@@ -27,9 +27,9 @@ module CrystalWorld
       Controllers.do_login ctx
     when "/admin", "/admin/articles"
       Controllers.admin_articles ctx
-    when .match /^\/admin\/edit\/#{slug_pattern}$/
+    when .match /^\/admin\/edit\/#{SLUG_PATTERN}$/
       Controllers.admin_edit_article ctx
-    when .match /^\/admin\/edit\/#{slug_pattern}\/preview$/
+    when .match /^\/admin\/edit\/#{SLUG_PATTERN}\/preview$/
       Controllers.admin_edit_preview ctx
     when "/"
       Controllers.home_page ctx
@@ -39,7 +39,7 @@ module CrystalWorld
       Controllers.tag_page ctx
     when "/about"
       Controllers.about_page ctx
-    when .match /^\/#{slug_pattern}$/
+    when .match /^\/#{SLUG_PATTERN}$/
       Controllers.article_page ctx
     else
       Controllers.error_404 ctx

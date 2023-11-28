@@ -3,31 +3,25 @@
 <h2>Edit article: {{ article.title }}</h2>
 <div class="edit-container">
   <section class="edit">
-    <textarea id="article-edit-box">{{ article.md }}</textarea>
+    <textarea
+      id="article-edit-box"
+      _="on input put getHtmlFromMarkdown(my value) into <div.pre-preview/>"
+    >{{ article.md }}</textarea>
   </section>
   <section class="preview">
-    <!--<a  href="/admin/edit/{{ article.slug }}/preview"
-        title="Preview in a new tab"
-        target="previewArticle"
-    >-->
     <a  href="/admin/edit/{{ article.slug }}/preview"
         title="Preview in a new tab"
         target="previewArticle"
-        _="on click set localStorage.previewHtml to innerHTML of <div.preview1/>"
+        _=" on click set localStorage.previewHtml to innerHTML of <div.pre-preview/>"
     >
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
     </a>
-    <div class="preview1">
+    <div class="pre-preview">
     {{ article.html|safe }}
     </div>
   </section>
 </div>
 <script type="text/hyperscript">
-
-  def openPreview()
-    ---window.open("/", "newtab")
-  end
-
   def getHtmlFromMarkdown(md_text)
     make a showdown.Converter called converter
     return converter.makeHtml(md_text.replaceAll('/bucket/', '{{ imagekit_bucket }}/'))
@@ -58,20 +52,20 @@ section.preview svg {
   float: right;
   margin-top: -30px
 }
-div.preview1 {
+div.pre-preview {
   font-size: 0.84rem;
   line-height: 1.38rem;
   background-color: #08416d;
   padding: 10px 15px 0 15px;
   border-radius: 3px;
 }
-div.preview1 blockquote {
+div.pre-preview blockquote {
   background: #1f232b;
   border-radius: 5px;
   padding: 15px 25px;
   margin: 0 10px 0 10px
 }
-div.preview1 p:first-child {
+div.pre-preview p:first-child {
   margin-top: 0;
 }
 </style>

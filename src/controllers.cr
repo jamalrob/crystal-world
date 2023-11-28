@@ -28,42 +28,35 @@ module CrystalWorld
 
     def home_page(ctx)
       articles = DataLib.get_articles
-      TemplateRenderer.render_and_out(
-        ctx: ctx,
+      TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "articles" => articles,
           "title"    => "My Crystal World"
         },
         template_path: "home.html"
-      )
     end
 
     def about_page(ctx)
-      TemplateRenderer.render_and_out(
-        ctx: ctx,
+      TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "title" => "About me",
         },
         template_path: "about.html"
-      )
     end
 
     def article_page(ctx)
       urlbits = ctx.request.path.split('/', remove_empty: true)
       slug = urlbits[0]?
-      article = DataLib.get_article(slug: slug)
-      if article
+      if article = DataLib.get_article(slug: slug)
         options = Markd::Options.new(smart: true, safe: true)
         html = Markd.to_html(article["md"].as(String), options)
         article["html"] = html.gsub("/bucket/", IMGBUCKET)
-        TemplateRenderer.render_and_out(
-          ctx: ctx,
+        TemplateRenderer.render_and_out ctx: ctx,
           data: {
             "article" => article,
             "title"   => article["title"],
           },
-          template_path: "article.html",
-        )
+          template_path: "article.html"
         return
       end
       self.error_404 ctx
@@ -71,40 +64,35 @@ module CrystalWorld
 
     def tags_page(ctx)
       tags = DataLib.get_tags
-      TemplateRenderer.render_and_out(
-        ctx: ctx,
+      TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "tags"  => tags,
           "title" => "Tags",
         },
         template_path: "tags.html"
-      )
     end
 
     def tag_page(ctx)
       urlbits = ctx.request.path.split('/', remove_empty: true)
       tag = urlbits[1]?
-      articles = DataLib.get_articles_for_tag(tag)
+      articles = DataLib.get_articles_for_tag tag
       if !articles.empty?
-        TemplateRenderer.render_and_out(
-          ctx: ctx,
+        TemplateRenderer.render_and_out ctx: ctx,
           data: {
             "articles" => articles,
             "tag"      => tag,
             "title"    => "Articles tagged with #{tag.to_s}",
           },
           template_path: "tag.html"
-        )
         return
       end
       self.error_404 ctx
     end
 
     def admin_articles(ctx)
-      if u = self.authenticated_user(ctx)
+      if u = self.authenticated_user ctx
         articles = DataLib.get_articles
-        TemplateRenderer.render_and_out(
-          ctx: ctx,
+        TemplateRenderer.render_and_out ctx: ctx,
           data: {
             "title" => "Admin: articles",
             "articles" => articles,
@@ -112,26 +100,23 @@ module CrystalWorld
             "admin" => true
           },
           template_path: "admin/articles.html"
-        )
         return
       end
       ctx.response.redirect "/"
     end
 
     def admin_edit_preview(ctx)
-      if u = self.authenticated_user(ctx)
+      if u = self.authenticated_user ctx
         urlbits = ctx.request.path.split('/', remove_empty: true)
         slug = urlbits[-2]?
-        article = DataLib.get_article(slug)
+        article = DataLib.get_article slug
         if article
-          TemplateRenderer.render_and_out(
-            ctx: ctx,
+          TemplateRenderer.render_and_out ctx: ctx,
             data: {
               "article" => article,
               "title"   => article["title"],
             },
-            template_path: "admin/article_preview.html",
-          )
+            template_path: "admin/article_preview.html"
           return
         end
         self.error_404 ctx
@@ -139,16 +124,15 @@ module CrystalWorld
     end
 
     def admin_edit_article(ctx)
-      if u = self.authenticated_user(ctx)
+      if u = self.authenticated_user ctx
         urlbits = ctx.request.path.split('/', remove_empty: true)
         slug = urlbits[-1]?
-        article = DataLib.get_article(slug)
+        article = DataLib.get_article slug
         if article
           options = Markd::Options.new(smart: true, safe: true)
           html = Markd.to_html(article["md"].as(String), options)
           article["html"] = html.gsub("/bucket/", IMGBUCKET)
-          TemplateRenderer.render_and_out(
-            ctx: ctx,
+          TemplateRenderer.render_and_out ctx: ctx,
             data: {
               "title" => "Admin: articles",
               "article" => article,
@@ -157,7 +141,6 @@ module CrystalWorld
               "imagekit_bucket" => IMGBUCKET
             },
             template_path: "admin/edit-article.html"
-          )
           return
         end
       end
@@ -165,13 +148,11 @@ module CrystalWorld
     end
 
     def login_page(ctx)
-      TemplateRenderer.render_and_out(
-        ctx: ctx,
+      TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "title" => "Sign in to admin",
         },
         template_path: "admin/login.html"
-      )
     end
 
     def do_logout(ctx)
@@ -247,13 +228,11 @@ module CrystalWorld
 
     def error_404(ctx)
       ctx.response.status = HTTP::Status.new(404)
-      TemplateRenderer.render_and_out(
-        ctx: ctx,
+      TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "error_msg" => "Page not found",
         },
-        template_path: "errors/404.html",
-      )
+        template_path: "errors/404.html"
     end
 
   end
