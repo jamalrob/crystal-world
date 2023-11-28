@@ -46,9 +46,6 @@ module CrystalWorld
     end
   end
 
-  p! "/admin/edit/nova-by-samuel-r-delany/preview".match(/^\/admin\/edit\/[a-z0-9]+(?:[_-][a-z0-9]+)*/)
-  p! "/admin/edit/nova-by-samuel-r-delany-1968".match(/^\/admin\/edit\/[a-z0-9]+(?:[_-][a-z0-9]+)*/)
-  p! "/admin/foo-bar-gumbo/preview".match(/\/admin\/[a-z0-9]+(?:[_-][a-z0-9]+)*\/preview/)
   address = server.bind_tcp 8123
   puts "Listening on http://#{address}"
   server.listen
