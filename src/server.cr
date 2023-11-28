@@ -13,33 +13,42 @@ module CrystalWorld
 
     puts "Request for #{ctx.request.path}"
 
+    slug_pattern = "[a-z0-9]+(?:[_-][a-z0-9]+)*"
+
     case ctx.request.path
     when "admin/signup"
       # Probably not implementing here
       # See dump
     when "/admin/login"
-      Controllers.login_page(ctx)
+      Controllers.login_page ctx
     when "/admin/logout"
-      Controllers.do_logout(ctx)
+      Controllers.do_logout ctx
     when "/admin/login/auth"
-      Controllers.do_login(ctx)
+      Controllers.do_login ctx
     when "/admin", "/admin/articles"
-      Controllers.admin_articles(ctx)
-    when .match(/\/admin\/edit\/[a-zA-Z0-9]/)
-      Controllers.admin_edit_article(ctx)
+      Controllers.admin_articles ctx
+    when .match /^\/admin\/edit\/#{slug_pattern}$/
+      Controllers.admin_edit_article ctx
+    when .match /^\/admin\/edit\/#{slug_pattern}\/preview$/
+      Controllers.admin_edit_preview ctx
     when "/"
-      Controllers.home_page(ctx)
+      Controllers.home_page ctx
     when "/tags"
-      Controllers.tags_page(ctx)
-    when .index("/tag/")
-      Controllers.tag_page(ctx)
+      Controllers.tags_page ctx
+    when .index "/tag/"
+      Controllers.tag_page ctx
     when "/about"
-      Controllers.about_page(ctx)
-    when .match(/[a-zA-Z0-9]/)
-      Controllers.article_page(ctx)
+      Controllers.about_page ctx
+    when .match /^\/#{slug_pattern}$/
+      Controllers.article_page ctx
+    else
+      Controllers.error_404 ctx
     end
   end
 
+  p! "/admin/edit/nova-by-samuel-r-delany/preview".match(/^\/admin\/edit\/[a-z0-9]+(?:[_-][a-z0-9]+)*/)
+  p! "/admin/edit/nova-by-samuel-r-delany-1968".match(/^\/admin\/edit\/[a-z0-9]+(?:[_-][a-z0-9]+)*/)
+  p! "/admin/foo-bar-gumbo/preview".match(/\/admin\/[a-z0-9]+(?:[_-][a-z0-9]+)*\/preview/)
   address = server.bind_tcp 8123
   puts "Listening on http://#{address}"
   server.listen

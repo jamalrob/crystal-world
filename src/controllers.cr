@@ -132,6 +132,12 @@ module CrystalWorld
       ctx.response.redirect "/"
     end
 
+    def admin_edit_preview(ctx)
+      urlbits = ctx.request.path.split('/', remove_empty: true)
+      slug = urlbits[-2]?
+      p! slug
+    end
+
     def admin_edit_article(ctx)
       urlbits = ctx.request.path.split('/', remove_empty: true)
       slug = urlbits[-1]?
@@ -239,6 +245,17 @@ module CrystalWorld
       # Adding an error status to the response here trips up
       # the HTMX replacement, so we don't do it
       ctx.response.print "Your credentials were not recognized."
+    end
+
+    def error_404(ctx)
+      ctx.response.status = HTTP::Status.new(404)
+      TemplateRenderer.render_and_out(
+        ctx: ctx,
+        data: {
+          "error_msg" => "Page not found",
+        },
+        template_path: "errors/404.html",
+      )
     end
 
   end
