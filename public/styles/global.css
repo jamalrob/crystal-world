@@ -70,13 +70,6 @@ h3 {
     }
 }
 
-.col {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    padding: 20px 20px;
-    width: 50%;
-}
 .button-row {
     margin-top: 1rem;
     display: flex;

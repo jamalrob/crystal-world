@@ -4,9 +4,9 @@ main.admin {
   margin-left: 21%;
 }
 main.admin.expanded {
-  margin: 0 0 0 100px;
-  width: 85%;
-  max-width: 85%;
+  margin: 0 0 0 90px;
+  width: 90%;
+  max-width: 90%;
 }
 h2 {
   margin-top: 5px;

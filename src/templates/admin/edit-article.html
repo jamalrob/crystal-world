@@ -1,13 +1,35 @@
 {% extends "admin/layouts/base.html" %}
 {% block content %}
 <h2>Edit article: {{ article.title }}</h2>
-<textarea id="article-edit-box">
-{{ article.md }}
-</textarea>
-<div class="button-row">
-  <button>Save</button>
+<div class="edit-container">
+  <section class="edit">
+    <textarea id="article-edit-box">{{ article.md }}</textarea>
+  </section>
+  <section class="preview">
+    {{ article.html|safe }}
+  </section>
 </div>
+<script type="text/hyperscript">
+  def getHtmlFromMarkdown(md_text)
+    make a showdown.Converter called converter
+    return converter.makeHtml(md_text.replaceAll('/bucket/', '{{ imagekit_bucket }}/'))
+  end
+</script>
 <style>
+.edit-container {
+  display: flex;
+  flex-direction: row;
+}
+.edit-container section {
+  width: 50%;
+}
+.edit-container section:first-child {
+  margin-right: 35px;
+}
+.edit-container section.preview {
+  font-size: 0.84rem;
+  line-height: 1.39rem;
+}
 #article-edit-box {
   background: rgb(232, 229, 229);
   color: #222;

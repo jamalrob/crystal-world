@@ -137,17 +137,23 @@ module CrystalWorld
       slug = urlbits[-1]?
       if u = self.authenticated_user(ctx)
         article = DataLib.get_article(slug)
-        TemplateRenderer.render_and_out(
-          ctx: ctx,
-          data: {
-            "title" => "Admin: articles",
-            "article" => article,
-            "user_authenticated" => true,
-            "admin" => true
-          },
-          template_path: "admin/edit-article.html"
-        )
-        return
+        if article
+          options = Markd::Options.new(smart: true, safe: true)
+          html = Markd.to_html(article["md"].as(String), options)
+          article["html"] = html.gsub("/bucket/", IMGBUCKET)
+          TemplateRenderer.render_and_out(
+            ctx: ctx,
+            data: {
+              "title" => "Admin: articles",
+              "article" => article,
+              "user_authenticated" => true,
+              "admin" => true,
+              "imagekit_bucket" => IMGBUCKET
+            },
+            template_path: "admin/edit-article.html"
+          )
+          return
+        end
       end
       ctx.response.redirect "/"
     end
