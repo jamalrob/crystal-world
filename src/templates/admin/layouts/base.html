@@ -1,33 +1,40 @@
 {% extends "layouts/base.html" %}
 {% block admin_sidebar %}
-<div id="sidebar">
-  <button id="toggle-sidebar"
-    _=" on click toggle .collapsed on #sidebar
-        toggle .hidden on <svg.feather-chevron-right/>
-        toggle .hidden on <svg.feather-chevron-left/>
-        toggle the *display of <a span.text/>
-        wait 150ms
-        toggle .hidden on <a span.text/>
-        "
-  >
-    <span data-feather="chevron-left"></span>
-    <span class="hidden" data-feather="chevron-right"></span>
+<div id="sidebar" hx-boost="true">
+  <button id="toggle-sidebar" _="on click call toggleSidebar()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right hidden"><polyline points="9 18 15 12 9 6"></polyline></svg>
   </button>
   <nav>
     <a href="/admin/articles" class="admin-section {% if title == 'Admin: articles' %}active{% endif %}" id="articles" title="Articles">
-      <span data-feather="edit-3" style="color: white;"></span><span class="text">Articles</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+      <span class="text">Articles</span>
     </a>
     <a href="/admin/pages"    class="admin-section {% if title == 'Admin: pages' %}active{% endif %}" id="pages" title="Pages">
-      <span data-feather="book-open" style="color: white;"></span><span class="text">Pages</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book-open"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+      <span class="text">Pages</span>
     </a>
     <a href="/admin/customize" class="admin-section {% if title == 'Admin: customize' %}active{% endif %}" id="customize" title="Customize">
-      <span data-feather="image" style="color: white;"></span><span class="text">Customize</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      <span class="text">Customize</span>
     </a>
     <a href="/admin/authors"  class="admin-section {% if title == 'Admin: authors' %}active{% endif %}" id="authors" title="Authors">
-      <span data-feather="users" style="color: white;"></span><span class="text">Authors</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      <span class="text">Authors</span>
     </a>
   </nav>
 </div>
+<script type="text/hyperscript">
+  def toggleSidebar()
+    toggle .collapsed on #sidebar
+    toggle .hidden on <svg.feather-chevron-right/>
+    toggle .hidden on <svg.feather-chevron-left/>
+    toggle .expanded on <main.admin/>
+    toggle the *display of <a span.text/>
+    wait 180ms
+    toggle .hidden on <a span.text/>
+  end
+</script>
 <style>
 button#toggle-sidebar {
   padding: 0;

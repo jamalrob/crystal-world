@@ -3,6 +3,11 @@ main.admin {
   max-width: 73%;
   margin-left: 21%;
 }
+main.admin.expanded {
+  margin: 0 0 0 100px;
+  width: 85%;
+  max-width: 85%;
+}
 h2 {
   margin-top: 5px;
 }
