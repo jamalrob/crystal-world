@@ -89,6 +89,64 @@ module CrystalWorld
       self.error_404 ctx
     end
 
+    def admin_settings(ctx)
+      if u = self.authenticated_user ctx
+        TemplateRenderer.render_and_out ctx: ctx,
+          data: {
+            "title" => "Admin: articles",
+            "user_authenticated" => true,
+            "admin" => true
+          },
+          template_path: "admin/settings.html"
+        return
+      end
+      ctx.response.redirect "/"
+    end
+
+    def admin_authors(ctx)
+      if u = self.authenticated_user ctx
+        TemplateRenderer.render_and_out ctx: ctx,
+          data: {
+            "title" => "Admin: articles",
+            #"authors" => authors,
+            "user_authenticated" => true,
+            "admin" => true
+          },
+          template_path: "admin/authors.html"
+        return
+      end
+      ctx.response.redirect "/"
+    end
+
+    def admin_customize(ctx)
+      if u = self.authenticated_user ctx
+        TemplateRenderer.render_and_out ctx: ctx,
+          data: {
+            "title" => "Admin: articles",
+            "user_authenticated" => true,
+            "admin" => true
+          },
+          template_path: "admin/customize.html"
+        return
+      end
+      ctx.response.redirect "/"
+    end
+
+    def admin_pages(ctx)
+      if u = self.authenticated_user ctx
+        TemplateRenderer.render_and_out ctx: ctx,
+          data: {
+            "title" => "Admin: articles",
+            #"articles" => articles,
+            "user_authenticated" => true,
+            "admin" => true
+          },
+          template_path: "admin/pages.html"
+        return
+      end
+      ctx.response.redirect "/"
+    end
+
     def admin_articles(ctx)
       if u = self.authenticated_user ctx
         articles = DataLib.get_articles
