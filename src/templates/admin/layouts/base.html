@@ -27,16 +27,42 @@ button#toggle-sidebar {
   right: 10px;
   background-color: #08426f;
 }
+#sidebar {
+  padding-top: 57px;
+  width: 15%;
+  border-right: 1px solid rgba(84, 143, 211, 0.3);
+  top: 42px;
+  height: 100%;
+  position: fixed;
+  background-color: #08426f;
+}
+#sidebar h3 {
+  margin-top: 0;
+}
+#sidebar nav a {
+  display: block;
+  font-size: 0.8rem;
+  padding: 10px 0 10px 20px;
+  border-bottom: solid 1px #08426f;
+}
+#sidebar nav a svg {
+  height: 1.3rem;
+  vertical-align: bottom;
+  margin-right: 10px;
+}
+#sidebar nav a.active, #sidebar nav a:hover {
+  /*text-decoration: underline;
+  text-underline-offset: 4px;*/
+  text-decoration: none;
+  color: white;
+  background-color: #0b66ab;
+  border-bottom: 1px solid rgba(84, 143, 211, 0.3);
+}
 #sidebar.collapsed {
   width: 45px;
   opacity: 1;
   transition: width 0.15s ease;
   padding-left: 12px;
-}
-#sidebar nav a {
-    background: url("external-link-52.png") no-repeat 100% 0;
-    background-size: 16px 16px;
-    padding-right: 19px;
 }
 </style>
 <script type="text/hyperscript">

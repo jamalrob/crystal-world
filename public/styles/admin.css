@@ -6,33 +6,6 @@ main.admin {
 h2 {
   margin-top: 5px;
 }
-#sidebar {
-  padding-top: 65px;
-  padding-left: 20px;
-  width: 15%;
-  border-right: 1px solid rgba(84, 143, 211, 0.3);
-  top: 42px;
-  height: 100%;
-  position: fixed;
-  background-color: #08426f;
-}
-#sidebar h3 {
-  margin-top: 0;
-}
-#sidebar nav a {
-  display: block;
-  font-size: 0.9rem;
-}
-#sidebar nav a svg {
-  height: 1rem;
-  vertical-align: text-top;
-  margin-right: 3px;
-}
-#sidebar nav a.active {
-  /*text-decoration: underline;
-  text-underline-offset: 4px;*/
-}
-
 table.admin-table {
   width: 100%;
   /*border: 1px solid rgba(84, 143, 211, 0.3);*/
