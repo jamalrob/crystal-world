@@ -110,7 +110,8 @@ module CrystalWorld
       if ctx.request.cookies.has_key?("sessionid") && ctx.request.cookies.has_key?("csrftoken")
         sessionid = ctx.request.cookies["sessionid"].value
         csrftoken = ctx.request.cookies["csrftoken"].value
-        if DataLib.get_authenticated_user(sessionid, csrftoken)
+        u = DataLib.get_authenticated_user(sessionid, csrftoken)
+        if u
           TemplateRenderer.render_and_out(
             ctx: ctx,
             data: {
