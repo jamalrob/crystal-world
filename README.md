@@ -9,6 +9,7 @@ The main objectives here are:
   - authentication
   - template rendering
   - data access
+  - CSRF and XSS prevention
 - Testing different patterns and architectures
 - Learning a new programming language that's as nice to read as Python or Ruby, and yet _fast_
 - Building a groundwork for small real-world projects that's easy and enjoyable to use
