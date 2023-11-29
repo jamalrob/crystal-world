@@ -5,11 +5,11 @@ A blog application written in Crystal without a framework, inspired by the [Fram
 The main objectives here are:
 
 - Implementing the basics without a framework:
-  - routing
-  - authentication and sessions
-  - cookie management
-  - template rendering
-  - database access
+  - Routing
+  - Authentication and sessions
+  - Cookie management
+  - Template rendering
+  - Database access
   - CSRF and XSS prevention
 - Testing different patterns and architectures
 - Learning a new programming language that's as nice to read as Python or Ruby, and yet _fast_
@@ -18,9 +18,10 @@ The main objectives here are:
 
 ### Features
 
-- Admin section/CMS:
+- Admin section/CMS
 - Edit articles in Markdown, with instant previews
 - CRUD for articles, authors, pages, customization, and settings
+- Image store connectng to ImageKit
 - Choose from two separate modes of operation:
-  - file-based (Markdown files with frontmatter)
-  - or data-based (SQLite3 database)
+  - File-based (Markdown files with frontmatter)
+  - Or data-based (SQLite3 database)
