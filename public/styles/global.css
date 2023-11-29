@@ -112,7 +112,7 @@ input[type='text'], input[type='date'], input[type='password'] {
 }
 
 input, textarea, #editBox {
-    border-radius: 3px;
+    border-radius: 2px;
     border: none;
     font-size: 18px;
     box-shadow: inset 1px 1px 10px #454d605c;
@@ -187,6 +187,11 @@ header nav button {
   position: absolute;
   left: 0;
   top:-10px;
+}
+code {
+  background: #1f232b;
+  padding: 2px 4px;
+  border-radius: 2px;
 }
 .blog-article pre {
   background: #1f232b;

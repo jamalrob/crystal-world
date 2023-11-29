@@ -7,7 +7,7 @@ main.admin.extended { /* for e.g., article edit */
   width: 77%;
   max-width: 77%;
   margin-left: 19%;
-  padding-top: 35px;
+  padding-top: 75px;
 }
 main.admin.collapsed { /* when sidebar is collapsed */
   margin: 0 0 0 80px;
@@ -22,7 +22,7 @@ table.admin-table {
   border-collapse: collapse;
   background-color: #165a8f34;
   overflow: hidden;
-  border-radius: 5px;
+  border-radius: 3px;
   box-shadow: 0 0 3px #0b2a42;
   /*background-color: #f1f1e6;*/
   /*color: #222;*/
@@ -73,10 +73,10 @@ button.has-icon {
   padding-left: 22px;
 }
 button.green {
-  background-color: #019463
+  background-color: #2f71bc;
 }
 button.green:hover {
-  background-color: #1cb384
+  background-color: #2889f8
 }
 button.push-right{
   position: absolute;
