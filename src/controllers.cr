@@ -200,9 +200,8 @@ module CrystalWorld
       if ctx.request.cookies.has_key?("sidebar_collapsed")
         # Update existing cookie
         # STEP 1: expire the old one
-        oldstate = "normal" ? "collapsed" : "normal"
         ck_sidebar_collapsed = HTTP::Cookie.new(
-          "sidebar_collapsed", oldstate,
+          "sidebar_collapsed", "",
           expires: Time.utc - 1.day
         )
         # STEP 2: create a new one
@@ -228,7 +227,7 @@ module CrystalWorld
           http_only: true
         )
       end
-      json_text = %({"status": state})
+      json_text = %({"status": "#{state}"})
       ctx.response.print json_text
     end
 
