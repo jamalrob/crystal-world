@@ -1,7 +1,7 @@
 {% extends "admin/layouts/base.html" %}
 {% block content %}
 <h2>Editing: <em>{{ article.title }}</em></h2>
-<div class="edit-container" _="on load call scrollSync()">
+<div class="edit-container">
   <section class="edit">
     <textarea
       id="article-edit-box"
@@ -10,6 +10,8 @@
             make a showdown.Converter called converter
             set html to converter.makeHtml(my value.replaceAll('/bucket/', '{{ imagekit_bucket }}/'))
             put html into <div.pre-preview/>
+          on scroll
+            set scrollTop of <div.pre-preview/> to my.scrollTop
       "
     >{{ article.md }}</textarea>
   </section>
@@ -21,35 +23,11 @@
     >
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
     </a>
-    <div class="pre-preview" class="scrollSync">
+    <div class="pre-preview scrollSync">
     {{ article.html|safe }}
     </div>
   </section>
 </div>
-<script type="text/hyperscript">
-  js
-    function scrollSync(selector = ".scrollSync") {
-      let active = null;
-      document.querySelectorAll(selector).forEach(function(div) {
-        div.addEventListener("mouseenter", function(e) {
-          active = e.target;
-        });
-
-        div.addEventListener("scroll", function(e) {
-          if (e.target !== active) return;
-
-          document.querySelectorAll(selector).forEach(function(target) {
-            if (active === target) return;
-
-            target.scrollTop = active.scrollTop;
-            target.scrollLeft = active.scrollLeft;
-          });
-        });
-      });
-    }
-    return { scrollSync }
-  end
-</script>
 <style>
 .edit-container {
   display: flex;
