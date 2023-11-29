@@ -10,9 +10,9 @@ main.admin.extended { /* for e.g., article edit */
   padding-top: 35px;
 }
 main.admin.collapsed { /* when sidebar is collapsed */
-  margin: 0 0 0 90px;
-  width: 89%;
-  max-width: 89%;
+  margin: 0 0 0 80px;
+  width: 91%;
+  max-width: 91%;
 }
 table.admin-table {
   width: 100%;

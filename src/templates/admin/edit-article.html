@@ -5,34 +5,19 @@
   <section class="edit">
     <div class="editable" contenteditable="true"
     _=" on input
-            make a showdown.Converter called converter
-            set html to converter.makeHtml(my innerText.replaceAll('/bucket/', '{{ imagekit_bucket }}/'))
-            put html into #pre-preview
-            hljs.highlightAll()
+          call do_html(me.innerText)
         on scroll
           set scrollTop of #pre-preview to my.scrollTop
-          on keydown[key is 'Tab']
-            halt the event
-            document.execCommand('insertHTML', false, '&#009')
+        on keydown[key is 'Tab']
+          halt the event then call document.execCommand('insertText', false, '&#009')
+        on keydown[key is 'b' and ctrlKey is true]
+          halt the event
+          call doFontStyle('**') then call do_html(me.innerText)
+        on keydown[key is 'i' and ctrlKey is true]
+          halt the event
+          call doFontStyle('_') then call do_html(me.innerText)
         "
     >{{ article.md }}</div>
-    <!--<textarea
-      id="article-edit-box"
-      _=" on input
-            make a showdown.Converter called converter
-            set html to converter.makeHtml(my value.replaceAll('/bucket/', '{{ imagekit_bucket }}/'))
-            put html into <div.pre-preview/>
-          on scroll
-            set scrollTop of <div.pre-preview/> to my.scrollTop
-          on keydown[key is 'Tab']
-            halt the event then call me.setRangeText(
-              '\t',
-              me.selectionStart,
-              me.selectionStart,
-              'end'
-              )
-          "
-    >{{ article.md }}</textarea>-->
   </section>
   <section class="preview">
     <a  href="/admin/edit/{{ article.slug }}/preview"
@@ -47,6 +32,27 @@
     </div>
   </section>
 </div>
+<script type="text/hyperscript">
+  def doFontStyle(mk)
+    set div to <div.editable/>
+    if window.getSelection
+      set sel to window.getSelection()
+      set replacementText to mk.concat(sel, mk)
+      if sel.rangeCount is greater than 0
+        set range to sel.getRangeAt(0)
+        call range.deleteContents()
+        call range.insertNode(document.createTextNode(replacementText))
+      end
+    end
+  end
+
+  def do_html(md)
+    make a showdown.Converter called converter
+    set html to converter.makeHtml(md.replaceAll('/bucket/', '{{ imagekit_bucket }}/'))
+    put html into #pre-preview
+    hljs.highlightAll()
+  end
+</script>
 <style>
 .edit-container {
   display: flex;
@@ -85,7 +91,7 @@ section.preview svg {
 }
 div#pre-preview, div.editable {
   height: 80vh;
-  overflow: scroll;
+  overflow: auto;
   font-size: 0.84rem;
   line-height: 1.38rem;
   background-color: #08416d;
@@ -114,7 +120,7 @@ div#pre-preview pre {
   margin-left: 0px;
   margin-right: 10px;
   position: relative;
-  overflow: scroll;
+  overflow: auto;
   line-height: 1.2rem;
 }
 div#pre-preview pre code {
