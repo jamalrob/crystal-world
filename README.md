@@ -1,6 +1,6 @@
 # The Crystal World
 
-A blog application written in Crystal without a framework, inspired by the [Frameworkless Manifesto](https://github.com/frameworkless-movement/manifesto).
+A reinventing-the-wheel project: a blog application written in the [Crystal](https://crystal-lang.org/) compiled programming language, without a framework, inspired by the [Frameworkless Manifesto](https://github.com/frameworkless-movement/manifesto).
 
 The main objectives here are:
 
