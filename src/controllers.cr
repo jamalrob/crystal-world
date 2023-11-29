@@ -194,41 +194,63 @@ module CrystalWorld
       end
     end
 
-    def save_sidebar_state(ctx)
-      urlbits = ctx.request.path.split('/', remove_empty: true)
-      state = urlbits[2] # 'collapsed' or 'normal'
-      if ctx.request.cookies.has_key?("sidebar_collapsed")
-        # Update existing cookie
-        # STEP 1: expire the old one
-        ck_sidebar_collapsed = HTTP::Cookie.new(
-          "sidebar_collapsed", "",
-          expires: Time.utc - 1.day
-        )
-        # STEP 2: create a new one
-        ck_sidebar_collapsed = HTTP::Cookie.new(
-          name: "sidebar_collapsed",
-          value: state,
-          path: "/",
-          max_age: Time::Span.new(hours: 12),
-          secure: false,
-          samesite: HTTP::Cookie::SameSite.new(1),
-          http_only: true,
-        )
-        ctx.response.headers["Set-Cookie"] = ck_sidebar_collapsed.to_set_cookie_header
-      else
-        # Add new cookie
-        ctx.response.cookies["sidebar_collapsed"] = HTTP::Cookie.new(
-          name: "sidebar_collapsed",
-          value: state,
-          path: "/",
-          max_age: Time::Span.new(hours: 12),
-          secure: false,
-          samesite: HTTP::Cookie::SameSite.new(1),
-          http_only: true
-        )
+    def get_preview_html(ctx)
+      # Use if showdown.js doesn't do smart quotes
+      if u = self.authenticated_user ctx
+        p! ctx.request
+        params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
+        if params.has_key?("markdown")
+          md = params["markdown"]
+          options = Markd::Options.new(smart: true, safe: true)
+          html = Markd.to_html(md, options)
+          html = html.gsub("/bucket/", IMGBUCKET)
+          #json_text = %({"html": "#{html}"})
+          ctx.response.print html
+          return
+        end
       end
-      json_text = %({"status": "#{state}"})
-      ctx.response.print json_text
+      ctx.response.status = HTTP::Status.new(403)
+    end
+
+    def save_sidebar_state(ctx)
+      if u = self.authenticated_user ctx
+        urlbits = ctx.request.path.split('/', remove_empty: true)
+        state = urlbits[2] # 'collapsed' or 'normal'
+        if ctx.request.cookies.has_key?("sidebar_collapsed")
+          # Update existing cookie
+          # STEP 1: expire the old one
+          ck_sidebar_collapsed = HTTP::Cookie.new(
+            "sidebar_collapsed", "",
+            expires: Time.utc - 1.day
+          )
+          # STEP 2: create a new one
+          ck_sidebar_collapsed = HTTP::Cookie.new(
+            name: "sidebar_collapsed",
+            value: state,
+            path: "/",
+            max_age: Time::Span.new(hours: 12),
+            secure: false,
+            samesite: HTTP::Cookie::SameSite.new(1),
+            http_only: true,
+          )
+          ctx.response.headers["Set-Cookie"] = ck_sidebar_collapsed.to_set_cookie_header
+        else
+          # Add new cookie
+          ctx.response.cookies["sidebar_collapsed"] = HTTP::Cookie.new(
+            name: "sidebar_collapsed",
+            value: state,
+            path: "/",
+            max_age: Time::Span.new(hours: 12),
+            secure: false,
+            samesite: HTTP::Cookie::SameSite.new(1),
+            http_only: true
+          )
+        end
+        json_text = %({"status": "#{state}"})
+        ctx.response.print json_text
+        return
+      end
+      ctx.response.status = HTTP::Status.new(403)
     end
 
     def admin_edit_article(ctx)

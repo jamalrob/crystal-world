@@ -28,10 +28,18 @@
     >{{ article.md }}</div>
   </section>
   <section class="preview">
-    <a  href="/admin/edit/{{ article.slug }}/preview"
+    <!-- href="/admin/edit/{{ article.slug }}/preview" -->
+    <a  href="/get_preview_html"
         title="Full preview"
         target="previewArticle"
-        _=" on click set localStorage.previewHtml to innerHTML of #pre-preview"
+        hx-post="/get_preview_html"
+        hx-vals="js:{
+            markdown: document.querySelector('.editable').innerText
+        }"
+        hx-target="#pre-preview"
+        hx-indicator=""
+        hx-on::before-request=""
+        hx-on::after-request="setLocalStorage()"
     >
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
     </a>
@@ -41,20 +49,19 @@
   </section>
 </div>
 <script>
+  // ********************************************************
+  // Prevent users pasting in anything other than usual stuff
+  // ********************************************************
   const el = document.querySelector('.editable');
-
   el.addEventListener('paste', (e) => {
     // Get user's pasted data
     let data = e.clipboardData.getData('text/html') ||
         e.clipboardData.getData('text/plain');
-
     // Filter out everything except simple text and allowable HTML elements
     let regex = /<(?!(\/\s*)?(a|b|i|em|s|code|pre|strong|u)[>,\s])([^>])*>/g;
     data = data.replace(regex, '');
-
     // Insert the filtered content
     document.execCommand('insertHTML', false, data);
-
     // Prevent the standard paste behavior
     e.preventDefault();
   });
@@ -78,6 +85,11 @@
     set html to converter.makeHtml(md.replaceAll('/bucket/', '{{ imagekit_bucket }}/'))
     put html into #pre-preview
     hljs.highlightAll()
+  end
+
+  def setLocalStorage()
+    set localStorage.previewHtml to innerHTML of #pre-preview
+    go to '/admin/edit/{{ article.slug }}/preview'
   end
 </script>
 <style>
