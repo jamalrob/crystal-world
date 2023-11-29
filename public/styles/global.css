@@ -191,14 +191,16 @@ header nav button {
 .blog-article pre {
   background: #1f232b;
   border-radius: 2px;
-  padding: 10px 15px 25px 15px;
   margin-left: 0px;
   margin-right: 10px;
   overflow: scroll;
+  line-height: 1.2rem;
 }
 .blog-article pre code {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   position: relative;
+  background: #1f232b;
+  font-family: 'Ubuntu Mono', 'Code New Roman', 'Source Code Pro', monospace !important;
 }
 .blog-article img {
     max-width: 95%;

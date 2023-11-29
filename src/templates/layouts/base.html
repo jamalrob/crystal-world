@@ -12,6 +12,10 @@
     <script src="/scripts/_hyperscript.min.js" defer></script>
     <script src="/scripts/json-enc.js" defer></script>
     <script src="/scripts/showdown.min.js" defer></script>
+
+    <link rel="stylesheet" href="/scripts/highlight/styles/github-dark.min.css">
+    <script src="/scripts/highlight/highlight.min.js"></script>
+
     <meta name="htmx-config" content='{
         "selfRequestsOnly": true
     }'>
@@ -40,5 +44,6 @@
         {% endif %}
         {% block content %}{% endblock %}
     </main>
+    <script>hljs.highlightAll();</script>
 </body>
 </html>

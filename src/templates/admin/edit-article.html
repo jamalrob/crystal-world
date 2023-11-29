@@ -3,7 +3,19 @@
 <h2>Editing: <em>{{ article.title }}</em></h2>
 <div class="edit-container">
   <section class="edit">
-    <div class="editable" contenteditable="true">{{ article.md }}</div>
+    <div class="editable" contenteditable="true"
+    _=" on input
+            make a showdown.Converter called converter
+            set html to converter.makeHtml(my innerText.replaceAll('/bucket/', '{{ imagekit_bucket }}/'))
+            put html into #pre-preview
+            hljs.highlightAll()
+        on scroll
+          set scrollTop of #pre-preview to my.scrollTop
+          on keydown[key is 'Tab']
+            halt the event
+            document.execCommand('insertHTML', false, '&#009')
+        "
+    >{{ article.md }}</div>
     <!--<textarea
       id="article-edit-box"
       _=" on input
@@ -26,11 +38,11 @@
     <a  href="/admin/edit/{{ article.slug }}/preview"
         title="Full preview"
         target="previewArticle"
-        _=" on click set localStorage.previewHtml to innerHTML of <div.pre-preview/>"
+        _=" on click set localStorage.previewHtml to innerHTML of #pre-preview"
     >
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
     </a>
-    <div class="pre-preview">
+    <div id="pre-preview">
     {{ article.html|safe }}
     </div>
   </section>
@@ -62,16 +74,16 @@
   /*white-space: pre;*/
 }
 textarea,
-pre, .pre-preview, .editable {
-  -moz-tab-size : 2;
-  -o-tab-size : 2;
-  tab-size : 2;
+pre, #pre-preview, .editable {
+  -moz-tab-size : 4;
+  -o-tab-size : 4;
+  tab-size : 4;
 }
 section.preview svg {
   float: right;
   margin-top: -30px
 }
-div.pre-preview, div.editable {
+div#pre-preview, div.editable {
   height: 80vh;
   overflow: scroll;
   font-size: 0.84rem;
@@ -80,7 +92,7 @@ div.pre-preview, div.editable {
   padding: 10px 15px 0 15px;
   border-radius: 3px;
 }
-div.pre-preview blockquote {
+div#pre-preview blockquote {
   border-radius: 2px;
   padding: 15px 25px 5px 60px;
   margin-left: 0;
@@ -88,7 +100,7 @@ div.pre-preview blockquote {
   position: relative;
   font-style: italic;
 }
-div.pre-preview blockquote::before{
+div#pre-preview blockquote::before{
   font-family: "Roboto";
   content: "\201C";
   font-size: 5em;
@@ -96,24 +108,27 @@ div.pre-preview blockquote::before{
   left: 5px;
   top: 35px;
 }
-div.pre-preview pre {
+div#pre-preview pre {
   background: #1f232b;
   border-radius: 2px;
-  padding: 10px 25px 10px 25px;
   margin-left: 0px;
   margin-right: 10px;
   position: relative;
   overflow: scroll;
-  font-size: 0.9rem;
+  line-height: 1.2rem;
 }
-div.pre-preview img {
+div#pre-preview pre code {
+  font-family: 'Ubuntu Mono', 'Code New Roman', 'Source Code Pro', monospace !important;
+  background: #1f232b;
+}
+div#pre-preview img {
     max-width: 95%;
     display: block;
 }
-div.pre-preview img+em {
+div#pre-preview img+em {
     font-size: 0.8rem;
 }
-div.pre-preview p:first-child {
+div#pre-preview p:first-child {
   margin-top: 0;
 }
 </style>
