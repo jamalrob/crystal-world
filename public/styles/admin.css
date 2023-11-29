@@ -7,15 +7,12 @@ main.admin.extended { /* for e.g., article edit */
   width: 77%;
   max-width: 77%;
   margin-left: 19%;
-  padding-top: 70px;
+  padding-top: 35px;
 }
 main.admin.collapsed { /* when sidebar is collapsed */
   margin: 0 0 0 90px;
   width: 89%;
   max-width: 89%;
-}
-main.admin h2 {
-  margin-top: 5px;
 }
 table.admin-table {
   width: 100%;
@@ -63,7 +60,25 @@ table.admin-table button {
   position: relative;
   top: -2px;
 }
-
 .showing {
   display: table-row;
+}
+button svg {
+  height: 1.3rem;
+  vertical-align: bottom;
+  margin-right: 0;
+}
+button.has-icon {
+  padding-top: 5px;
+  padding-left: 22px;
+}
+button.green {
+  background-color: #019463
+}
+button.green:hover {
+  background-color: #1cb384
+}
+button.push-right{
+  position: absolute;
+  right: 0;
 }
