@@ -3,13 +3,19 @@ main.admin {
   max-width: 73%;
   margin-left: 21%;
 }
+main.admin.extended { /* for e.g., article edit */
+  width: 77%;
+  max-width: 77%;
+  margin-left: 19%;
+  padding-top: 70px;
+}
+main.admin.collapsed { /* when sidebar is collapsed */
+  margin: 0 0 0 90px;
+  width: 89%;
+  max-width: 89%;
+}
 main.admin h2 {
   margin-top: 5px;
-}
-main.admin.expanded {
-  margin: 0 0 0 90px;
-  width: 88%;
-  max-width: 88%;
 }
 table.admin-table {
   width: 100%;

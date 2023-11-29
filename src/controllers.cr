@@ -26,6 +26,14 @@ module CrystalWorld
       end
     end
 
+    def sidebar_collapsed_classname(ctx)
+      sidebar_collapsed = nil
+      if ctx.request.cookies.has_key?("sidebar_collapsed")
+        return ctx.request.cookies["sidebar_collapsed"].value
+      end
+      return "normal"
+    end
+
     def home_page(ctx)
       articles = DataLib.get_articles
       TemplateRenderer.render_and_out ctx: ctx,
@@ -95,6 +103,7 @@ module CrystalWorld
           data: {
             "title" => "Admin: articles",
             "user_authenticated" => true,
+            "sidebar_collapsed" => self.sidebar_collapsed_classname(ctx),
             "admin" => true
           },
           template_path: "admin/settings.html"
@@ -110,6 +119,7 @@ module CrystalWorld
             "title" => "Admin: articles",
             #"authors" => authors,
             "user_authenticated" => true,
+            "sidebar_collapsed" => self.sidebar_collapsed_classname(ctx),
             "admin" => true
           },
           template_path: "admin/authors.html"
@@ -124,6 +134,7 @@ module CrystalWorld
           data: {
             "title" => "Admin: articles",
             "user_authenticated" => true,
+            "sidebar_collapsed" => self.sidebar_collapsed_classname(ctx),
             "admin" => true
           },
           template_path: "admin/customize.html"
@@ -139,6 +150,7 @@ module CrystalWorld
             "title" => "Admin: articles",
             #"articles" => articles,
             "user_authenticated" => true,
+            "sidebar_collapsed" => self.sidebar_collapsed_classname(ctx),
             "admin" => true
           },
           template_path: "admin/pages.html"
@@ -155,6 +167,7 @@ module CrystalWorld
             "title" => "Admin: articles",
             "articles" => articles,
             "user_authenticated" => true,
+            "sidebar_collapsed" => self.sidebar_collapsed_classname(ctx),
             "admin" => true
           },
           template_path: "admin/articles.html"
@@ -181,6 +194,44 @@ module CrystalWorld
       end
     end
 
+    def save_sidebar_state(ctx)
+      urlbits = ctx.request.path.split('/', remove_empty: true)
+      state = urlbits[2] # 'collapsed' or 'normal'
+      if ctx.request.cookies.has_key?("sidebar_collapsed")
+        # Update existing cookie
+        # STEP 1: expire the old one
+        oldstate = "normal" ? "collapsed" : "normal"
+        ck_sidebar_collapsed = HTTP::Cookie.new(
+          "sidebar_collapsed", oldstate,
+          expires: Time.utc - 1.day
+        )
+        # STEP 2: create a new one
+        ck_sidebar_collapsed = HTTP::Cookie.new(
+          name: "sidebar_collapsed",
+          value: state,
+          path: "/",
+          max_age: Time::Span.new(hours: 12),
+          secure: false,
+          samesite: HTTP::Cookie::SameSite.new(1),
+          http_only: true,
+        )
+        ctx.response.headers["Set-Cookie"] = ck_sidebar_collapsed.to_set_cookie_header
+      else
+        # Add new cookie
+        ctx.response.cookies["sidebar_collapsed"] = HTTP::Cookie.new(
+          name: "sidebar_collapsed",
+          value: state,
+          path: "/",
+          max_age: Time::Span.new(hours: 12),
+          secure: false,
+          samesite: HTTP::Cookie::SameSite.new(1),
+          http_only: true
+        )
+      end
+      json_text = %({"status": state})
+      ctx.response.print json_text
+    end
+
     def admin_edit_article(ctx)
       if u = self.authenticated_user ctx
         urlbits = ctx.request.path.split('/', remove_empty: true)
@@ -196,6 +247,8 @@ module CrystalWorld
               "article" => article,
               "user_authenticated" => true,
               "admin" => true,
+              "extended_main" => true,
+              "sidebar_collapsed" => self.sidebar_collapsed_classname(ctx),
               "imagekit_bucket" => IMGBUCKET
             },
             template_path: "admin/edit-article.html"
@@ -216,8 +269,8 @@ module CrystalWorld
     def do_logout(ctx)
       if u = self.authenticated_user(ctx)
         # Setting a cookie's expires in the past prompts the browser to delete it
-        session_cookie = HTTP::Cookie.new("sessionid", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
-        csrf_cookie = HTTP::Cookie.new("csrftoken", "", expires: Time.utc - 1.day, samesite: HTTP::Cookie::SameSite.new(1))
+        session_cookie = HTTP::Cookie.new("sessionid", "", expires: Time.utc - 1.day)
+        csrf_cookie = HTTP::Cookie.new("csrftoken", "", expires: Time.utc - 1.day)
         ctx.response.headers["Set-Cookie"] = [session_cookie.to_set_cookie_header, csrf_cookie.to_set_cookie_header]
         ctx.response.headers["HX-Location"] = %({"path": "/", "target": "body"})
         DataLib.delete_user_session(

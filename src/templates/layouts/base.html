@@ -34,7 +34,7 @@
         </nav>
     </header>
     {% block admin_sidebar %}{% endblock %}
-    <main {% if admin %}class="admin"{% endif %}>
+    <main class="{% if admin %}admin{% endif %} {% if extended_main %}extended{% endif %} {{ sidebar_collapsed }}">
         {% if error_message %}
         <h1>{{ error_msg }}</h1>
         {% endif %}

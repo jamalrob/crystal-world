@@ -1,13 +1,31 @@
 {% extends "layouts/base.html" %}
 {% block admin_sidebar %}
-<div id="sidebar" hx-boost="true">
-  <button id="toggle-sidebar" _="on click call toggleSidebar()" title="Collapse/expand the sidebar">
+<div id="sidebar" hx-boost="true" class="{{ sidebar_collapsed }}">
+  <button
+    id="toggle-sidebar"
+    title="Collapse/expand the sidebar"
+    _=" on click
+          toggle .collapsed on #sidebar
+          ---toggle .hidden on <svg.feather-chevron-right/>
+          ---toggle .hidden on <svg.feather-chevron-left/>
+          toggle .collapsed on <main.admin/>
+          toggle the *display of <a span.text/>
+          wait 180ms
+          toggle the *display of <a span.text/>
+          if <#sidebar.collapsed/> is empty
+            fetch /api/save_sidebar_state/normal as json with method:'POST'
+            log the result
+          else
+            fetch /api/save_sidebar_state/collapsed as json with method:'POST'
+            log the result
+    "
+  >
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left"><polyline points="15 18 9 12 15 6"></polyline></svg>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right hidden"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
   </button>
   <nav>
     <a href="/admin/articles" class="admin-section {% if title == 'Admin: articles' %}active{% endif %}" id="articles" title="Articles">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
       <span class="text">Articles</span>
     </a>
     <a href="/admin/pages"    class="admin-section {% if title == 'Admin: pages' %}active{% endif %}" id="pages" title="Pages">
@@ -15,7 +33,7 @@
       <span class="text">Pages</span>
     </a>
     <a href="/admin/customize" class="admin-section {% if title == 'Admin: customize' %}active{% endif %}" id="customize" title="Customize">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#fff"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" /></svg>
       <span class="text">Customize</span>
     </a>
     <a href="/admin/authors"  class="admin-section {% if title == 'Admin: authors' %}active{% endif %}" id="authors" title="Authors">
@@ -28,17 +46,6 @@
     </a>
   </nav>
 </div>
-<script type="text/hyperscript">
-  def toggleSidebar()
-    toggle .collapsed on #sidebar
-    toggle .hidden on <svg.feather-chevron-right/>
-    toggle .hidden on <svg.feather-chevron-left/>
-    toggle .expanded on <main.admin/>
-    toggle the *display of <a span.text/>
-    wait 180ms
-    toggle .hidden on <a span.text/>
-  end
-</script>
 <style>
 button#toggle-sidebar {
   padding: 0;
@@ -88,7 +95,16 @@ button#toggle-sidebar {
 #sidebar.collapsed nav a {
   padding-left: 9px;
 }
-.hidden {
+#sidebar.collapsed nav a span.text {
+  display: none;
+}
+#sidebar svg.feather-chevron-right {
+  display: none;
+}
+#sidebar.collapsed svg.feather-chevron-right {
+  display: inline;
+}
+#sidebar.collapsed svg.feather-chevron-left {
   display: none;
 }
 </style>

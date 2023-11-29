@@ -20,7 +20,7 @@ module CrystalWorld
       Controllers.home_page ctx
     when "/tags"
       Controllers.tags_page ctx
-    when .index "/tag/"
+    when .starts_with? "/tag/"
       Controllers.tag_page ctx
     when "/about"
       Controllers.about_page ctx
@@ -42,6 +42,8 @@ module CrystalWorld
       Controllers.admin_authors ctx
     when "/admin/settings"
       Controllers.admin_settings ctx
+    when .starts_with? "/api/save_sidebar_state"
+      Controllers.save_sidebar_state ctx
     when .match /^\/admin\/edit\/#{SLUG_PATTERN}$/
       Controllers.admin_edit_article ctx
     when .match /^\/admin\/edit\/#{SLUG_PATTERN}\/preview$/

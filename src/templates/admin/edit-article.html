@@ -1,11 +1,16 @@
 {% extends "admin/layouts/base.html" %}
 {% block content %}
-<h2>Edit article: {{ article.title }}</h2>
-<div class="edit-container">
+<h2>Editing: <em>{{ article.title }}</em></h2>
+<div class="edit-container" _="on load call scrollSync()">
   <section class="edit">
     <textarea
       id="article-edit-box"
-      _="on input put getHtmlFromMarkdown(my value) into <div.pre-preview/>"
+      class="scrollSync"
+      _=" on input
+            make a showdown.Converter called converter
+            set html to converter.makeHtml(my value.replaceAll('/bucket/', '{{ imagekit_bucket }}/'))
+            put html into <div.pre-preview/>
+      "
     >{{ article.md }}</textarea>
   </section>
   <section class="preview">
@@ -16,15 +21,33 @@
     >
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
     </a>
-    <div class="pre-preview">
+    <div class="pre-preview" class="scrollSync">
     {{ article.html|safe }}
     </div>
   </section>
 </div>
 <script type="text/hyperscript">
-  def getHtmlFromMarkdown(md_text)
-    make a showdown.Converter called converter
-    return converter.makeHtml(md_text.replaceAll('/bucket/', '{{ imagekit_bucket }}/'))
+  js
+    function scrollSync(selector = ".scrollSync") {
+      let active = null;
+      document.querySelectorAll(selector).forEach(function(div) {
+        div.addEventListener("mouseenter", function(e) {
+          active = e.target;
+        });
+
+        div.addEventListener("scroll", function(e) {
+          if (e.target !== active) return;
+
+          document.querySelectorAll(selector).forEach(function(target) {
+            if (active === target) return;
+
+            target.scrollTop = active.scrollTop;
+            target.scrollLeft = active.scrollLeft;
+          });
+        });
+      });
+    }
+    return { scrollSync }
   end
 </script>
 <style>
