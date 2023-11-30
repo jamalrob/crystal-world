@@ -124,10 +124,12 @@ module CrystalWorld::Models
         end
 
         results.each do |result|
+          dt = result[2].split(' ')[0]
+          day, month, year = dt.split('-')[2].to_i, dt.split('-')[1].to_i, dt.split('-')[0].to_i
           this_row = {
             "slug"  => result[0],
             "title" => result[1],
-            "date"  => result[2],
+            "date"  => Time.utc(year, month, day).to_s("%d %B %Y"),
             "tags"  => result[3],
           }
           articles.<<(this_row)

@@ -1,12 +1,12 @@
 {% extends "layouts/base.html" %}
 {% block content %}
 <h1>Articles tagged with “{{ tag }}”</h1>
-
 <ul class="article-list" hx-boost="true">
-    {% for a in articles %}
-    <li>
-        <a href='/{{ a.slug }}'>{{ a.title }}</a>
-    </li>
-    {% endfor %}
+  {% for a in articles %}
+  <li>
+      <a href="/{{ a.slug }}">{{ a.title }}</a>
+      <small>{{ a.date }}</small>
+  </li>
+  {% endfor %}
 </ul>
 {% endblock %}
