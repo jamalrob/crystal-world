@@ -5,7 +5,10 @@
   IF USING THE NEW TAB METHOD:
   _="on load put localStorage.previewHtml into #preview-content"
 -->
-<article class="blog-article preview">
+<article
+  class="blog-article preview"
+  _="on load go to the top of .modal-inner smoothly"
+>
     {% if article.image == 1 %}
     <img
         src='https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-80/{{ article.slug }}.jpg'

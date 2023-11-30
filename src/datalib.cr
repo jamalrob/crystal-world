@@ -81,6 +81,9 @@ module CrystalWorld
     end
 
     def create_article(slug, title, tags, date, image, imageClass, draft, content)
+      #
+      # ******* OUT OF DATE *******
+      #
       DB.open "sqlite3://./crw.db" do |db|
         db.exec "INSERT INTO articles " \
                 "(slug, title, tags, date, image, imageClass, draft, content) VALUES " \
@@ -153,10 +156,11 @@ module CrystalWorld
       DB.open "sqlite3://./crw.db" do |db|
         begin
           slug, title, tags, date, image, imageclass, draft, md =
-            db.query_one "SELECT slug, title, tags, date, image, imageClass, draft, content " \
-                         "FROM articles WHERE slug = ? LIMIT 1",
+            db.query_one  "SELECT slug, title, tags, date, main_image, " \
+                          "image_class, draft, content " \
+                          "FROM articles WHERE slug = ? LIMIT 1",
               slug,
-              as: {String, String, String, String, Int32, String, Int32, String}
+              as: {String, String, String?, String, String?, String?, Int32, String}
         rescue DB::NoResultsError
           puts "No article found"
           return nil
@@ -165,7 +169,7 @@ module CrystalWorld
         return {
           "slug"       => slug,
           "title"      => title,
-          "date"       => date,
+          "date"       => date.split(' ')[0],
           "tags"       => tags,
           "image"      => image,
           "imageclass" => imageclass,

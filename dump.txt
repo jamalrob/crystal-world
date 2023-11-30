@@ -125,3 +125,6 @@ when "admin/signup"
     set data to data.replace(regex, "")
     call document.execCommand('insertHTML', false, data)
   end
+
+# JSON
+#json_text = %({"html": "#{html}"})

@@ -1,0 +1,36 @@
+<div id="article-props-container">
+  <h1>Article status: <span id="article-status">{% if article.draft %}draft{% else %}published{% endif %}</span></h1>
+  <form hx-encoding='multipart/form-data' hx-post='/save_properties'>
+    <label for="">Title</label>
+    <input type="text" name="title" id="inpTitle" value="{{ article.title }}">
+    <label for="">Slug</label>
+    <input type="text" name="slug" id="inpSlug" value="{{ article.slug }}">
+    <label for="">Date</label>
+    <input type="date" name="date" id="inpDate" value="{{ article.date }}">
+    <label for="">Tags</label>
+    <input type="text" name="tags" id="inpTags" value="{{ article.tags }}">
+    <label for="">Main image</label>
+    <input type="file" name="mainImage" id="inpMainImage">
+    <label for="">Main image size</label>
+    <select name="imageclass" id="selImageClass">
+      <option value="">--Choose--</option>
+      <option value="small">Small</option>
+      <option value="medium">Medium</option>
+      <option value="large">Large</option>
+      <option value="full">Full-width</option>
+    </select>
+  </form>
+</div>
+<style>
+#article-props-container {
+  padding: 30px;
+  font-size: 0.8rem;
+}
+#article-props-container h1 {
+  font-size: 1rem;
+}
+input[type=checkbox] {
+  width: 20px;
+  height: 20px;
+}
+</style>

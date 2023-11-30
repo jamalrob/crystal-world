@@ -105,18 +105,18 @@ input[type="checkbox"] {
     margin-top: 15px;
 }
 
-input[type='text'], input[type='date'], input[type='password'] {
+input[type='text'], input[type='date'], input[type='password'], input[type='file'], select {
     display: block;
     padding: 10px;
     width: 100%;
     margin: 0 0 10px 0;
 }
 
-input, textarea, #editBox {
+input, textarea, #editBox, select {
     border-radius: 2px;
     border: none;
     font-size: 18px;
-    box-shadow: inset 1px 1px 10px #454d605c;
+    box-shadow: inset 2px 2px 2px #454d605c;
     background: rgb(232, 229, 229);
 }
 

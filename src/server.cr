@@ -1,5 +1,7 @@
 require "http/server"
-require "./controllers.cr"
+require "./public_controllers.cr"
+require "./admin_controllers.cr"
+require "./auth_controllers.cr"
 require "./lib/handlers.cr"
 
 module CrystalWorld
@@ -46,6 +48,8 @@ module CrystalWorld
       Controllers.save_sidebar_state ctx
     when .match /^\/admin\/edit\/#{SLUG_PATTERN}\/preview$/
       Controllers.get_preview_html ctx
+    when .match /^\/admin\/#{SLUG_PATTERN}\/properties$/
+      Controllers.article_properties ctx
     when .match /^\/admin\/edit\/#{SLUG_PATTERN}$/
       Controllers.admin_edit_article ctx
     #when .match /^\/admin\/edit\/#{SLUG_PATTERN}\/preview$/

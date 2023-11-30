@@ -6,9 +6,7 @@
     <title>{{ title }}</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Condensed">
     <link rel="stylesheet" href="/styles/global.css?v={{ cachebust }}">
-    {% if user_authenticated %}
     <link rel="stylesheet" href="/styles/admin.css?v={{ cachebust }}">
-    {% endif %}
     <link rel="icon" href="/images/favicon.ico?v={{ cachebust }}" type="image/x-icon" />
     <script src="/scripts/htmx.min.js" defer></script>
     <script src="/scripts/_hyperscript.min.js" defer></script>
@@ -24,22 +22,29 @@
 </head>
 <body hx-headers='{"X-CSRFToken": "{{ csrftoken }}"}'>
     {% if admin_preview is not defined %}
-    <header hx-boost="true">
-        <a href="/" class="logo" title="Home">
-          <!--<img src="/images/bird1-logo.webp" alt="logo">-->
-        </a>
-        <nav>
-          <a href="/">Home</a>
-          <a href="/tags">Tags</a>
-          <a href="/about">About</a>
-          {% if user_authenticated %}
-          <a href="/admin">Admin</a>
-          <button hx-get="/admin/logout" hx-target="body" hx-push-url="true">Sign out</button>
-          {% else %}
-          <button hx-get="/admin/login" hx-target="body" hx-push-url="true">Sign in</button>
-          {% endif %}
-        </nav>
-    </header>
+      <header hx-boost="true">
+          <a href="/" class="logo" title="Home">
+            <!--<img src="/images/bird1-logo.webp" alt="logo">-->
+          </a>
+          <nav>
+            <a href="/">Home</a>
+            <a href="/tags">Tags</a>
+            <a href="/about">About</a>
+            {% if user_authenticated %}
+            <a href="/admin">Admin</a>
+            <button hx-get="/admin/logout" hx-target="body" hx-push-url="true">Sign out</button>
+            {% else %}
+            <button hx-get="/admin/login" hx-target="body" hx-push-url="true">Sign in</button>
+            {% endif %}
+          </nav>
+      </header>
+    {% endif %}
+    {% if article and admin is not defined %}
+      {% if article.imageclass == 'fullscreen' %}
+      <img  src="https://ik.imagekit.io/alistairrobinson/blog/tr:w-1920,h-600,q-80/nova-by-samuel-r-delany-1968.jpg"
+            style="width: 100vw;"
+      >
+      {% endif %}
     {% endif %}
     {% block admin_sidebar %}{% endblock %}
     <main class="{% if admin %}admin{% endif %} {% if extended_main %}extended{% endif %} {{ sidebar_collapsed }}">

@@ -5,7 +5,13 @@
   Editing: <em>{{ article.title }}</em>
   <span id="link-container">
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-    <a href="#">
+    <a  href="/admin/{{ article.slug }}/properties"
+        title="Article properties"
+        target="articlePropeties"
+        hx-post="/admin/{{ article.slug }}/properties"
+        hx-target=".modal-inner"
+        hx-on::after-request="showModal('props')"
+    >
       Article properties
     </a>
   </span>
@@ -26,6 +32,8 @@
         on keydown[key is 'i' and ctrlKey is true]
           halt the event
           call doFontStyle('_') then call do_html(me.innerText)
+        ---on load
+        ---  call preventIllicitPastings()
         "
     >{{ article.md }}</div>
   </section>
@@ -48,9 +56,7 @@
             markdown: document.querySelector('.editable').innerText
         }"
         hx-target=".modal-inner"
-        hx-indicator=""
-        hx-on::before-request=""
-        hx-on::after-request="setLocalStorage()"
+        hx-on::after-request="showModal('preview')"
     >
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
     </a>
@@ -59,8 +65,16 @@
     </div>
   </section>
 
-  <div class="modal-container" _="on click remove .visible from .modal-container">
-    <div class="modal" _="on click halt">
+  <!--_="on click remove .visible from .modal-container"-->
+  <div class="modal-container">
+    <div class="modal">
+        <button
+          class="icon close"
+          title="Close"
+          _="on click remove .visible from .modal-container"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x-square"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>
+        </button>
         <div id="answerLoading"></div>
         <div class="modal-inner">
         </div>
@@ -68,21 +82,6 @@
   </div>
 
 </div>
-
-<script>
-  // Prevent user pasting in anything other than usual stuff
-  // --------------------------------------------------------
-  const el = document.querySelector('.editable');
-  el.addEventListener('paste', (e) => {
-    let data = e.clipboardData.getData('text/html') ||
-        e.clipboardData.getData('text/plain');
-    let regex = /<(?!(\/\s*)?(a|b|i|em|s|code|pre|strong|u)[>,\s])([^>])*>/g;
-    data = data.replace(regex, '');
-    document.execCommand('insertHTML', false, data);
-    e.preventDefault();
-  });
-</script>
-
 <script type="text/hyperscript">
   on keyup[key is 'Escape']
     remove .visible from .modal-container
@@ -114,14 +113,44 @@
     hljs.highlightAll()
   end
 
-  def setLocalStorage()
-    ---set localStorage.previewHtml to innerHTML of #pre-preview
-    ---go to '/admin/edit/{{ article.slug }}/preview'
+  def showModal(content)
+    if content is 'props'
+      add .narrow to .modal
+    else
+      remove .narrow from .modal
+    end
     add .visible to .modal-container
-    ---set .modal-inner.innerHTML to innerHTML of #pre-preview
+  end
+
+  js
+    function preventIllicitPastings() {
+      // Prevent user pasting in anything other than usual stuff
+      // NOTE: Currently not using (doesn't quite work correctly)
+      // --------------------------------------------------------
+      const el = document.querySelector('.editable');
+      el.addEventListener('paste', (e) => {
+        let data = e.clipboardData.getData('text/html') ||
+            e.clipboardData.getData('text/plain');
+        let regex = /<(?!(\/\s*)?(a|b|i|em|s|code|pre|strong|u)[>,\s])([^>])*>/g;
+        data = data.replace(regex, '');
+        document.execCommand('insertHTML', false, data);
+        e.preventDefault();
+      });
+    }
+    return { preventIllicitPastings }
   end
 </script>
 <style>
+button.close {
+  position: sticky;
+  float: right;
+  top: 5px;
+  right: 5px;
+}
+.narrow {
+  width: 500px !important;
+  min-width: unset !important;
+}
 .supertitle {
   font-size: 0.78rem;
   margin-bottom: 10px;
@@ -235,16 +264,17 @@ div#pre-preview p:first-child {
 }
 
 .modal {
-  margin: 4rem auto;
+  margin: 2.4rem auto;
   width: 80vw;
   min-width: 1000px;
-  height: 800px;
+  height: 89vh;
   /*background: #fffdf8;*/
   background-color: #0a4775;
   overflow-y: auto;
   z-index: 1000;
   border-radius: 3px;
   padding: 0;
+  position: relative;
 }
 </style>
 {% endblock %}
