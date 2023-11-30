@@ -13,7 +13,12 @@ require "./lib/*"
 module CrystalWorld
   extend self
 
+  @@env : Poncho::Parser
+  @@env = Poncho.from_file ".env"
+  IMGBUCKET = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-70/"
   SLUG_PATTERN = "[a-z0-9]+(?:[_-][a-z0-9]+)*"
+  LOCAL     = @@env["ENV"] == "local" || false
+  CACHEBUST = Time.monotonic.to_s.split(".")[-1]
 
   server = HTTP::Server.new([
     HTTP::StaticFileHandler.new(public_dir = "./public", fallthrough = true, directory_listing = false),
