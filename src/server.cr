@@ -1,8 +1,13 @@
+require "http/client"
+require "markd"
+require "front_matter"
+require "poncho"
+require "crinja"
+require "crystal-argon2"
 require "http/server"
-require "./public_controllers.cr"
-require "./admin_controllers.cr"
-require "./auth_controllers.cr"
-require "./lib/handlers.cr"
+require "./*"
+require "./lib/*"
+require "sqlite3"
 
 module CrystalWorld
   extend self
@@ -19,45 +24,45 @@ module CrystalWorld
 
     case ctx.request.path
     when "/"
-      Controllers.home_page ctx
+      PublicControllers.home_page ctx
     when "/tags"
-      Controllers.tags_page ctx
+      PublicControllers.tags_page ctx
     when .starts_with? "/tag/"
-      Controllers.tag_page ctx
+      PublicControllers.tag_page ctx
     when "/about"
-      Controllers.about_page ctx
+      PublicControllers.about_page ctx
     when "admin/signup"
       # Probably not implementing here / see dump
     when "/admin/login"
-      Controllers.login_page ctx
+      PublicControllers.login_page ctx
     when "/admin/logout"
-      Controllers.do_logout ctx
+      AuthControllers.do_logout ctx
     when "/admin/login/auth"
-      Controllers.do_login ctx
+      AuthControllers.do_login ctx
     when "/admin", "/admin/articles"
-      Controllers.admin_articles ctx
+      AdminControllers.admin_articles ctx
     when "/admin/pages"
-      Controllers.admin_pages ctx
+      AdminControllers.admin_pages ctx
     when "/admin/customize"
-      Controllers.admin_customize ctx
+      AdminControllers.admin_customize ctx
     when "/admin/authors"
-      Controllers.admin_authors ctx
+      AdminControllers.admin_authors ctx
     when "/admin/settings"
-      Controllers.admin_settings ctx
+      AdminControllers.admin_settings ctx
     when .starts_with? "/api/save_sidebar_state"
-      Controllers.save_sidebar_state ctx
+      AdminControllers.save_sidebar_state ctx
     when .match /^\/admin\/edit\/#{SLUG_PATTERN}\/preview$/
-      Controllers.get_preview_html ctx
+      AdminControllers.get_preview_html ctx
     when .match /^\/admin\/#{SLUG_PATTERN}\/properties$/
-      Controllers.article_properties ctx
+      AdminControllers.article_properties ctx
     when .match /^\/admin\/edit\/#{SLUG_PATTERN}$/
-      Controllers.admin_edit_article ctx
+      AdminControllers.edit_article_page ctx
     #when .match /^\/admin\/edit\/#{SLUG_PATTERN}\/preview$/
     #  Controllers.admin_edit_preview ctx
     when .match /^\/#{SLUG_PATTERN}$/
-      Controllers.article_page ctx
+      PublicControllers.article_page ctx
     else
-      Controllers.error_404 ctx
+      PublicControllers.error_404 ctx
     end
   end
 

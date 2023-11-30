@@ -1,5 +1,3 @@
-require "sqlite3"
-
 module CrystalWorld
   module DataLib
     extend self

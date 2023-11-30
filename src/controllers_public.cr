@@ -1,12 +1,3 @@
-require "http/client"
-require "markd"
-require "front_matter"
-require "poncho"
-require "./datalib.cr"
-require "crinja"
-require "crystal-argon2"
-require "./lib/renderer.cr"
-
 module CrystalWorld
   extend self
 
@@ -15,7 +6,7 @@ module CrystalWorld
 
   IMGBUCKET = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-70/"
 
-  module Controllers
+  module PublicControllers
     extend self
 
     def home_page(ctx)

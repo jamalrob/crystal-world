@@ -1,7 +1,6 @@
 module CrystalWorld
-  extend self
 
-  module Controllers
+  module AuthControllers
     extend self
 
     def authenticated_user(ctx)
@@ -10,38 +9,6 @@ module CrystalWorld
         csrftoken = ctx.request.cookies["csrftoken"].value
         return DataLib.get_authenticated_user(sessionid, csrftoken)
       end
-    end
-
-    def do_logout(ctx)
-      if u = self.authenticated_user(ctx)
-        #
-        # SETTING A COOKIE'S EXPIRES IN THE PAST PROMPTS THE BROWSER TO DELETE IT
-        # NOTE: These cookies still need the samesite parameter
-        # or else the browser complains
-        #
-        session_cookie = HTTP::Cookie.new(
-          name: "sessionid",
-          value: "",
-          expires: Time.utc - 1.day,
-          samesite: HTTP::Cookie::SameSite.new(1)
-        )
-        csrf_cookie = HTTP::Cookie.new(
-          name: "csrftoken",
-          value: "",
-          expires: Time.utc - 1.day,
-          samesite: HTTP::Cookie::SameSite.new(1)
-        )
-        ctx.response.headers["Set-Cookie"] = [
-          session_cookie.to_set_cookie_header,
-          csrf_cookie.to_set_cookie_header,
-        ]
-        ctx.response.headers["HX-Location"] = %({"path": "/", "target": "body"})
-        DataLib.delete_user_session(
-          sessionid: u["sessionid"]
-        )
-        return
-      end
-      ctx.response.redirect "/"
     end
 
     def do_login(ctx)
@@ -98,6 +65,38 @@ module CrystalWorld
       # Adding an error status to the response here trips up
       # the HTMX replacement, so we don't do it
       ctx.response.print "Your credentials were not recognized."
+    end
+
+    def do_logout(ctx)
+      if u = self.authenticated_user(ctx)
+        #
+        # SETTING A COOKIE'S EXPIRES IN THE PAST PROMPTS THE BROWSER TO DELETE IT
+        # NOTE: These cookies still need the samesite parameter
+        # or else the browser complains
+        #
+        session_cookie = HTTP::Cookie.new(
+          name: "sessionid",
+          value: "",
+          expires: Time.utc - 1.day,
+          samesite: HTTP::Cookie::SameSite.new(1)
+        )
+        csrf_cookie = HTTP::Cookie.new(
+          name: "csrftoken",
+          value: "",
+          expires: Time.utc - 1.day,
+          samesite: HTTP::Cookie::SameSite.new(1)
+        )
+        ctx.response.headers["Set-Cookie"] = [
+          session_cookie.to_set_cookie_header,
+          csrf_cookie.to_set_cookie_header,
+        ]
+        ctx.response.headers["HX-Location"] = %({"path": "/", "target": "body"})
+        DataLib.delete_user_session(
+          sessionid: u["sessionid"]
+        )
+        return
+      end
+      ctx.response.redirect "/"
     end
 
   end

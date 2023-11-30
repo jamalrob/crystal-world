@@ -24,7 +24,7 @@ module CrystalWorld
         data.put("csrftoken", ctx.request.cookies["csrftoken"].value) { "update" }
       end
       if !data.has_key?("user_authenticated")
-        u = Controllers.authenticated_user(ctx)
+        u = AuthControllers.authenticated_user(ctx)
         if u
           data.put("user_authenticated", "true") { "update" }
         end
