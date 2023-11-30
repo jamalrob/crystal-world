@@ -21,7 +21,7 @@ The main objectives here are:
 - Admin section/CMS
 - Edit articles in Markdown, with instant previews
 - CRUD for articles, authors, pages, customization, and settings
-- Image store connectng to ImageKit
+- Cloud API-based image management for CMS
 - Choose from two separate modes of operation:
   - File-based (Markdown files with frontmatter)
   - Or data-based (SQLite3 database)

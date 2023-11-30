@@ -7,11 +7,9 @@
     title="Collapse/expand the sidebar"
     _=" on click
           toggle .collapsed on #sidebar
-          ---toggle .hidden on <svg.feather-chevron-right/>
-          ---toggle .hidden on <svg.feather-chevron-left/>
           toggle .collapsed on <main.admin/>
           toggle the *display of <a span.text/>
-          wait 120ms
+          wait 20ms
           toggle the *display of <a span.text/>
           if <#sidebar.collapsed/> is empty
             fetch /api/save_sidebar_state/normal as json with method:'POST'

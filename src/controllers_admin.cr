@@ -4,7 +4,6 @@ module CrystalWorld
     extend self
 
     def sidebar_collapsed_classname(ctx)
-      sidebar_collapsed = nil
       if ctx.request.cookies.has_key?("sidebar_collapsed")
         return ctx.request.cookies["sidebar_collapsed"].value
       end
