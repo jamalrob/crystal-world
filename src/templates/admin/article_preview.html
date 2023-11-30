@@ -1,10 +1,11 @@
 {% extends "layouts/base.html" %}
 {% block content %}
 <h1 class="articletitle">{{ article.title }}</h1>
-<article
-  class="blog-article preview"
+<!--
+  IF USING THE NEW TAB METHOD:
   _="on load put localStorage.previewHtml into #preview-content"
-  >
+-->
+<article class="blog-article preview">
     {% if article.image == 1 %}
     <img
         src='https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-80/{{ article.slug }}.jpg'
@@ -12,6 +13,6 @@
         class='{{ article.imageclass }}'
     >
     {% endif %}
-    <div id="preview-content"></div>
+    <div id="preview-content">{{ html|safe }}</div>
 </article>
 {% endblock %}

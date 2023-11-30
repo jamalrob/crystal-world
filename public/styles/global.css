@@ -27,6 +27,7 @@ a {
 a:hover {
     text-decoration: underline;
     text-underline-offset: 4px;
+    color: white;
 }
 
 main {
@@ -174,11 +175,12 @@ header nav button {
 }
 .blog-article blockquote {
     border-radius: 2px;
-    padding: 15px 25px 5px 60px;
+    padding: 5px 25px 5px 45px;
     margin-left: 0;
     margin-right: 25px;
     position: relative;
-    font-style: italic;
+    font-size: 0.8rem;
+    line-height: 1.2rem;
 }
 .blog-article blockquote::before{
   font-family: "Roboto";
@@ -186,7 +188,7 @@ header nav button {
   font-size: 5em;
   position: absolute;
   left: 0;
-  top:-10px;
+  top: 36px;
 }
 code {
   background: #1f232b;
@@ -228,6 +230,7 @@ code {
 ul.article-list {
     list-style-type: none;
     padding-left: 0;
+    font-family: 'Roboto Condensed', Ubuntu, -apple-system,BlinkMacSystemFont,'avenir next',avenir,'helvetica neue',helvetica,ubuntu,roboto,noto,'segoe ui',arial,sans-serif;
 }
 ul.article-list li {
     margin-bottom: 0.7rem;
@@ -239,7 +242,7 @@ ul.article-list li {
 }
 ul.article-list a {
     font-weight: 900;
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     line-height: 0.1rem;
 }
 

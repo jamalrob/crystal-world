@@ -113,3 +113,15 @@ when "admin/signup"
     # TO STORE THE PASSWORD:
     securepwd = Argon2::Password.create("mypwd")
     # create database user
+
+
+  # DOESN'T WORK
+  on paste
+    halt the event
+    set ev to the event
+    set el to <div.editable/>
+    set data to ev.clipboardData.getData('text/html') or ev.clipboardData.getData('text/plain')
+    set regex to '/<(?!(\/\s*)?(a|b|i|em|s|code|pre|strong|u)[>,\s])([^>])*>/g'
+    set data to data.replace(regex, "")
+    call document.execCommand('insertHTML', false, data)
+  end

@@ -1,5 +1,6 @@
 {% extends "admin/layouts/base.html" %}
 {% block content %}
+
 <div class="supertitle">
   Editing: <em>{{ article.title }}</em>
   <span id="link-container">
@@ -9,6 +10,7 @@
     </a>
   </span>
 </div>
+
 <div class="edit-container">
   <section class="edit">
     <div class="editable" contenteditable="true"
@@ -27,51 +29,76 @@
         "
     >{{ article.md }}</div>
   </section>
+
   <section class="preview">
-    <!-- href="/admin/edit/{{ article.slug }}/preview" -->
-    <a  href="/get_preview_html"
+    <!--  FULL PREVIEW: get the markdown conversion from the server,
+          because showdown.js doesn't do proper typography
+
+          ALSO, IF USING THE NEW TAB METHOD INSTEAD OF MODAL, WE NEED TO
+          SET LOCAL STORAGE THEN OPEN THE NEW TAB NORMALLY:
+          <a href="/admin/edit/{{ article.slug }}/preview"
+            _="on click set localStorage.previewHtml to innerHTML of #pre-preview">
+          OR SOMETHING LIKE THAT
+    -->
+    <a  href="/admin/edit/{{ article.slug }}/preview"
         title="Full preview"
         target="previewArticle"
-        hx-post="/get_preview_html"
+        hx-post="/admin/edit/{{ article.slug }}/preview"
         hx-vals="js:{
             markdown: document.querySelector('.editable').innerText
         }"
-        hx-target="#pre-preview"
+        hx-target=".modal-inner"
         hx-indicator=""
         hx-on::before-request=""
         hx-on::after-request="setLocalStorage()"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
     </a>
     <div id="pre-preview">
     {{ article.html|safe }}
     </div>
   </section>
+
+  <div class="modal-container" _="on click remove .visible from .modal-container">
+    <div class="modal" _="on click halt">
+        <div id="answerLoading"></div>
+        <div class="modal-inner">
+        </div>
+    </div>
+  </div>
+
 </div>
+
 <script>
-  // ********************************************************
-  // Prevent users pasting in anything other than usual stuff
-  // ********************************************************
+  // Prevent user pasting in anything other than usual stuff
+  // --------------------------------------------------------
   const el = document.querySelector('.editable');
   el.addEventListener('paste', (e) => {
-    // Get user's pasted data
     let data = e.clipboardData.getData('text/html') ||
         e.clipboardData.getData('text/plain');
-    // Filter out everything except simple text and allowable HTML elements
     let regex = /<(?!(\/\s*)?(a|b|i|em|s|code|pre|strong|u)[>,\s])([^>])*>/g;
     data = data.replace(regex, '');
-    // Insert the filtered content
     document.execCommand('insertHTML', false, data);
-    // Prevent the standard paste behavior
     e.preventDefault();
   });
 </script>
+
 <script type="text/hyperscript">
+  on keyup[key is 'Escape']
+    remove .visible from .modal-container
+  end
+
   def doFontStyle(mk)
     set div to <div.editable/>
     if window.getSelection
       set sel to window.getSelection()
-      set replacementText to mk.concat(sel, mk)
+      set selString to sel.toString()
+      if the first of selString is mk and the last of selString is mk
+        ---set replacementText to mk.concat(sel, mk)
+        set replacementText to selString.split(mk)[1]
+      else
+        set replacementText to mk.concat(selString, mk)
+      end
       if sel.rangeCount is greater than 0
         set range to sel.getRangeAt(0)
         call range.deleteContents()
@@ -88,8 +115,10 @@
   end
 
   def setLocalStorage()
-    set localStorage.previewHtml to innerHTML of #pre-preview
-    go to '/admin/edit/{{ article.slug }}/preview'
+    ---set localStorage.previewHtml to innerHTML of #pre-preview
+    ---go to '/admin/edit/{{ article.slug }}/preview'
+    add .visible to .modal-container
+    ---set .modal-inner.innerHTML to innerHTML of #pre-preview
   end
 </script>
 <style>
@@ -151,11 +180,12 @@ div#pre-preview, div.editable {
 }
 div#pre-preview blockquote {
   border-radius: 2px;
-  padding: 15px 25px 5px 60px;
+  padding: 15px 25px 5px 50px;
   margin-left: 0;
   margin-right: 25px;
   position: relative;
-  font-style: italic;
+  font-size: 0.8rem;
+  line-height: 1.2rem;
 }
 div#pre-preview blockquote::before{
   font-family: "Roboto";
@@ -187,6 +217,34 @@ div#pre-preview img+em {
 }
 div#pre-preview p:first-child {
   margin-top: 0;
+}
+
+.modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #433;
+  background-color:rgba(0,0,0,0.5);
+  display: none;
+}
+
+.modal-container.visible {
+  display: block !important;
+}
+
+.modal {
+  margin: 4rem auto;
+  width: 80vw;
+  min-width: 1000px;
+  height: 800px;
+  /*background: #fffdf8;*/
+  background-color: #0a4775;
+  overflow-y: auto;
+  z-index: 1000;
+  border-radius: 3px;
+  padding: 0;
 }
 </style>
 {% endblock %}

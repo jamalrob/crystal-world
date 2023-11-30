@@ -177,6 +177,7 @@ module CrystalWorld
     end
 
     def admin_edit_preview(ctx)
+      # CURRENTLY NOT USED
       if u = self.authenticated_user ctx
         urlbits = ctx.request.path.split('/', remove_empty: true)
         slug = urlbits[-2]?
@@ -196,17 +197,27 @@ module CrystalWorld
 
     def get_preview_html(ctx)
       # Use if showdown.js doesn't do smart quotes
-      if u = self.authenticated_user ctx
-        p! ctx.request
-        params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
-        if params.has_key?("markdown")
-          md = params["markdown"]
-          options = Markd::Options.new(smart: true, safe: true)
-          html = Markd.to_html(md, options)
-          html = html.gsub("/bucket/", IMGBUCKET)
-          #json_text = %({"html": "#{html}"})
-          ctx.response.print html
-          return
+      if u = self.authenticated_user(ctx) && ctx.request.body
+        urlbits = ctx.request.path.split('/', remove_empty: true)
+        slug = urlbits[-2]?
+        article = DataLib.get_article slug
+        if article
+          params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
+          if params.has_key?("markdown")
+            md = params["markdown"]
+            options = Markd::Options.new(smart: true, safe: true)
+            html = Markd.to_html(md, options)
+            html = html.gsub("/bucket/", IMGBUCKET)
+            #json_text = %({"html": "#{html}"})
+            TemplateRenderer.render_and_out ctx: ctx,
+              data: {
+                "article" => article,
+                "html" => html,
+                "admin_preview" => true
+              },
+              template_path: "admin/article_preview.html"
+            return
+          end
         end
       end
       ctx.response.status = HTTP::Status.new(403)

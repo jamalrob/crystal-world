@@ -44,12 +44,12 @@ module CrystalWorld
       Controllers.admin_settings ctx
     when .starts_with? "/api/save_sidebar_state"
       Controllers.save_sidebar_state ctx
-    when "/get_preview_html" # If showdown can't do smart quotes
+    when .match /^\/admin\/edit\/#{SLUG_PATTERN}\/preview$/
       Controllers.get_preview_html ctx
     when .match /^\/admin\/edit\/#{SLUG_PATTERN}$/
       Controllers.admin_edit_article ctx
-    when .match /^\/admin\/edit\/#{SLUG_PATTERN}\/preview$/
-      Controllers.admin_edit_preview ctx
+    #when .match /^\/admin\/edit\/#{SLUG_PATTERN}\/preview$/
+    #  Controllers.admin_edit_preview ctx
     when .match /^\/#{SLUG_PATTERN}$/
       Controllers.article_page ctx
     else
