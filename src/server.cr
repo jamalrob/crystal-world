@@ -5,9 +5,10 @@ require "poncho"
 require "crinja"
 require "crystal-argon2"
 require "http/server"
+require "sqlite3"
+require "db"
 require "./*"
 require "./lib/*"
-require "sqlite3"
 
 module CrystalWorld
   extend self
@@ -66,6 +67,7 @@ module CrystalWorld
     end
   end
 
+  #Time.parse("2015-10-12 10:30:00 +00:00", "%Y-%m-%d %H:%M:%S %z", Time::Location::UTC)
   address = server.bind_tcp 8123
   puts "Listening on http://#{address}"
   server.listen

@@ -10,7 +10,7 @@ module CrystalWorld
     extend self
 
     def home_page(ctx)
-      articles = DataLib.get_articles
+      articles = Models::Article.get_articles
       TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "articles" => articles,
@@ -30,7 +30,7 @@ module CrystalWorld
     def article_page(ctx)
       urlbits = ctx.request.path.split('/', remove_empty: true)
       slug = urlbits[0]?
-      if article = DataLib.get_article(slug: slug)
+      if article = Models::Article.get_article(slug: slug)
         options = Markd::Options.new(smart: true, safe: true)
         html = Markd.to_html(article["md"].as(String), options)
         article["html"] = html.gsub("/bucket/", IMGBUCKET)
@@ -46,7 +46,7 @@ module CrystalWorld
     end
 
     def tags_page(ctx)
-      tags = DataLib.get_tags
+      tags = Models::Article.get_tags
       TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "tags"  => tags,
@@ -58,7 +58,7 @@ module CrystalWorld
     def tag_page(ctx)
       urlbits = ctx.request.path.split('/', remove_empty: true)
       tag = urlbits[1]?
-      articles = DataLib.get_articles_for_tag tag
+      articles = Models::Article.get_articles_for_tag tag
       if !articles.empty?
         TemplateRenderer.render_and_out ctx: ctx,
           data: {

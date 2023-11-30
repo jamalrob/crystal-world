@@ -230,22 +230,20 @@ code {
 ul.article-list {
     list-style-type: none;
     padding-left: 0;
-    font-family: 'Roboto Condensed', Ubuntu, -apple-system,BlinkMacSystemFont,'avenir next',avenir,'helvetica neue',helvetica,ubuntu,roboto,noto,'segoe ui',arial,sans-serif;
 }
 ul.article-list li {
-    margin-bottom: 0.7rem;
-}
-@media (min-width: 600px) {
-    ul.article-list li {
-        margin-bottom: 0.3rem;
-    }
+    margin-bottom: 0.65rem;
 }
 ul.article-list a {
     font-weight: 900;
     font-size: 1.3rem;
-    line-height: 0.1rem;
+    line-height: 1.3rem;
+    display:block;
+    font-family: 'Roboto Condensed', Ubuntu, -apple-system,BlinkMacSystemFont,'avenir next',avenir,'helvetica neue',helvetica,ubuntu,roboto,noto,'segoe ui',arial,sans-serif;
 }
-
+ul.article-list li small {
+  color: #c9c9c9;
+}
 /* tags */
 ul.tag-list {
     color: rgba(84, 143, 211, 0.8);

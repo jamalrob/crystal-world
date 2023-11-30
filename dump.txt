@@ -76,7 +76,7 @@ context.response.headers["WWW-Authenticate"] = "Basic realm=\"Login Required\""
 
 # DB create
 # -----------------------------------
-DataLib.create_article(
+Models.create_article(
     slug: "there-are-ghosts-in-this-room",
     title: fm["title"],
     tags: fm["tags"],
@@ -128,3 +128,130 @@ when "admin/signup"
 
 # JSON
 #json_text = %({"html": "#{html}"})
+
+      DB.open "sqlite3://./crw.db" do |db|
+        begin
+          if username
+            userid, password, first_name, last_name, sessionid, csrftoken =
+              db.query_one "SELECT id, password, first_name, last_name, sessionid, csrftoken " \
+                          "FROM users WHERE username = ? LIMIT 1",
+                username,
+                as: {Int32, String, String?, String?, String?, String?}
+          elsif sessionid
+            userid, password, first_name, last_name, sessionid, csrftoken =
+              db.query_one "SELECT id, password, first_name, last_name, sessionid, csrftoken " \
+                          "FROM users WHERE sessionid = ? LIMIT 1",
+                sessionid,
+                as: {Int32, String, String?, String?, String?, String?}
+          end
+        rescue DB::NoResultsError
+          puts "No user found"
+          return nil
+        end
+        return {
+          "id"         => userid,
+          "password"   => password,
+          "first_name" => first_name,
+          "last_name"  => last_name,
+          "sessionid"  => sessionid,
+        }
+      end
+
+
+
+{
+  "articles" => [
+    #<CrystalWorld::Models::Article:0x7f2113814a00 @id=1, @date="2023-11-23 00:00:00.000", @slug="nova-by-samuel-r-delany-1968", @title="Nova by Samuel R. Delany (1968)", @tags="sf,  reviews", @main_image=nil, @image_class="mainImageSmaller", @draft=0>,
+    #<CrystalWorld::Models::Article:0x7f21138149b0 @id=6, @date="2023-11-10 00:00:00.000", @slug="jg-ballards-crash-is-it-science-fiction", @title="J. G. Ballard’s Crash: is it Science Fiction?", @tags="sf, literature, ballard", @main_image=nil, @image_class="mainImageSmaller", @draft=0>,
+    #<CrystalWorld::Models::Article:0x7f2113814960 @id=7, @date="2023-11-10 00:00:00.000", @slug="a-stand-of-yellow-birch-trees", @title="A Stand of Yellow Birch Trees", @tags="philosophy, perception", @main_image=nil, @image_class="mainImageSmaller", @draft=0>,
+    #<CrystalWorld::Models::Article:0x7f2113814910 @id=4, @date="2023-10-23 00:00:00.000", @slug="sanatorium", @title="Sanatorium", @tags="travel", @main_image=nil, @image_class="", @draft=0>,
+    #<CrystalWorld::Models::Article:0x7f21138148c0 @id=5, @date="2023-10-10 00:00:00.000", @slug="crash-by-jg-ballard", @title="Crash by J. G. Ballard (1973)", @tags="sf, reviews, ballard", @main_image=nil, @image_class="mainImageSmaller", @draft=0>,
+    #<CrystalWorld::Models::Article:0x7f2113814870 @id=9, @date="2021-02-05 00:00:00.000", @slug="post-war-soviet-modernist-architecture", @title="Remembering the Future, Soviet-style", @tags="nonfiction, modernism, reviews", @main_image=nil, @image_class="mainImageSmaller", @draft=0>,
+    #<CrystalWorld::Models::Article:0x7f2113814820 @id=10, @date="2021-02-05 00:00:00.000", @slug="logicomix-an-epic-search", @title="Logicomix: An Epic Search for an Epic Search for Truth", @tags="philosophy, reviews", @main_image=nil, @image_class="mainImageSmallest", @draft=0>,
+    #<CrystalWorld::Models::Article:0x7f21138147d0 @id=11, @date="2016-02-05 00:00:00.000", @slug="the-argument-for-indirect-realism", @title="The Argument for Indirect Realism", @tags="philosophy, perception", @main_image=nil, @image_class="", @draft=0>,
+    #<CrystalWorld::Models::Article:0x7f2113814780 @id=12, @date="2015-04-25 00:00:00.000", @slug="there-are-ghosts-in-this-room", @title="There are Ghosts in This Room", @tags="philosophy, travel", @main_image=nil, @image_class="", @draft=0>,
+    #<CrystalWorld::Models::Article:0x7f2113814730 @id=8, @date="2015-03-10 00:00:00.000", @slug="it-gets-lonely-downstairs", @title="It Gets Lonely Downstairs", @tags="philosophy, perception", @main_image=nil, @image_class="mainImageSmaller", @draft=0>
+  ],
+  "title" => "My Crystal World"
+}
+
+
+# WHEN TRYING TO USE DB::Serializable and DB::Mapping:
+class Article
+  include DB::Serializable
+  property id : Int32
+  property date : String
+  property slug : String
+  property title : String
+  property tags : String?
+  property main_image : String?
+  property image_class : String?
+  property draft : Int32
+
+  DB.mapping({
+    id: Int32,
+    date: String,
+    slug: String,
+    title: String,
+    tags: String?,
+    main_image: String?,
+    image_class: String?,
+    draft: Int32,
+  })
+
+DB.open "sqlite3://./crw.db" do |db|
+  begin
+    articles = Article.from_rs(db.query "SELECT id, slug, title, date, tags, main_image, " \
+                                        "image_class, draft FROM articles ORDER BY date DESC")
+    return articles
+  rescue DB::NoResultsError
+    return nil
+  end
+end
+
+
+    class User
+      include DB::Serializable
+      property id : Int32
+      property first_name : String
+      property last_name : String
+      property sessionid : String
+      property csrftoken : String
+      property username : String
+      property password : String
+
+
+        #DB.open "sqlite3://./crw.db" do |db|
+        #  begin
+        #    if username
+        #      user = User.from_rs(db.query(
+        #        "SELECT id, username, password, first_name, last_name, sessionid, csrftoken " \
+        #        "FROM users WHERE username = '#{username}' LIMIT 1"
+        #        )
+        #      )
+        #    elsif sessionid
+        #      user = User.from_rs(db.query(
+        #        "SELECT id, username, password, first_name, last_name, sessionid, csrftoken " \
+        #          "FROM users WHERE sessionid = '#{sessionid}' LIMIT 1"
+        #        )
+        #      )
+        #    end
+        #    if user
+        #      user = user[0]
+        #      return user # We can now use e.g., user.first_name
+        #    end
+        #  rescue DB::NoResultsError
+        #    return nil
+        #  end
+        #end
+
+          #begin
+          #  user = User.from_rs(db.query(
+          #    "SELECT id, username, password, first_name, last_name, sessionid, csrftoken " \
+          #    "FROM users WHERE sessionid = '#{sessionid}' and csrftoken = '#{csrftoken}' LIMIT 1"
+          #    )
+          #  )
+          #  return user
+          #rescue DB::NoResultsError
+          #  return nil
+          #end

@@ -5,6 +5,7 @@
     {% for a in articles %}
     <li>
         <a href="/{{ a.slug }}">{{ a.title }}</a>
+        <small>{{ a.date }}</small>
     </li>
     {% endfor %}
 </ul>
