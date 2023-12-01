@@ -3,7 +3,7 @@ module CrystalWorld::PublicControllers
   extend self
 
   def home_page(ctx)
-    articles = Models::Article.get_articles
+    articles = Data.get_articles
     TemplateRenderer.render_and_out ctx: ctx,
       data: {
         "articles" => articles,
@@ -23,7 +23,7 @@ module CrystalWorld::PublicControllers
   def article_page(ctx)
     urlbits = ctx.request.path.split('/', remove_empty: true)
     slug = urlbits[0]?
-    if article = Models::Article.get_article(slug: slug)
+    if article = Data.get_article(slug: slug)
       options = Markd::Options.new(smart: true, safe: true)
       html = Markd.to_html(article["md"].as(String), options)
       article["html"] = html.gsub("/bucket/", IMGBUCKET)
@@ -39,7 +39,7 @@ module CrystalWorld::PublicControllers
   end
 
   def tags_page(ctx)
-    tags = Models::Article.get_tags
+    tags = Data.get_tags
     TemplateRenderer.render_and_out ctx: ctx,
       data: {
         "tags"  => tags,
@@ -51,7 +51,7 @@ module CrystalWorld::PublicControllers
   def tag_page(ctx)
     urlbits = ctx.request.path.split('/', remove_empty: true)
     tag = urlbits[1]?
-    articles = Models::Article.get_articles_for_tag tag
+    articles = Data.get_articles_for_tag tag
     if articles
       TemplateRenderer.render_and_out ctx: ctx,
         data: {

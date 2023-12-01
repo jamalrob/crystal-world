@@ -6,7 +6,6 @@ require "crinja"
 require "crystal-argon2"
 require "http/server"
 require "sqlite3"
-require "db"
 require "./*"
 require "./lib/*"
 

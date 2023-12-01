@@ -9,8 +9,8 @@ module CrystalWorld::AdminControllers
   end
 
   def admin_articles(ctx)
-    if u = Models::User.authenticated_user ctx
-      articles = Models::Article.get_articles
+    if u = Data.authenticated_user ctx
+      articles = Data.get_articles
       TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "title" => "Admin: articles",
@@ -26,7 +26,7 @@ module CrystalWorld::AdminControllers
   end
 
   def admin_settings(ctx)
-    if u = Models::User.authenticated_user ctx
+    if u = Data.authenticated_user ctx
       TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "title" => "Admin: articles",
@@ -41,7 +41,7 @@ module CrystalWorld::AdminControllers
   end
 
   def admin_authors(ctx)
-    if u = Models::User.authenticated_user ctx
+    if u = Data.authenticated_user ctx
       TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "title" => "Admin: articles",
@@ -57,7 +57,7 @@ module CrystalWorld::AdminControllers
   end
 
   def admin_customize(ctx)
-    if u = Models::User.authenticated_user ctx
+    if u = Data.authenticated_user ctx
       TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "title" => "Admin: articles",
@@ -72,7 +72,7 @@ module CrystalWorld::AdminControllers
   end
 
   def admin_pages(ctx)
-    if u = Models::User.authenticated_user ctx
+    if u = Data.authenticated_user ctx
       TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "title" => "Admin: articles",
@@ -91,10 +91,10 @@ module CrystalWorld::AdminControllers
     # *********************************
     # CURRENTLY NOT USED
     #
-    if u = Models::User.authenticated_user ctx
+    if u = Data.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)
       slug = urlbits[-2]?
-      article = Models::Article.get_article slug
+      article = Data.get_article slug
       if article
         TemplateRenderer.render_and_out ctx: ctx,
           data: {
@@ -112,7 +112,7 @@ module CrystalWorld::AdminControllers
     urlbits = ctx.request.path.split('/', remove_empty: true)
     slug = urlbits[1]?
     p! slug
-    article = Models::Article.get_article slug
+    article = Data.get_article slug
     if article
       TemplateRenderer.render_and_out ctx: ctx,
         data: {
@@ -126,10 +126,10 @@ module CrystalWorld::AdminControllers
 
   def get_preview_html(ctx)
     # Using because showdown.js doesn't do smart quotes etc
-    if u = Models::User.authenticated_user(ctx) && ctx.request.body
+    if u = Data.authenticated_user(ctx) && ctx.request.body
       urlbits = ctx.request.path.split('/', remove_empty: true)
       slug = urlbits[2]?
-      article = Models::Article.get_article slug
+      article = Data.get_article slug
       if article
         params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
         if params.has_key?("markdown")
@@ -152,7 +152,7 @@ module CrystalWorld::AdminControllers
   end
 
   def save_sidebar_state(ctx)
-    if u = Models::User.authenticated_user ctx
+    if u = Data.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)
       state = urlbits[2] # 'collapsed' or 'normal'
       if ctx.request.cookies.has_key?("sidebar_collapsed")
@@ -193,10 +193,10 @@ module CrystalWorld::AdminControllers
   end
 
   def edit_article_page(ctx)
-    if u = Models::User.authenticated_user ctx
+    if u = Data.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)
       slug = urlbits[-1]?
-      article = Models::Article.get_article slug
+      article = Data.get_article slug
       if article
         options = Markd::Options.new(smart: true, safe: true)
         html = Markd.to_html(article["md"].as(String), options)

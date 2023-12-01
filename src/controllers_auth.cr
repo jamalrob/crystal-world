@@ -5,7 +5,7 @@ module CrystalWorld::AuthControllers
     params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
     username = params["username"] || ""
     password = params["password"] || ""
-    if u = Models::User.get_user(username)
+    if u = Data.get_user(username)
       begin
         res = Argon2::Password.verify_password(password, u["password"].to_s)
         if res == Argon2::Response::ARGON2_OK
@@ -30,7 +30,7 @@ module CrystalWorld::AuthControllers
             samesite: HTTP::Cookie::SameSite.new(1),
             http_only: true,
           )
-          Models::User.update_user_session(
+          Data.update_user_session(
             id: u["id"],
             sessionid: sessionid,
             new_csrf_token: csrftoken,
@@ -58,7 +58,7 @@ module CrystalWorld::AuthControllers
   end
 
   def do_logout(ctx)
-    if u = Models::User.authenticated_user(ctx)
+    if u = Data.authenticated_user(ctx)
       #
       # SETTING A COOKIE'S EXPIRES IN THE PAST PROMPTS THE BROWSER TO DELETE IT
       # NOTE: These cookies still need the samesite parameter
@@ -81,7 +81,7 @@ module CrystalWorld::AuthControllers
         csrf_cookie.to_set_cookie_header,
       ]
       ctx.response.headers["HX-Location"] = %({"path": "/", "target": "body"})
-      Models::User.delete_user_session(
+      Data.delete_user_session(
         sessionid: u["sessionid"]
       )
       return

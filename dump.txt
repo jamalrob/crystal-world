@@ -255,3 +255,63 @@ end
           #rescue DB::NoResultsError
           #  return nil
           #end
+
+
+#
+  def doFontStyle(mk)
+    set div to <div.editable/>
+    if window.getSelection
+      set sel to window.getSelection()
+      set selString to sel.toString()
+
+      set range to sel.getRangeAt(0)
+      set range2 to range.cloneRange()
+      range2.setStart(range.startContainer, range.startOffset-2)
+      range2.setEnd(range.startContainer, range.endOffset+2)
+      ---log range2.toString()
+
+      set replacementText to ""
+      if selString.startsWith(mk) and selString.endsWith(mk)
+        set replacementText to selString.split(mk)[1]
+      else if range2.toString().startsWith(mk) and range2.toString().endsWith(mk)
+        set replacementText to range2.toString().split(mk)[1]
+        set range to range2
+      else
+        set replacementText to mk + selString + mk
+      end
+
+      call range2.deleteContents()
+
+      if sel.rangeCount is greater than 0
+        set range to sel.getRangeAt(0)
+        call range.deleteContents()
+        set txtNode to document.createTextNode(replacementText)
+        call range.insertNode(txtNode)
+
+        ---THE FOLLOWING IS KINDA POINTLESS IMO
+        ---IT'S TO APPLY BOLD, ITALIC (ETC) TO THE MARKDOWN ITSELF,
+        ---WITHIN THE MARKDOWN TEXT
+        ---set elType to ""
+        ---if mk == "**"
+        ---  set elType to "strong"
+        ---else if mk == "_"
+        ---  set elType to "em"
+        ---end
+        ---if selString.startsWith(mk) and selString.endsWith(mk)
+        ---  set elType to "span"
+        ---end
+        ---set newParent to document.createElement(elType)
+        ---range.surroundContents(newParent)
+
+      end
+    end
+  end
+
+  # Above called by this on contenteditable:
+
+on keydown[key is 'b' and ctrlKey is true]
+  halt the event
+  call doFontStyle('**') then call do_html(me.innerText)
+on keydown[key is 'i' and ctrlKey is true]
+  halt the event
+  call doFontStyle('_') then call do_html(me.innerText)

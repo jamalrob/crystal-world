@@ -1,6 +1,5 @@
 {% extends "admin/layouts/base.html" %}
 {% block content %}
-
 <div class="supertitle">
   Editing: <em>{{ article.title }}</em>
   <span id="link-container">
@@ -26,14 +25,6 @@
           set scrollTop of #pre-preview to my.scrollTop
         on keydown[key is 'Tab']
           halt the event then call document.execCommand('insertText', false, '&#009')
-        on keydown[key is 'b' and ctrlKey is true]
-          halt the event
-          call doFontStyle('**') then call do_html(me.innerText)
-        on keydown[key is 'i' and ctrlKey is true]
-          halt the event
-          call doFontStyle('_') then call do_html(me.innerText)
-        ---on load
-        ---  call preventIllicitPastings()
         "
     >{{ article.md }}</div>
   </section>
@@ -68,7 +59,6 @@
   <!--_="on click remove .visible from .modal-container"-->
   <div class="modal-container"
     _="on click
-        log the event
         if the target of the event does not match <div.modal/> and the target of the event is not in <div.modal/>
           remove .visible from .modal-container
         end
@@ -95,25 +85,6 @@
     remove .visible from .modal-container
   end
 
-  def doFontStyle(mk)
-    set div to <div.editable/>
-    if window.getSelection
-      set sel to window.getSelection()
-      set selString to sel.toString()
-      if the first of selString is mk and the last of selString is mk
-        ---set replacementText to mk.concat(sel, mk)
-        set replacementText to selString.split(mk)[1]
-      else
-        set replacementText to mk.concat(selString, mk)
-      end
-      if sel.rangeCount is greater than 0
-        set range to sel.getRangeAt(0)
-        call range.deleteContents()
-        call range.insertNode(document.createTextNode(replacementText))
-      end
-    end
-  end
-
   def do_html(md)
     make a showdown.Converter called converter
     set html to converter.makeHtml(md.replaceAll('/bucket/', '{{ imagekit_bucket }}/'))
@@ -128,6 +99,9 @@
       remove .narrow from .modal
     end
     add .visible to .modal-container
+    if content is 'preview'
+      hljs.highlightAll()
+    end
   end
 
   js
@@ -149,6 +123,10 @@
   end
 </script>
 <style>
+.biggles {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
 button.close {
   position: sticky;
   float: right;
@@ -183,7 +161,8 @@ button.close {
 }
 .edit-container div.editable {
   white-space: pre-wrap;
-  background-color: #1c2125;
+  background-color: #f3eeee;
+  color: #222;
   line-height: 1.34rem;
 }
 #article-edit-box {

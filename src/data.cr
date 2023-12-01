@@ -1,7 +1,5 @@
-module CrystalWorld::Models
+module CrystalWorld::Data
   extend self
-
-  class User
 
     def self.get_user(username=nil, sessionid=nil)
       DB.open "sqlite3://./crw.db" do |db|
@@ -81,11 +79,6 @@ module CrystalWorld::Models
         sessionid
       end
     end
-
-  end
-
-
-  class Article
 
     def self.create_article(slug, title, tags, date, image, imageClass, draft, content)
       #
@@ -192,7 +185,5 @@ module CrystalWorld::Models
         end
       end
     end
-
-  end
 
 end

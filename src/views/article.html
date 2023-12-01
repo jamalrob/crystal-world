@@ -2,13 +2,13 @@
 {% block content %}
 <h1>{{ article.title }}</h1>
 <article class="blog-article">
-    {% if article.image == 1 %}
+
     <img
         src='https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-80/{{ article.slug }}.jpg'
         alt='Image representing {{ article.title }}'
         class='{{ article.imageclass }}'
     >
-    {% endif %}
+    
     {{ article.html|safe }}
 </article>
 <script>hljs.highlightAll();</script>
