@@ -87,27 +87,6 @@ module CrystalWorld::AdminControllers
     ctx.response.redirect "/"
   end
 
-  def admin_edit_preview(ctx)
-    # *********************************
-    # CURRENTLY NOT USED
-    #
-    if u = Data.authenticated_user ctx
-      urlbits = ctx.request.path.split('/', remove_empty: true)
-      slug = urlbits[-2]?
-      article = Data.get_article slug
-      if article
-        TemplateRenderer.render_and_out ctx: ctx,
-          data: {
-            "article" => article,
-            "title"   => article["title"],
-          },
-          template_path: "admin/article_preview.html"
-        return
-      end
-      self.error_404 ctx
-    end
-  end
-
   def article_properties(ctx)
     urlbits = ctx.request.path.split('/', remove_empty: true)
     slug = urlbits[1]?
@@ -214,6 +193,8 @@ module CrystalWorld::AdminControllers
           template_path: "admin/edit-article.html"
         return
       end
+      Controllers.error_404 ctx
+      return
     end
     ctx.response.redirect "/"
   end

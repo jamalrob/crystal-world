@@ -1,5 +1,4 @@
 module CrystalWorld::PublicControllers
-  include Controllers
   extend self
 
   def home_page(ctx)
@@ -35,7 +34,7 @@ module CrystalWorld::PublicControllers
         template_path: "article.html"
       return
     end
-    self.error_404 ctx
+    Controllers.error_404 ctx
   end
 
   def tags_page(ctx)
@@ -53,6 +52,7 @@ module CrystalWorld::PublicControllers
     tag = urlbits[1]?
     articles = Data.get_articles_for_tag tag
     if articles
+      p! articles
       TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "articles" => articles,
@@ -62,7 +62,7 @@ module CrystalWorld::PublicControllers
         template_path: "tag.html"
       return
     end
-    self.error_404 ctx
+    Controllers.error_404 ctx
   end
 
   def login_page(ctx)

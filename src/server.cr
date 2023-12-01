@@ -67,7 +67,7 @@ module CrystalWorld
     when .match /^\/#{SLUG_PATTERN}$/
       PublicControllers.article_page ctx
     else
-      PublicControllers.error_404 ctx
+      Controllers.error_404 ctx
     end
   end
 

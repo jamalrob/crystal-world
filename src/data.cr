@@ -123,6 +123,9 @@ module CrystalWorld::Data
             }
             articles.<<(this_row)
           end
+          if articles.empty?
+            articles = nil
+          end
           return articles
         rescue DB::NoResultsError
           return nil

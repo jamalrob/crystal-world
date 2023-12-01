@@ -315,3 +315,27 @@ on keydown[key is 'b' and ctrlKey is true]
 on keydown[key is 'i' and ctrlKey is true]
   halt the event
   call doFontStyle('_') then call do_html(me.innerText)
+
+
+
+  def admin_edit_preview(ctx)
+    # *********************************
+    # CURRENTLY NOT USED
+    #
+    if u = Data.authenticated_user ctx
+      urlbits = ctx.request.path.split('/', remove_empty: true)
+      slug = urlbits[-2]?
+      article = Data.get_article slug
+      if article
+        TemplateRenderer.render_and_out ctx: ctx,
+          data: {
+            "article" => article,
+            "title"   => article["title"],
+          },
+          template_path: "admin/article_preview.html"
+        return
+      end
+      CrystalWorld::Controllers.error_404 ctx
+      return
+    end
+  end
