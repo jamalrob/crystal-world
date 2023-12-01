@@ -103,6 +103,20 @@ module CrystalWorld::AdminControllers
     end
   end
 
+  def admin_markdown_cheatsheet(ctx)
+    if u = Data.authenticated_user ctx
+      TemplateRenderer.render_and_out ctx: ctx,
+        data: {
+          "title" => "Markdown cheatsheet",
+          "user_authenticated" => true,
+          "admin" => true,
+        },
+        template_path: "admin/markdown-cheatsheet.html"
+      return
+    end
+    ctx.response.redirect "/"
+  end
+
   def get_preview_html(ctx)
     # Using because showdown.js doesn't do smart quotes etc
     if u = Data.authenticated_user(ctx) && ctx.request.body

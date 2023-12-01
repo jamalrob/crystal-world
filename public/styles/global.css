@@ -10,29 +10,6 @@ body {
     height: 100%;
 }
 
-body.light {
-  background: #ebedef;
-  color: #262626;
-  height: 100%;
-}
-body.light a {
-  color: #0859b7;
-}
-body.light a:hover {
-  color: #034193;;
-}
-body.light header {
-  background: rgba(188, 180, 180, 0);
-  box-shadow: 0 4px 30px rgba(41, 41, 41, 0.07);
-  border-bottom: 1px solid rgba(165, 172, 179, 0.3);
-}
-body.light ul.article-list li small {
-  color: #7a7c82;
-}
-body.light ul.article-list li small .home-tags a {
-  color: #5c74ab;
-}
-
 * {
     box-sizing: border-box;
 }
@@ -52,7 +29,9 @@ main {
     padding: 100px 0 200px;
     position: relative;
 }
-
+small {
+  font-size: 0.7rem;
+}
 h1, h2, h3, h4 {
     font-family: 'Roboto Condensed', Ubuntu, Helvetica, Arial, sans-serif;
 }

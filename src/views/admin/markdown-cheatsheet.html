@@ -1,0 +1,18 @@
+<div id="pdf-container">
+  <embed src="/docs/markdown-cheatsheet.pdf"/>
+</div>
+<script type="text/hyperscript">
+  on load
+    hide <button.close/>
+  end
+</script>
+<style>
+  #pdf-container embed {
+    width: 90vw;
+    height: 100vh;
+  }
+  #pdf-container {
+    display: flex;
+    justify-content: center;
+  }
+</style>

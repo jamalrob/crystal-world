@@ -54,6 +54,8 @@ module CrystalWorld
       AdminControllers.admin_authors ctx
     when "/admin/settings"
       AdminControllers.admin_settings ctx
+    when "/admin/markdown-cheatsheet"
+      AdminControllers.admin_markdown_cheatsheet ctx
     when .starts_with? "/api/save_sidebar_state"
       AdminControllers.save_sidebar_state ctx
     when .match /^\/admin\/edit\/#{SLUG_PATTERN}\/preview$/
