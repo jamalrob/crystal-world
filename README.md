@@ -14,7 +14,7 @@ The main objectives here are:
 - Testing different patterns and architectures
 - Learning a new programming language that's as nice to read as Python or Ruby, but _fast_
 - Building a groundwork for small real-world projects that's easy and enjoyable to use
-- On the client-side, HTMX and Hyperscript has replaced all JavaScript to achieve a fast, SPA-like user experience
+- On the client-side, replacing all (self-written) JavaScript with HTMX and Hyperscript while retaining a fast, SPA-like user experience
 
 ### Features
 
