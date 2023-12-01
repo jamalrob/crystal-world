@@ -28,4 +28,18 @@ The main objectives here are:
 
 ### Screenshots
 
-![screenshot](./screenshots/Screenshot-from-2023-12-01-14-32-15.png)
+![Home page](./screenshots/Screenshot-from-2023-12-01-14-50-03.png)
+
+![Home page](./screenshots/Screenshot-from-2023-12-01-14-52-16.png)
+
+![Home page](./screenshots/Screenshot-from-2023-12-01-14-33-56.png)
+
+![Home page](./screenshots/Screenshot-from-2023-12-01-14-33-14.png)
+
+![Home page](./screenshots/Screenshot-from-2023-12-01-14-35-40.png)
+
+![Home page](./screenshots/Screenshot-from-2023-12-01-14-39-08.png)
+
+![Home page](./screenshots/Screenshot-from-2023-12-01-14-39-19.png)
+
+![Home page](./screenshots/Screenshot-from-2023-12-01-14-33-24.png)
