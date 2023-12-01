@@ -5,7 +5,7 @@
 <ul class="tag-list" hx-boost="true">
     {% for t in tags %}
     <li>
-        <a href='/tag/{{ t }}'>{{ t }}</a>
+        <a href="/tag/{{ t }}">{{ t }}</a>
         {% if not loop.last %}/{% endif %}
     </li>
     {% endfor %}

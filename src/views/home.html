@@ -5,7 +5,15 @@
     {% for a in articles %}
     <li>
         <a href="/{{ a.slug }}">{{ a.title }}</a>
-        <small>{{ a.date }}</small>
+        <small>
+          {{ a.date }}
+          <span class="home-tags">
+            {% for t in a.tags %}
+            <a href="/tag/{{ t }}">{{ t }}</a>
+            {% if not loop.last %}&#x2022;{% endif %}
+            {% endfor %}
+          </span>
+        </small>
     </li>
     {% endfor %}
 </ul>

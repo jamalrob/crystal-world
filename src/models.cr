@@ -141,7 +141,7 @@ module CrystalWorld::Models
     def self.get_articles
 
       DB.open "sqlite3://./crw.db" do |db|
-        articles = [] of Hash(String, String)
+        articles = [] of Hash(String, String | Array(String))
         begin
           results = db.query_all "SELECT slug, title, date, tags FROM articles ORDER BY date DESC",
             as: {String, String, String, String}
@@ -156,7 +156,7 @@ module CrystalWorld::Models
             "slug"  => result[0],
             "title" => result[1],
             "date"  => Time.utc(year, month, day).to_s("%d %B %Y"),
-            "tags"  => result[3],
+            "tags"  => result[3].delete(' ').split(","),
           }
           articles.<<(this_row)
         end

@@ -18,18 +18,15 @@ body {
 * {
     box-sizing: border-box;
 }
-
 a {
     color: #a3cdfd;
     text-decoration: none;
 }
-
 a:hover {
     text-decoration: underline;
     text-underline-offset: 4px;
     color: white;
 }
-
 main {
     width: 95%;
     margin: 0 auto;
@@ -234,7 +231,7 @@ ul.article-list {
 ul.article-list li {
     margin-bottom: 0.65rem;
 }
-ul.article-list a {
+ul.article-list li > a:first-child {
     font-weight: 900;
     font-size: 1.3rem;
     line-height: 1.3rem;
@@ -242,7 +239,16 @@ ul.article-list a {
     font-family: 'Roboto Condensed', Ubuntu, -apple-system,BlinkMacSystemFont,'avenir next',avenir,'helvetica neue',helvetica,ubuntu,roboto,noto,'segoe ui',arial,sans-serif;
 }
 ul.article-list li small {
+  font-size: 0.76rem;
   color: #c9c9c9;
+}
+ul.article-list li small .home-tags {
+  font-size: 0.7rem;
+  margin-left: 15px;
+  color: #508ab6;
+}
+ul.article-list li small .home-tags a {
+  color: #8f9ec0;
 }
 /* tags */
 ul.tag-list {
