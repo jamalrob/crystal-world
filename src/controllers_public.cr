@@ -52,7 +52,7 @@ module CrystalWorld::PublicControllers
     urlbits = ctx.request.path.split('/', remove_empty: true)
     tag = urlbits[1]?
     articles = Models::Article.get_articles_for_tag tag
-    if !articles.empty?
+    if articles
       TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "articles" => articles,

@@ -20,7 +20,6 @@ module CrystalWorld::Models
                 as: {Int32, String, String?, String?, String?, String?}
           end
         rescue DB::NoResultsError
-          puts "No user found"
           return nil
         end
         return {
@@ -105,7 +104,7 @@ module CrystalWorld::Models
       DB.open "sqlite3://./crw.db" do |db|
         tag_vals = db.query_all "SELECT tags from articles WHERE draft = 0", as: {String}
         tag_vals.each do |row|
-          all_tags = all_tags | row.delete(' ').split(",")
+          all_tags |= row.delete(' ').split(",")
         end
       end
       return all_tags
@@ -115,26 +114,26 @@ module CrystalWorld::Models
       DB.open "sqlite3://./crw.db" do |db|
         articles = [] of Hash(String, String)
         begin
-          results = db.query_all "SELECT slug, title, date, tags FROM articles WHERE tags LIKE '%' || ? || '%' ORDER BY date DESC",
+          results = (db.query_all "SELECT slug, title, date, tags FROM articles " \
+                                  "WHERE tags LIKE '%' || ? || '%' ORDER BY date DESC",
             tag,
             as: {String, String, String, String}
+          )
+          results.each do |result|
+            dt = result[2].split(' ')[0]
+            day, month, year = dt.split('-')[2].to_i, dt.split('-')[1].to_i, dt.split('-')[0].to_i
+            this_row = {
+              "slug"  => result[0],
+              "title" => result[1],
+              "date"  => Time.utc(year, month, day).to_s("%d %B %Y"),
+              "tags"  => result[3],
+            }
+            articles.<<(this_row)
+          end
+          return articles
         rescue DB::NoResultsError
-          puts "No articles found"
-          return [] of String
+          return nil
         end
-
-        results.each do |result|
-          dt = result[2].split(' ')[0]
-          day, month, year = dt.split('-')[2].to_i, dt.split('-')[1].to_i, dt.split('-')[0].to_i
-          this_row = {
-            "slug"  => result[0],
-            "title" => result[1],
-            "date"  => Time.utc(year, month, day).to_s("%d %B %Y"),
-            "tags"  => result[3],
-          }
-          articles.<<(this_row)
-        end
-        return articles
       end
     end
 
@@ -143,24 +142,24 @@ module CrystalWorld::Models
       DB.open "sqlite3://./crw.db" do |db|
         articles = [] of Hash(String, String | Array(String))
         begin
-          results = db.query_all "SELECT slug, title, date, tags FROM articles ORDER BY date DESC",
+          results = (db.query_all "SELECT slug, title, date, tags FROM articles ORDER BY date DESC",
             as: {String, String, String, String}
+          )
+          results.each do |result|
+            dt = result[2].split(' ')[0]
+            day, month, year = dt.split('-')[2].to_i, dt.split('-')[1].to_i, dt.split('-')[0].to_i
+            this_row = {
+              "slug"  => result[0],
+              "title" => result[1],
+              "date"  => Time.utc(year, month, day).to_s("%d %B %Y"),
+              "tags"  => result[3].delete(' ').split(","),
+            }
+            articles.<<(this_row)
+          end
+          return articles
         rescue DB::NoResultsError
-          puts "No articles found"
-          return [] of String
+          return nil
         end
-        results.each do |result|
-          dt = result[2].split(' ')[0]
-          day, month, year = dt.split('-')[2].to_i, dt.split('-')[1].to_i, dt.split('-')[0].to_i
-          this_row = {
-            "slug"  => result[0],
-            "title" => result[1],
-            "date"  => Time.utc(year, month, day).to_s("%d %B %Y"),
-            "tags"  => result[3].delete(' ').split(","),
-          }
-          articles.<<(this_row)
-        end
-        return articles
       end
 
     end
@@ -169,26 +168,28 @@ module CrystalWorld::Models
       DB.open "sqlite3://./crw.db" do |db|
         begin
           slug, title, tags, date, image, imageclass, draft, md =
-            db.query_one  "SELECT slug, title, tags, date, main_image, " \
+            db.query_one( "SELECT slug, title, tags, date, main_image, " \
                           "image_class, draft, content " \
                           "FROM articles WHERE slug = ? LIMIT 1",
               slug,
               as: {String, String, String?, String, String?, String?, Int32, String}
+            )
+          dt = date.split(' ')[0]
+          day, month, year = dt.split('-')[2].to_i, dt.split('-')[1].to_i, dt.split('-')[0].to_i
+
+          return {
+            "slug"       => slug,
+            "title"      => title,
+            "date"       => Time.utc(year, month, day).to_s("%d %B %Y"),
+            "tags"       => tags,
+            "image"      => image,
+            "imageclass" => imageclass,
+            "draft"      => draft,
+            "md"         => md,
+          }
         rescue DB::NoResultsError
-          puts "No article found"
           return nil
         end
-
-        return {
-          "slug"       => slug,
-          "title"      => title,
-          "date"       => date.split(' ')[0],
-          "tags"       => tags,
-          "image"      => image,
-          "imageclass" => imageclass,
-          "draft"      => draft,
-          "md"         => md,
-        }
       end
     end
 
