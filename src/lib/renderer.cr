@@ -25,9 +25,20 @@ module CrystalWorld::TemplateRenderer
       end
     end
     tengine = Crinja.new
-    tengine.loader = Crinja::Loader::FileSystemLoader.new("src/views/")
+    tengine.loader = Crinja::Loader::FileSystemLoader.new(TEMPLATE_FOLDER)
     template = tengine.get_template(template_path)
     final_html = template.render(data)
+    ctx.response.print final_html
+  end
+
+  def render_basic(
+    ctx : HTTP::Server::Context,
+    template_path : String
+  )
+    tengine = Crinja.new
+    tengine.loader = Crinja::Loader::FileSystemLoader.new(TEMPLATE_FOLDER)
+    template = tengine.get_template(template_path)
+    final_html = template.render()
     ctx.response.print final_html
   end
 

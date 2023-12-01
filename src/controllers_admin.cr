@@ -105,13 +105,14 @@ module CrystalWorld::AdminControllers
 
   def admin_markdown_cheatsheet(ctx)
     if u = Data.authenticated_user ctx
-      TemplateRenderer.render_and_out ctx: ctx,
-        data: {
-          "title" => "Markdown cheatsheet",
-          "user_authenticated" => true,
-          "admin" => true,
-        },
+      TemplateRenderer.render_basic(
+        ctx: ctx,
         template_path: "admin/markdown-cheatsheet.html"
+      )
+      #TemplateRenderer.render_and_out(ctx: ctx,
+      #  data: {} of String => String,
+      #  template_path: "admin/markdown-cheatsheet.html"
+      #)
       return
     end
     ctx.response.redirect "/"
