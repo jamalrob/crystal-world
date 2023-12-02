@@ -47,10 +47,9 @@
         }"
         hx-select=".status"
         hx-on::after-request="showAfterRequest('unpublishAction', 1000)"
-        _="on click hide #unpublishAction"
       >
         <span id="unpublishAction">Unpublish</span>
-        <span class="spinner" id="unpublishLoading"></span>
+        <span class="spinner spinner--hidden" id="unpublishLoading"></span>
       </button>
       {% endif %}
 
@@ -59,10 +58,10 @@
         class="fullwidth"
         id="publish"
         hx-post="/admin/article/{{ article.slug }}/publish"
-        hx-swap="beforeend"
+        hx-swap="none"
         hx-indicator="#publishLoading"
         hx-vals="js:{
-            md:           localStorage.getItem('article_{{ article.id }}'),
+            md:           localStorage.getItem('article_{{ article.id }}') || document.getElementById('editBox').innerText,
             article_id:   {{ article.id }},
             slug:         document.getElementById('inpSlug').value,
             title:        document.getElementById('inpTitle').value,
@@ -73,30 +72,17 @@
         }"
         hx-select=".status"
         hx-on::after-request="showAfterRequest('publish', 'publishAction', 1000)"
-        _="on click hide #publishAction"
       >
         <span id="publishAction">Publish {% if not article.draft %}changes{% endif %}</span>
-        <span class="spinner" id="publishLoading"></span>
+        <span class="spinner spinner--hidden" id="publishLoading"></span>
       </button>
     </div>
   </form>
 </div>
-<script>
-  function showAfterRequest(){
-    const bt = document.getElementById("publish")
-    const article_id = bt.dataset.articleid;
-    console.log(article_id);
-  }
-</script>
-
-<script type="text/hyperscript" data-articleid="{{ article.id }}">
-  def showAfZterRequest(action, elementId, waitms)
-    set data to document.currentScript.dataset
-    set article_id to data.articleid
-    log article_id
+<script type="text/hyperscript">
+  def showAfterRequest(action, elementId, waitms)
     if action is 'publish'
-      ---remove 'article_{{ article.id }}' from localStorage
-      localStorage.removeItem('article_{{ article.id }}')
+      localStorage.removeItem('article_' + #publish.dataset.articleid)
     end
   --- NOTE: The following can also be done like this:
   --- wait waitms then hide .status then show #{elementId}
@@ -117,6 +103,36 @@
   end
 </script>
 <style>
+  .spinner {
+    position: absolute;
+    top: calc(50% - 0.55rem);
+    width: 1rem;
+    height: 1rem;
+    border: 0.15rem solid #ffc000;
+    border-bottom-width: 0.15rem;
+    border-bottom-style: solid;
+    border-bottom-color: rgb(255, 192, 0);
+    border-bottom: 0.25rem solid rgba(0,0,0,0);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 9999;
+    margin: 0 0 10px 10px;
+    margin-left: 8px;
+  }
+
+  .spinner--hidden {
+    display: none;
+  }
+
+  .htmx-request {
+    display: unset;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
 .button-group {
   margin: 40px 0 20px;
 }

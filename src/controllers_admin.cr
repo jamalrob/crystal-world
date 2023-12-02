@@ -168,6 +168,14 @@ module CrystalWorld::AdminControllers
 
 
   def publish_article(ctx)
+
+    #i = 0
+    #s = ""
+    #while i < 20000
+    #  s += Random.rand.to_s
+    #  i += 1
+    #end
+
     if u = self.authenticated_user ctx
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
       if article_id = params["article_id"].to_i?

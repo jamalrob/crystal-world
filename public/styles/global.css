@@ -71,6 +71,7 @@ h3 {
     justify-content: right;
 }
 button {
+    position: relative;
     background-color: #2f837d;
     color: #fff;
     border: none;
