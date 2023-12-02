@@ -14,23 +14,44 @@
       Article properties
     </a>
   </span>
+  <div id="revision">
+    {% if article.draft %}
+    {% else %}
+    <span id="revision-message">Showing autosaved.</span>
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-skip-back"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg>
+    <a href="#">
+      Revert to published
+    </a>
+    {% endif %}
+  </div>
 </div>
 
 <div class="edit-container">
   <section class="edit">
     <div class="editable" contenteditable="true"
-    _=" on load
-          ---set localStorage.md to my innerText
-          ---set my innerText to localStorage.md
+    _="
+        --- ################################################################################
+        --- #
+        --- # MAY HAVE TO ADD ERROR HANDLING WHEN LOCASTORAGE IS FULL
+        --- # See here for exceptions in hyperscript: https://hyperscript.org/features/def/
+        --- # See here for distinguishing localStorage exceptions:
+        --- #  https://mmazzarolo.com/blog/2022-06-25-local-storage-status/
+        --- #
+        --- ################################################################################
+
+        on load
+          if localStorage.article_{{ article.id }} is not empty
+            set my innerText to localStorage.article_{{ article.id }}
+            call do_html(me.innerText)
+          end
         on input
           call do_html(me.innerText)
-          wait 5s then set localStorage.article_{{ article.id }} to my innerText --- autosave
-          ---wait 5s then localStorage.setItem({{ article.slug }}, my innerText)
+        on keyup
+          call doAutosave(me)
         on scroll
           set scrollTop of #pre-preview to my.scrollTop
         on keydown[key is 'Tab']
           halt the event then call document.execCommand('insertText', false, '&#009')
-
         "
     >{{ article.md }}</div>
     <small>
@@ -144,6 +165,19 @@
     }
     return { preventIllicitPastings }
   end
+
+  js
+    // AUTOSAVE AFTER 1s NOT TYPING
+    function doAutosave(inputElm) {
+      var duration = 1000;
+      clearTimeout(inputElm._timer);
+      inputElm._timer = setTimeout(()=>{
+        console.log("Saving")
+        localStorage.setItem("article_{{ article.id }}", inputElm.innerText)
+      }, duration);
+    }
+    return { doAutosave }
+  end
 </script>
 <style>
 small > svg {
@@ -167,11 +201,23 @@ button.close {
 }
 .supertitle {
   font-size: 0.78rem;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   width: 50%;
 }
 .supertitle #link-container svg {
   vertical-align: sub;
+}
+.supertitle #revision {
+  float: right;
+  margin-right: 12px;
+}
+.supertitle #revision svg {
+  vertical-align: text-top;
+  margin-right: -2px;
+}
+.supertitle #revision button {
+  position: relative;
+  top: -3px;
 }
 .edit-container {
   display: flex;
@@ -193,7 +239,7 @@ button.close {
   background: rgb(232, 229, 229);
   color: #222;
   padding: 20px;
-  border-radius: 3px;
+  border-radius: 2px;
   font-size: 0.8rem;
   width: 100%;
   height: 80vh;
@@ -216,7 +262,7 @@ div#pre-preview, div.editable {
   line-height: 1.38rem;
   background-color: #08416d;
   padding: 10px 15px 0 15px;
-  border-radius: 3px;
+  border-radius: 2px;
 }
 div#pre-preview blockquote {
   border-radius: 2px;
@@ -283,7 +329,7 @@ div#pre-preview p:first-child {
   background-color: #0a4775;
   overflow-y: auto;
   z-index: 1000;
-  border-radius: 3px;
+  border-radius: 2px;
   padding: 0;
   position: relative;
 }

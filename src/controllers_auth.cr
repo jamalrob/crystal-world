@@ -57,6 +57,7 @@ module CrystalWorld::AuthControllers
     ctx.response.print "Your credentials were not recognized."
   end
 
+
   def do_logout(ctx)
     if u = AdminControllers.authenticated_user(ctx)
       #
@@ -68,7 +69,7 @@ module CrystalWorld::AuthControllers
         name: "sessionid",
         value: "",
         expires: Time.utc - 1.day,
-        samesite: HTTP::Cookie::SameSite.new(1)
+        samesite: HTTP::Cookie::SameSite.new(1),
       )
       csrf_cookie = HTTP::Cookie.new(
         name: "csrftoken",

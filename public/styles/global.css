@@ -75,7 +75,7 @@ button {
     background-color: #2f837d;
     color: #fff;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     padding: 10px 25px 8px;
     font-size: 16px;
     font-weight: bold;
@@ -150,13 +150,15 @@ header nav a {
 }
 header nav button {
   margin-left: 0.6rem;
-  font-size: 0.6rem;
-  /*padding: 5px 17px 3px;*/
-  line-height: 0.3rem;
-  font-weight: normal;
   position: relative;
   top: -2px;
   width: 100px;
+}
+
+button.small {
+  font-size: 0.6rem;
+  line-height: 0.3rem;
+  font-weight: normal;
 }
 
 /* blog article */

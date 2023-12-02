@@ -8,6 +8,7 @@ module CrystalWorld::AdminControllers
     return "normal"
   end
 
+
   def authenticated_user(ctx)
     if ctx.request.cookies.has_key?("sessionid") && ctx.request.cookies.has_key?("csrftoken")
       sessionid = ctx.request.cookies["sessionid"].value
@@ -16,99 +17,114 @@ module CrystalWorld::AdminControllers
     end
   end
 
+
   def admin_articles(ctx)
     if u = self.authenticated_user ctx
       articles = Data.get_articles(include_drafts: true)
-      TemplateRenderer.render_and_out ctx: ctx,
+      TemplateRenderer.render_and_out(
+        ctx: ctx,
         data: {
-          "title" => "Admin: articles",
-          "articles" => articles,
-          "user_authenticated" => true,
-          "sidebar_collapsed" => self.sidebar_collapsed_classname(ctx),
-          "admin" => true
+          "title"               => "Admin: articles",
+          "articles"            => articles,
+          "user_authenticated"  => true,
+          "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
+          "admin"               => true
         },
         template_path: "admin/articles.html"
+      )
       return
     end
     ctx.response.redirect "/"
   end
+
 
   def admin_settings(ctx)
     if u = self.authenticated_user ctx
-      TemplateRenderer.render_and_out ctx: ctx,
+      TemplateRenderer.render_and_out(ctx: ctx,
         data: {
-          "title" => "Admin: articles",
-          "user_authenticated" => true,
-          "sidebar_collapsed" => self.sidebar_collapsed_classname(ctx),
-          "admin" => true
+          "title"               => "Admin: articles",
+          "user_authenticated"  => true,
+          "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
+          "admin"               => true
         },
         template_path: "admin/settings.html"
+      )
       return
     end
     ctx.response.redirect "/"
   end
+
 
   def admin_authors(ctx)
     if u = self.authenticated_user ctx
-      TemplateRenderer.render_and_out ctx: ctx,
+      TemplateRenderer.render_and_out(ctx: ctx,
         data: {
-          "title" => "Admin: articles",
-          #"authors" => authors,
-          "user_authenticated" => true,
-          "sidebar_collapsed" => self.sidebar_collapsed_classname(ctx),
+          "title"               => "Admin: articles",
+          #"authors"            => authors,
+          "user_authenticated"  => true,
+          "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
           "admin" => true
         },
         template_path: "admin/authors.html"
+      )
       return
     end
     ctx.response.redirect "/"
   end
+
 
   def admin_customize(ctx)
     if u = self.authenticated_user ctx
-      TemplateRenderer.render_and_out ctx: ctx,
+      TemplateRenderer.render_and_out(
+        ctx: ctx,
         data: {
-          "title" => "Admin: articles",
-          "user_authenticated" => true,
-          "sidebar_collapsed" => self.sidebar_collapsed_classname(ctx),
-          "admin" => true
+          "title"               => "Admin: articles",
+          "user_authenticated"  => true,
+          "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
+          "admin"               => true
         },
         template_path: "admin/customize.html"
+      )
       return
     end
     ctx.response.redirect "/"
   end
 
+
   def admin_pages(ctx)
     if u = self.authenticated_user ctx
-      TemplateRenderer.render_and_out ctx: ctx,
+      TemplateRenderer.render_and_out(ctx: ctx,
         data: {
-          "title" => "Admin: articles",
+          "title"               => "Admin: articles",
           #"articles" => articles,
-          "user_authenticated" => true,
-          "sidebar_collapsed" => self.sidebar_collapsed_classname(ctx),
-          "admin" => true
+          "user_authenticated"  => true,
+          "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
+          "admin"               => true
         },
         template_path: "admin/pages.html"
+      )
       return
     end
     ctx.response.redirect "/"
   end
+
 
   def article_properties(ctx)
     urlbits = ctx.request.path.split('/', remove_empty: true)
     slug = urlbits[1]?
     article = Data.get_article(slug: slug, return_draft: true)
     if article
-      TemplateRenderer.render_and_out ctx: ctx,
+      TemplateRenderer.render_and_out(ctx: ctx,
         data: {
-          "article" => article,
-          "title"   => "Article properties",
+          "article"         => article,
+          "title"           => "Article properties",
           "imagekit_bucket" => IMGBUCKET
         },
         template_path: "admin/article_properties.html"
+      )
     end
   end
+
 
   def admin_markdown_cheatsheet(ctx)
     if u = self.authenticated_user ctx
@@ -120,6 +136,7 @@ module CrystalWorld::AdminControllers
     end
     ctx.response.redirect "/"
   end
+
 
   def get_preview_html(ctx)
     # Using because showdown.js doesn't do smart quotes etc
@@ -134,19 +151,21 @@ module CrystalWorld::AdminControllers
           options = Markd::Options.new(smart: true, safe: true)
           html = Markd.to_html(md, options)
           html = html.gsub("/bucket/", IMGBUCKET)
-          TemplateRenderer.render_and_out ctx: ctx,
+          TemplateRenderer.render_and_out(ctx: ctx,
             data: {
-              "article" => article,
-              "html" => html,
+              "article"       => article,
+              "html"          => html,
               "admin_preview" => true
             },
             template_path: "admin/article_preview.html"
+          )
           return
         end
       end
     end
     ctx.response.status = HTTP::Status.new(403)
   end
+
 
   def save_sidebar_state(ctx)
     if u = self.authenticated_user ctx
@@ -189,6 +208,7 @@ module CrystalWorld::AdminControllers
     ctx.response.status = HTTP::Status.new(403)
   end
 
+
   def edit_article_page(ctx)
     if u = self.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)
@@ -197,7 +217,8 @@ module CrystalWorld::AdminControllers
         options = Markd::Options.new(smart: true, safe: true)
         html = Markd.to_html(article["md"].as(String), options)
         article["html"] = html.gsub("/bucket/", IMGBUCKET)
-        TemplateRenderer.render_and_out ctx: ctx,
+        TemplateRenderer.render_and_out(
+          ctx: ctx,
           data: {
             "title"               => "Editing: #{article["title"]}",
             "article"             => article,
@@ -208,6 +229,7 @@ module CrystalWorld::AdminControllers
             "imagekit_bucket"     => IMGBUCKET
           },
           template_path: "admin/edit-article.html"
+        )
         return
       end
       Controllers.error_404 ctx
@@ -216,6 +238,7 @@ module CrystalWorld::AdminControllers
     ctx.response.redirect "/"
   end
 
+  
   def save_article(ctx)
     if u = self.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)

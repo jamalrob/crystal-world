@@ -32,9 +32,9 @@
             <a href="/about">About</a>
             {% if user_authenticated %}
             <a href="/admin">Admin</a>
-            <button hx-get="/admin/logout" hx-target="body" hx-push-url="true">Sign out</button>
+            <button class="small" hx-get="/admin/logout" hx-target="body" hx-push-url="true">Sign out</button>
             {% else %}
-            <button hx-get="/admin/login" hx-target="body" hx-push-url="true">Sign in</button>
+            <button class="small" hx-get="/admin/login" hx-target="body" hx-push-url="true">Sign in</button>
             {% endif %}
           </nav>
       </header>

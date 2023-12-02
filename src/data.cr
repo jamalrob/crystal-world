@@ -32,6 +32,7 @@ module CrystalWorld::Data
       end
     end
 
+
     def get_authenticated_user(sessionid, csrftoken)
       DB.open "sqlite3://./crw.db" do |db|
         begin
@@ -55,6 +56,7 @@ module CrystalWorld::Data
       end
     end
 
+
     def update_user_session(id, sessionid, new_csrf_token)
       DB.open "sqlite3://./crw.db" do |db|
         if id
@@ -66,6 +68,7 @@ module CrystalWorld::Data
       end
     end
 
+
     def delete_user_session(sessionid)
       DB.open "sqlite3://./crw.db" do |db|
         db.exec "UPDATE users " \
@@ -74,6 +77,7 @@ module CrystalWorld::Data
         sessionid
       end
     end
+
 
     def create_article(slug, title, tags, date, image, imageClass, draft, content)
       #
@@ -87,6 +91,7 @@ module CrystalWorld::Data
       end
     end
 
+    
     def get_tags
       all_tags = [] of String
       DB.open "sqlite3://./crw.db" do |db|
@@ -225,7 +230,6 @@ module CrystalWorld::Data
       draft,
       md
     )
-
 
       DB.open "sqlite3://./crw.db" do |db|
         db.exec "UPDATE articles " \
