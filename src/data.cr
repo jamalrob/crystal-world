@@ -118,6 +118,7 @@ module CrystalWorld::Data
               as: {String, String, String, String, Int32}
             )
           end
+          p! results
           results.each do |result|
             dt = result[2].split(' ')[0]
             day, month, year = dt.split('-')[2].to_i, dt.split('-')[1].to_i, dt.split('-')[0].to_i
@@ -129,7 +130,7 @@ module CrystalWorld::Data
               "draft"         => result[4],
               "tags"          => result[3].delete(' ').split(","),
             }
-            articles.<<(this_row)
+            articles.push(this_row)
           end
           return articles
         rescue DB::NoResultsError
@@ -172,20 +173,31 @@ module CrystalWorld::Data
     end
 
 
-    def get_article(slug)
+    def get_article(slug, return_draft=false)
       DB.open "sqlite3://./crw.db" do |db|
         begin
-          slug, title, tags, date, image, imageclass, draft, md =
-            db.query_one( "SELECT slug, title, tags, date, main_image, " \
+          if return_draft
+            id, slug, title, tags, date, image, imageclass, draft, md =
+            db.query_one( "SELECT id, slug, title, tags, date, main_image, " \
                           "image_class, draft, content " \
                           "FROM articles WHERE slug = ? LIMIT 1;",
               slug,
-              as: {String, String, String?, String, String?, String?, Int32, String}
+              as: {Int32, String, String, String?, String, String?, String?, Int32, String}
             )
+          else
+            id, slug, title, tags, date, image, imageclass, draft, md =
+              db.query_one( "SELECT id, slug, title, tags, date, main_image, " \
+                            "image_class, draft, content " \
+                            "FROM articles WHERE slug = ? AND draft = 0 LIMIT 1;",
+                slug,
+                as: {Int32, String, String, String?, String, String?, String?, Int32, String}
+              )
+          end
           dt = date.split(' ')[0]
           day, month, year = dt.split('-')[2].to_i, dt.split('-')[1].to_i, dt.split('-')[0].to_i
 
           return {
+            "id"            => id,
             "slug"          => slug,
             "title"         => title,
             "date"          => Time.utc(year, month, day).to_s("%Y-%m-%d"),

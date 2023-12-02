@@ -24,7 +24,8 @@
           ---set my innerText to localStorage.md
         on input
           call do_html(me.innerText)
-          wait 5s then set localStorage.md to my innerText --- autosave
+          wait 5s then set localStorage.article_{{ article.id }} to my innerText --- autosave
+          ---wait 5s then localStorage.setItem({{ article.slug }}, my innerText)
         on scroll
           set scrollTop of #pre-preview to my.scrollTop
         on keydown[key is 'Tab']

@@ -98,7 +98,7 @@ module CrystalWorld::AdminControllers
   def article_properties(ctx)
     urlbits = ctx.request.path.split('/', remove_empty: true)
     slug = urlbits[1]?
-    article = Data.get_article slug
+    article = Data.get_article(slug: slug, return_draft: true)
     if article
       TemplateRenderer.render_and_out ctx: ctx,
         data: {
@@ -126,7 +126,7 @@ module CrystalWorld::AdminControllers
     if u = self.authenticated_user(ctx) && ctx.request.body
       urlbits = ctx.request.path.split('/', remove_empty: true)
       slug = urlbits[2]?
-      article = Data.get_article slug
+      article = Data.get_article(slug: slug, return_draft: true)
       if article
         params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
         if params.has_key?("markdown")
@@ -193,7 +193,7 @@ module CrystalWorld::AdminControllers
     if u = self.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)
       slug = urlbits[-1]?
-      if article = Data.get_article slug
+      if article = Data.get_article(slug: slug, return_draft: true)
         options = Markd::Options.new(smart: true, safe: true)
         html = Markd.to_html(article["md"].as(String), options)
         article["html"] = html.gsub("/bucket/", IMGBUCKET)

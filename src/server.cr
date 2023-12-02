@@ -16,7 +16,7 @@ module CrystalWorld
   @@env = Poncho.from_file ".env"
   IMGBUCKET = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-70/"
   SLUG_PATTERN = "[a-z0-9]+(?:[_-][a-z0-9]+)*"
-  LOCAL     = @@env["ENV"] == "local" || false
+  LOCAL     = @@env["ENV"] == "local"
   CACHEBUST = Time.monotonic.to_s.split(".")[-1]
   TEMPLATE_FOLDER = "src/templates/"
 
