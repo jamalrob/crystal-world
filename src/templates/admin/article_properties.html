@@ -1,8 +1,4 @@
-<div id="article-props-container" _="
-  ---on load
-  ---  add focus to #inpTitle
-  ---end
-">
+<div id="article-props-container">
   <h1>Article status: <span id="article-status">{% if article.draft %}draft{% else %}published{% endif %}</span></h1>
   <form>
     <label for="">Title</label>
@@ -24,29 +20,20 @@
       <option value="full">Full screen-width</option>
     </select>
 
-    <!-- SEND DATA FROM LOCALSTORAGE INSTEAD -->
-    <!--
-      hx-vals="js:{
-          content: document.getElementById('editBox').value,
-          draft: true,
-          slug: '{{ article.slug }}'
-      }"
-    -->
-
     <div class="button-group">
       {% if not article.draft %}
       <button
         class="fullwidth green"
         id="unpublish"
         hx-post="/admin/article/{{ article.slug }}/unpublish"
-        hx-swap="beforeend"
+        hx-swap="none"
         hx-indicator="#unpublishLoading"
         hx-vals="js:{
             md: localStorage.getItem('article_{{ article.id }}'),
             article_id: {{ article.id }}
         }"
         hx-select=".status"
-        hx-on::after-request="showAfterRequest('unpublishAction', 1000)"
+        hx-on::after-request="afterRequest('unpublish')"
       >
         <span id="unpublishAction">Unpublish</span>
         <span class="spinner spinner--hidden" id="unpublishLoading"></span>
@@ -71,38 +58,29 @@
             image_class:  document.getElementById('selImageClass').value
         }"
         hx-select=".status"
-        hx-on::after-request="showAfterRequest('publish', 'publishAction', 1000)"
+        hx-on::after-request="afterRequest('publish')"
       >
         <span id="publishAction">Publish {% if not article.draft %}changes{% endif %}</span>
         <span class="spinner spinner--hidden" id="publishLoading"></span>
       </button>
     </div>
+    <div id="confirm-published">
+    </div>
+
   </form>
 </div>
 <script type="text/hyperscript">
-  def showAfterRequest(action, elementId, waitms)
+  def afterRequest(action, elementId, waitms)
     if action is 'publish'
       localStorage.removeItem('article_' + #publish.dataset.articleid)
+      put "✓ Published" into #confirm-published then wait for 3s then put '' into #confirm-published
     end
-  --- NOTE: The following can also be done like this:
-  --- wait waitms then hide .status then show #{elementId}
-  --  wait waitms
-  --  hide .status
-  --  show #{elementId}
-  --  if elementId is "unpublishAction"
-  --      show #savedraft
-  --      hide #unpublish
-  --      set #poststatus.innerHTML to 'Draft'
-  --  else
-  --      if elementId is "publishAction"
-  --          hide #savedraft
-  --          show #unpublish
-  --          set #poststatus.innerHTML to 'Published'
-  --      end
-  --  end
   end
 </script>
 <style>
+  #confirm-published {
+    height: 30px;
+  }
   .spinner {
     position: absolute;
     top: calc(50% - 0.55rem);
