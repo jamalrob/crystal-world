@@ -9,7 +9,10 @@
   <tbody>
     {% for a in articles %}
     <tr class="showing">
-      <td><a href="/admin/edit/{{ a.slug }}/">{{ a.title }}</a></td>
+      <td>
+        <a href="/admin/edit/{{ a.slug }}/">{{ a.title }}</a>
+        {% if a.draft %}<span class="tag">Draft</span>{% endif %}
+      </td>
       <td>
         <button hx-get="/admin/edit/{{ a.slug }}/" hx-target="body" hx-push-url="true">Edit</button>
         <button class="delete">Delete</button>

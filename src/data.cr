@@ -105,17 +105,17 @@ module CrystalWorld::Data
     def get_articles(include_drafts=false)
 
       DB.open "sqlite3://./crw.db" do |db|
-        articles = [] of Hash(String, String | Array(String))
+        articles = [] of Hash(String, String | Array(String) | Int32)
         begin
           if include_drafts
-            results = (db.query_all "SELECT slug, title, date, tags FROM articles " \
+            results = (db.query_all "SELECT slug, title, date, tags, draft FROM articles " \
                                     "ORDER BY date DESC;",
-              as: {String, String, String, String}
+              as: {String, String, String, String, Int32}
             )
           else
-            results = (db.query_all "SELECT slug, title, date, tags FROM articles " \
+            results = (db.query_all "SELECT slug, title, date, tags, draft FROM articles " \
                                     "WHERE draft = 0 ORDER BY date DESC;",
-              as: {String, String, String, String}
+              as: {String, String, String, String, Int32}
             )
           end
           results.each do |result|
@@ -126,6 +126,7 @@ module CrystalWorld::Data
               "title"         => result[1],
               "date"          => Time.utc(year, month, day).to_s("%Y-%m-%d"),
               "friendly_date" => Time.utc(year, month, day).to_s("%d %B %Y"),
+              "draft"         => result[4],
               "tags"          => result[3].delete(' ').split(","),
             }
             articles.<<(this_row)
