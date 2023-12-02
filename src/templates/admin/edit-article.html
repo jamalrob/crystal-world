@@ -15,14 +15,15 @@
     </a>
   </span>
   <div id="revision">
-    {% if article.draft %}
-    {% else %}
-    <span id="revision-message">Showing autosaved.</span>
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-skip-back"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg>
-    <a href="#">
-      Revert to published
-    </a>
+    {% if not article.draft %}
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rotate-ccw"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+    <a href="#" title="Restore the published version as the latest edit">
+      Revert</a>
     {% endif %}
+    <span id="revision-message">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      Autosaved
+    </span>
   </div>
 </div>
 
@@ -174,6 +175,14 @@
       inputElm._timer = setTimeout(()=>{
         console.log("Saving")
         localStorage.setItem("article_{{ article.id }}", inputElm.innerText)
+
+        let signalEl = document.getElementById("revision-message")
+        signalEl.classList.add("saved");
+          setTimeout(function() {
+            signalEl.classList.remove("saved");
+        }, 2000);
+
+
       }, duration);
     }
     return { doAutosave }
@@ -204,20 +213,32 @@ button.close {
   margin-bottom: 5px;
   width: 50%;
 }
-.supertitle #link-container svg {
+#link-container svg {
   vertical-align: sub;
 }
-.supertitle #revision {
+#revision {
+  font-size: 0.66rem;
   float: right;
-  margin-right: 12px;
+  margin-right: 10px;
 }
-.supertitle #revision svg {
+#revision svg {
   vertical-align: text-top;
   margin-right: -2px;
 }
-.supertitle #revision button {
+#revision button {
   position: relative;
   top: -3px;
+}
+#revision-message {
+  padding: 2px 2px;
+  border-radius: 2px;
+}
+#revision-message svg {
+  vertical-align: text-bottom;
+}
+#revision-message.saved {
+  background: #28ea62;
+  color: #111;
 }
 .edit-container {
   display: flex;
@@ -324,7 +345,7 @@ div#pre-preview p:first-child {
   margin: 2.4rem auto;
   width: 80vw;
   min-width: 1000px;
-  height: 89vh;
+  max-height: 89vh;
   /*background: #fffdf8;*/
   background-color: #0a4775;
   overflow-y: auto;

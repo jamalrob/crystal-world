@@ -1,8 +1,12 @@
-<div id="article-props-container">
+<div id="article-props-container" _="
+  ---on load
+  ---  add focus to #inpTitle
+  ---end
+">
   <h1>Article status: <span id="article-status">{% if article.draft %}draft{% else %}published{% endif %}</span></h1>
   <form>
     <label for="">Title</label>
-    <input type="text" name="title" id="inpTitle" value="{{ article.title }}">
+    <input autofocus type="text" name="title" id="inpTitle" value="{{ article.title }}">
     <label for="">Slug</label>
     <input type="text" name="slug" id="inpSlug" value="{{ article.slug }}">
     <label for="">Date</label>
@@ -28,7 +32,7 @@
           slug: '{{ article.slug }}'
       }"
     -->
-    <button
+    <!--<button
       class="publish savedraft"
       id="savedraft"
       hx-post="/admin/{{ article.slug }}/save_draft"
@@ -44,45 +48,52 @@
     >
       <span id="saveAction">Save draft</span>
       <span class="spinner" id="saveLoading"></span>
-    </button>
+    </button>-->
 
-    <button
-      class="publish unpublish"
-      id="unpublish"
-      hx-post="/admin/{{ article.slug }}/unpublish"
-      hx-swap="beforeend"
-      hx-indicator="#unpublishLoading"
-      hx-vals="js:{
-          draft: true,
-          slug: '{{ article.slug }}'
-      }"
-      hx-select=".status"
-      hx-on::after-request="showAfterRequest('unpublishAction', 1000)"
-      _="on click hide #unpublishAction"
-    >
-      <span id="unpublishAction">Unpublish</span>
-      <span class="spinner" id="unpublishLoading"></span>
-    </button>
+    <div class="button-group">
+      {% if not article.draft %}
+      <button
+        class="fullwidth green"
+        id="unpublish"
+        hx-post="/admin/{{ article.slug }}/unpublish"
+        hx-swap="beforeend"
+        hx-indicator="#unpublishLoading"
+        hx-vals="js:{
+            draft: true,
+            slug: '{{ article.slug }}'
+        }"
+        hx-select=".status"
+        hx-on::after-request="showAfterRequest('unpublishAction', 1000)"
+        _="on click hide #unpublishAction"
+      >
+        <span id="unpublishAction">Unpublish</span>
+        <span class="spinner" id="unpublishLoading"></span>
+      </button>
+      {% endif %}
 
-    <button
-      class="publish"
-      id="publish"
-      hx-post="/admin/{{ article.slug }}/publish"
-      hx-swap="beforeend"
-      hx-indicator="#publishLoading"
-      hx-vals="js:{
-          slug: '{{ article.slug }}'
-      }"
-      hx-select=".status"
-      hx-on::after-request="showAfterRequest('publishAction', 1000)"
-      _="on click hide #publishAction"
-    >
-      <span id="publishAction">Publish</span>
-      <span class="spinner" id="publishLoading"></span>
-    </button>
+      <button
+        class="fullwidth"
+        id="publish"
+        hx-post="/admin/{{ article.slug }}/publish"
+        hx-swap="beforeend"
+        hx-indicator="#publishLoading"
+        hx-vals="js:{
+            slug: '{{ article.slug }}'
+        }"
+        hx-select=".status"
+        hx-on::after-request="showAfterRequest('publishAction', 1000)"
+        _="on click hide #publishAction"
+      >
+        <span id="publishAction">Publish {% if not article.draft %}changes{% endif %}</span>
+        <span class="spinner" id="publishLoading"></span>
+      </button>
+    </div>
   </form>
 </div>
 <style>
+.button-group {
+  margin: 40px 0 20px;
+}
 #article-props-container {
   padding: 30px;
   font-size: 0.8rem;
