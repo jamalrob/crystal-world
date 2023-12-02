@@ -150,11 +150,13 @@ header nav a {
 }
 header nav button {
   margin-left: 0.6rem;
-  font-size: 0.62rem;
-  padding: 5px 17px 3px;
+  font-size: 0.6rem;
+  /*padding: 5px 17px 3px;*/
+  line-height: 0.3rem;
   font-weight: normal;
   position: relative;
-  top: -2px
+  top: -2px;
+  width: 100px;
 }
 
 /* blog article */

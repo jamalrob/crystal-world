@@ -58,7 +58,7 @@ module CrystalWorld::AuthControllers
   end
 
   def do_logout(ctx)
-    if u = Data.authenticated_user(ctx)
+    if u = AdminControllers.authenticated_user(ctx)
       #
       # SETTING A COOKIE'S EXPIRES IN THE PAST PROMPTS THE BROWSER TO DELETE IT
       # NOTE: These cookies still need the samesite parameter

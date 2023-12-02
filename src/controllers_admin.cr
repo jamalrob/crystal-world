@@ -8,9 +8,17 @@ module CrystalWorld::AdminControllers
     return "normal"
   end
 
+  def authenticated_user(ctx)
+    if ctx.request.cookies.has_key?("sessionid") && ctx.request.cookies.has_key?("csrftoken")
+      sessionid = ctx.request.cookies["sessionid"].value
+      csrftoken = ctx.request.cookies["csrftoken"].value
+      return Data.get_authenticated_user(sessionid, csrftoken)
+    end
+  end
+
   def admin_articles(ctx)
-    if u = Data.authenticated_user ctx
-      articles = Data.get_articles
+    if u = self.authenticated_user ctx
+      articles = Data.get_articles(include_drafts: true)
       TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "title" => "Admin: articles",
@@ -26,7 +34,7 @@ module CrystalWorld::AdminControllers
   end
 
   def admin_settings(ctx)
-    if u = Data.authenticated_user ctx
+    if u = self.authenticated_user ctx
       TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "title" => "Admin: articles",
@@ -41,7 +49,7 @@ module CrystalWorld::AdminControllers
   end
 
   def admin_authors(ctx)
-    if u = Data.authenticated_user ctx
+    if u = self.authenticated_user ctx
       TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "title" => "Admin: articles",
@@ -57,7 +65,7 @@ module CrystalWorld::AdminControllers
   end
 
   def admin_customize(ctx)
-    if u = Data.authenticated_user ctx
+    if u = self.authenticated_user ctx
       TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "title" => "Admin: articles",
@@ -72,7 +80,7 @@ module CrystalWorld::AdminControllers
   end
 
   def admin_pages(ctx)
-    if u = Data.authenticated_user ctx
+    if u = self.authenticated_user ctx
       TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "title" => "Admin: articles",
@@ -90,7 +98,6 @@ module CrystalWorld::AdminControllers
   def article_properties(ctx)
     urlbits = ctx.request.path.split('/', remove_empty: true)
     slug = urlbits[1]?
-    p! slug
     article = Data.get_article slug
     if article
       TemplateRenderer.render_and_out ctx: ctx,
@@ -104,15 +111,11 @@ module CrystalWorld::AdminControllers
   end
 
   def admin_markdown_cheatsheet(ctx)
-    if u = Data.authenticated_user ctx
+    if u = self.authenticated_user ctx
       TemplateRenderer.render_basic(
         ctx: ctx,
         template_path: "admin/markdown-cheatsheet.html"
       )
-      #TemplateRenderer.render_and_out(ctx: ctx,
-      #  data: {} of String => String,
-      #  template_path: "admin/markdown-cheatsheet.html"
-      #)
       return
     end
     ctx.response.redirect "/"
@@ -120,7 +123,7 @@ module CrystalWorld::AdminControllers
 
   def get_preview_html(ctx)
     # Using because showdown.js doesn't do smart quotes etc
-    if u = Data.authenticated_user(ctx) && ctx.request.body
+    if u = self.authenticated_user(ctx) && ctx.request.body
       urlbits = ctx.request.path.split('/', remove_empty: true)
       slug = urlbits[2]?
       article = Data.get_article slug
@@ -146,7 +149,7 @@ module CrystalWorld::AdminControllers
   end
 
   def save_sidebar_state(ctx)
-    if u = Data.authenticated_user ctx
+    if u = self.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)
       state = urlbits[2] # 'collapsed' or 'normal'
       if ctx.request.cookies.has_key?("sidebar_collapsed")
@@ -187,17 +190,16 @@ module CrystalWorld::AdminControllers
   end
 
   def edit_article_page(ctx)
-    if u = Data.authenticated_user ctx
+    if u = self.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)
       slug = urlbits[-1]?
-      article = Data.get_article slug
-      if article
+      if article = Data.get_article slug
         options = Markd::Options.new(smart: true, safe: true)
         html = Markd.to_html(article["md"].as(String), options)
         article["html"] = html.gsub("/bucket/", IMGBUCKET)
         TemplateRenderer.render_and_out ctx: ctx,
           data: {
-            "title"               => "Admin: articles",
+            "title"               => "Editing: #{article["title"]}",
             "article"             => article,
             "user_authenticated"  => true,
             "admin"               => true,
@@ -212,6 +214,43 @@ module CrystalWorld::AdminControllers
       return
     end
     ctx.response.redirect "/"
+  end
+
+  def save_article(ctx)
+    if u = self.authenticated_user ctx
+      urlbits = ctx.request.path.split('/', remove_empty: true)
+      slug = urlbits[-1]?
+      params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
+      # -------------------------
+      # TODO:
+      # VALIDATION
+      # -------------------------
+
+      begin
+        proper_date = Time.parse_utc(params["date"], "%Y-%m-%d").to_s
+      rescue Time::Format::Error
+        p "date format error"
+        return
+      end
+
+      # proper_date might now contain e.g., "2016-04-05 00:00:00.0 UTC"
+      # But for Sqlite we need YYYY-MM-DD HH:MM:SS.SSS
+      proper_date = "#{proper_date.split(' ')[0]} 00:00:00.000"
+
+      p! proper_date
+      return
+
+      Data.save_article(
+        slug: slug,
+        title: params["title"],
+        date: params["date"],
+        tags: params["tags"],
+        main_image: params["main_image"],
+        image_class: params["image_class"],
+        draft: params["draft"],
+        md: params["md"]
+      )
+    end
   end
 
 end

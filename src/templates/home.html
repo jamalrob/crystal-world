@@ -6,7 +6,7 @@
     <li>
         <a href="/{{ a.slug }}">{{ a.title }}</a>
         <small>
-          {{ a.date }}
+          {{ a.friendly_date }}
           <span class="home-tags">
             {% for t in a.tags %}
             <a href="/tag/{{ t }}">{{ t }}</a>

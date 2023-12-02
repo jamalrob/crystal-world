@@ -1,0 +1,102 @@
+<div id="article-props-container">
+  <!--
+    We want this date format:
+
+    "%d %B %Y"
+  -->
+  <h1>Article status: <span id="article-status">{% if article.draft %}draft{% else %}published{% endif %}</span></h1>
+  <form>
+    <label for="">Title</label>
+    <input type="text" name="title" id="inpTitle" value="{{ article.title }}">
+    <label for="">Slug</label>
+    <input type="text" name="slug" id="inpSlug" value="{{ article.slug }}">
+    <label for="">Date</label>
+    <input type="date" name="date" id="inpDate" value="{{ article.date }}">
+    <label for="">Tags</label>
+    <input type="text" name="tags" id="inpTags" value="{{ article.tags }}">
+    <label for="">Main image</label>
+    <input type="file" name="mainImage" id="inpMainImage">
+    <label for="">Main image size</label>
+    <select name="imageclass" id="selImageClass">
+      <option value="">--Choose--</option>
+      <option value="small">Small</option>
+      <option value="medium">Medium</option>
+      <option value="large">Full column</option>
+      <option value="full">Full screen-width</option>
+    </select>
+
+    <!-- SEND DATA FROM LOCALSTORAGE INSTEAD -->
+    <!--
+      hx-vals="js:{
+          content: document.getElementById('editBox').value,
+          draft: true,
+          slug: '{{ article.slug }}'
+      }"
+    -->
+    <button
+      class="publish savedraft"
+      id="savedraft"
+      hx-post="/admin/{{ article.slug }}/save_draft"
+      hx-swap="beforeend"
+      hx-indicator="#saveLoading"
+      hx-vals="js:{
+          draft: true,
+          slug: '{{ article.slug }}'
+      }"
+      hx-select=".status"
+      hx-on::after-request="showAfterRequest('saveAction', 1000)"
+      _="on click hide #saveAction"
+    >
+      <span id="saveAction">Save draft</span>
+      <span class="spinner" id="saveLoading"></span>
+    </button>
+
+    <button
+      class="publish unpublish"
+      id="unpublish"
+      hx-post="/admin/{{ article.slug }}/unpublish"
+      hx-swap="beforeend"
+      hx-indicator="#unpublishLoading"
+      hx-vals="js:{
+          draft: true,
+          slug: '{{ article.slug }}'
+      }"
+      hx-select=".status"
+      hx-on::after-request="showAfterRequest('unpublishAction', 1000)"
+      _="on click hide #unpublishAction"
+    >
+      <span id="unpublishAction">Unpublish</span>
+      <span class="spinner" id="unpublishLoading"></span>
+    </button>
+
+    <button
+      class="publish"
+      id="publish"
+      hx-post="/admin/{{ article.slug }}/publish"
+      hx-swap="beforeend"
+      hx-indicator="#publishLoading"
+      hx-vals="js:{
+          slug: '{{ article.slug }}'
+      }"
+      hx-select=".status"
+      hx-on::after-request="showAfterRequest('publishAction', 1000)"
+      _="on click hide #publishAction"
+    >
+      <span id="publishAction">Publish</span>
+      <span class="spinner" id="publishLoading"></span>
+    </button>
+  </form>
+</div>
+<style>
+#article-props-container {
+  padding: 30px;
+  font-size: 0.8rem;
+}
+#article-props-container h1 {
+  font-size: 1rem;
+}
+input[type=checkbox] {
+  width: 20px;
+  height: 20px;
+}
+</style>

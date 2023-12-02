@@ -50,9 +50,8 @@ module CrystalWorld::PublicControllers
   def tag_page(ctx)
     urlbits = ctx.request.path.split('/', remove_empty: true)
     tag = urlbits[1]?
-    articles = Data.get_articles_for_tag tag
+    articles = Data.get_articles_for_tag(tag)
     if articles
-      p! articles
       TemplateRenderer.render_and_out ctx: ctx,
         data: {
           "articles" => articles,

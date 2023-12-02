@@ -19,8 +19,7 @@ module CrystalWorld::TemplateRenderer
       data.put("csrftoken", ctx.request.cookies["csrftoken"].value) { "update" }
     end
     if !data.has_key?("user_authenticated")
-      u = Data.authenticated_user(ctx)
-      if u
+      if u = AdminControllers.authenticated_user(ctx)
         data.put("user_authenticated", "true") { "update" }
       end
     end
