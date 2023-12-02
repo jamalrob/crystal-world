@@ -75,6 +75,12 @@ module CrystalWorld
     when .starts_with? "/api/save_sidebar_state"
       AdminControllers.save_sidebar_state(ctx)
 
+    when .match /^\/admin\/article\/#{SLUG_PATTERN}\/publish$/
+      AdminControllers.publish_article(ctx)
+
+    when .match /^\/admin\/article\/#{SLUG_PATTERN}\/unpublish$/
+      AdminControllers.unpublish_article(ctx)
+
     when .match /^\/admin\/edit\/#{SLUG_PATTERN}\/preview$/
       AdminControllers.get_preview_html(ctx)
 

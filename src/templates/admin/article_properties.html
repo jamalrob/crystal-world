@@ -32,35 +32,18 @@
           slug: '{{ article.slug }}'
       }"
     -->
-    <!--<button
-      class="publish savedraft"
-      id="savedraft"
-      hx-post="/admin/{{ article.slug }}/save_draft"
-      hx-swap="beforeend"
-      hx-indicator="#saveLoading"
-      hx-vals="js:{
-          draft: true,
-          slug: '{{ article.slug }}'
-      }"
-      hx-select=".status"
-      hx-on::after-request="showAfterRequest('saveAction', 1000)"
-      _="on click hide #saveAction"
-    >
-      <span id="saveAction">Save draft</span>
-      <span class="spinner" id="saveLoading"></span>
-    </button>-->
 
     <div class="button-group">
       {% if not article.draft %}
       <button
         class="fullwidth green"
         id="unpublish"
-        hx-post="/admin/{{ article.slug }}/unpublish"
+        hx-post="/admin/article/{{ article.slug }}/unpublish"
         hx-swap="beforeend"
         hx-indicator="#unpublishLoading"
         hx-vals="js:{
-            draft: true,
-            slug: '{{ article.slug }}'
+            md: localStorage.getItem('article_{{ article.id }}'),
+            article_id: {{ article.id }}
         }"
         hx-select=".status"
         hx-on::after-request="showAfterRequest('unpublishAction', 1000)"
@@ -72,16 +55,24 @@
       {% endif %}
 
       <button
+        data-articleid="{{ article.id }}"
         class="fullwidth"
         id="publish"
-        hx-post="/admin/{{ article.slug }}/publish"
+        hx-post="/admin/article/{{ article.slug }}/publish"
         hx-swap="beforeend"
         hx-indicator="#publishLoading"
         hx-vals="js:{
-            slug: '{{ article.slug }}'
+            md:           localStorage.getItem('article_{{ article.id }}'),
+            article_id:   {{ article.id }},
+            slug:         document.getElementById('inpSlug').value,
+            title:        document.getElementById('inpTitle').value,
+            date:         document.getElementById('inpDate').value,
+            tags:         document.getElementById('inpTags').value,
+            main_image:   document.getElementById('inpMainImage').value,
+            image_class:  document.getElementById('selImageClass').value
         }"
         hx-select=".status"
-        hx-on::after-request="showAfterRequest('publishAction', 1000)"
+        hx-on::after-request="showAfterRequest('publish', 'publishAction', 1000)"
         _="on click hide #publishAction"
       >
         <span id="publishAction">Publish {% if not article.draft %}changes{% endif %}</span>
@@ -90,6 +81,41 @@
     </div>
   </form>
 </div>
+<script>
+  function showAfterRequest(){
+    const bt = document.getElementById("publish")
+    const article_id = bt.dataset.articleid;
+    console.log(article_id);
+  }
+</script>
+
+<script type="text/hyperscript" data-articleid="{{ article.id }}">
+  def showAfZterRequest(action, elementId, waitms)
+    set data to document.currentScript.dataset
+    set article_id to data.articleid
+    log article_id
+    if action is 'publish'
+      ---remove 'article_{{ article.id }}' from localStorage
+      localStorage.removeItem('article_{{ article.id }}')
+    end
+  --- NOTE: The following can also be done like this:
+  --- wait waitms then hide .status then show #{elementId}
+  --  wait waitms
+  --  hide .status
+  --  show #{elementId}
+  --  if elementId is "unpublishAction"
+  --      show #savedraft
+  --      hide #unpublish
+  --      set #poststatus.innerHTML to 'Draft'
+  --  else
+  --      if elementId is "publishAction"
+  --          hide #savedraft
+  --          show #unpublish
+  --          set #poststatus.innerHTML to 'Published'
+  --      end
+  --  end
+  end
+</script>
 <style>
 .button-group {
   margin: 40px 0 20px;

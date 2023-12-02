@@ -175,7 +175,6 @@
       inputElm._timer = setTimeout(()=>{
         console.log("Saving")
         localStorage.setItem("article_{{ article.id }}", inputElm.innerText)
-
         let signalEl = document.getElementById("revision-message")
         signalEl.classList.add("saved");
           setTimeout(function() {

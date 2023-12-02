@@ -91,7 +91,7 @@ module CrystalWorld::Data
       end
     end
 
-    
+
     def get_tags
       all_tags = [] of String
       DB.open "sqlite3://./crw.db" do |db|
@@ -123,7 +123,6 @@ module CrystalWorld::Data
               as: {String, String, String, String, Int32}
             )
           end
-          p! results
           results.each do |result|
             dt = result[2].split(' ')[0]
             day, month, year = dt.split('-')[2].to_i, dt.split('-')[1].to_i, dt.split('-')[0].to_i
@@ -214,6 +213,53 @@ module CrystalWorld::Data
             "md"            => md,
           }
         rescue DB::NoResultsError
+          return nil
+        end
+      end
+    end
+
+
+    def publish_article(
+      article_id,
+      slug,
+      title,
+      date,
+      tags,
+      main_image,
+      image_class,
+      md
+      )
+      #p! article_id,
+      #slug,
+      #title,
+      #date,
+      #tags,
+      #main_image,
+      #image_class,
+      #md
+      DB.open "sqlite3://./crw.db" do |db|
+        begin
+          db.exec("UPDATE articles " \
+                  "SET slug = ?, title = ?, date = ?, tags = ?, " \
+                  "main_image = ?, image_class = ?, draft = ?, content = ? WHERE id = ?;",
+                  slug, title, date, tags, main_image, image_class, 0, md, article_id
+          )
+        rescue ex
+          puts ex
+          return nil
+        end
+      end
+    end
+
+
+    def unpublish_article(article_id)
+      DB.open "sqlite3://./crw.db" do |db|
+        begin
+          db.exec "UPDATE articles " \
+                "SET draft = 1 WHERE id = ?;",
+                article_id
+        rescue ex
+          puts ex
           return nil
         end
       end

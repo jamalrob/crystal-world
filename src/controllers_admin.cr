@@ -167,6 +167,42 @@ module CrystalWorld::AdminControllers
   end
 
 
+  def publish_article(ctx)
+    if u = self.authenticated_user ctx
+      params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
+      if article_id = params["article_id"].to_i?
+        Data.publish_article(
+          article_id: article_id,
+          slug:       params["slug"],
+          title:      params["title"],
+          date:       params["date"],
+          tags:       params["tags"],
+          main_image: params["main_image"],
+          image_class:params["image_class"],
+          md:         params["md"]
+        )
+        json_text = %({"result": "Published"})
+        ctx.response.print json_text
+        return
+      end
+      Controllers.error_404 ctx
+    end
+  end
+
+
+  def unpublish_article(ctx)
+    if u = self.authenticated_user ctx
+      params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
+      if article_id = params["article_id"].to_i?
+        Data.unpublish_article(article_id)
+        json_text = %({"result": "Unpublished"})
+        ctx.response.print json_text
+        return
+      end
+    end
+  end
+
+
   def save_sidebar_state(ctx)
     if u = self.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)
@@ -238,7 +274,7 @@ module CrystalWorld::AdminControllers
     ctx.response.redirect "/"
   end
 
-  
+
   def save_article(ctx)
     if u = self.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)
