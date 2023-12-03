@@ -1,13 +1,13 @@
+require "http/server"
+require "sqlite3"
 require "markd"
 require "front_matter"
 require "poncho"
 require "crinja"
 require "crystal-argon2"
-require "http/server"
-require "sqlite3"
-require "./*"
-require "./lib/*"
 require "sanitize"
+require "./controllers/*"
+require "./*"
 
 module CrystalWorld
   extend self
