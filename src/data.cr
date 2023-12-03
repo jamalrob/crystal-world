@@ -109,19 +109,19 @@ module CrystalWorld::Data
     end
 
 
-    def get_articles(include_drafts=false)
+    def get_articles(include_drafts=false, order_by="date DESC")
 
       DB.open "sqlite3://./crw.db" do |db|
         articles = [] of Hash(String, String | Array(String) | Int32)
         begin
           if include_drafts
             results = (db.query_all "SELECT slug, title, date, tags, draft FROM articles " \
-                                    "ORDER BY date DESC;",
+                                    "ORDER BY #{order_by};",
               as: {String, String, String, String, Int32}
             )
           else
             results = (db.query_all "SELECT slug, title, date, tags, draft FROM articles " \
-                                    "WHERE draft = 0 ORDER BY date DESC;",
+                                    "WHERE draft = 0 ORDER BY #{order_by};",
               as: {String, String, String, String, Int32}
             )
           end

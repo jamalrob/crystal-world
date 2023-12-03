@@ -22,3 +22,6 @@ shards:
   crystal-argon2:
     git: https://github.com/sushichain/crystal-argon2.git
     version: 0.1.3
+  sanitize:
+    git: https://github.com/straight-shoota/sanitize.git
+    version: 0.1.0+git.commit.75c141b619c77956e88f557149566cd28876398b

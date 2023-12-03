@@ -20,7 +20,10 @@ module CrystalWorld::AdminControllers
 
   def admin_articles(ctx)
     if u = self.authenticated_user ctx
-      articles = Data.get_articles(include_drafts: true)
+      articles = Data.get_articles(
+        include_drafts: true,
+        order_by: "date_created DESC"
+      )
       TemplateRenderer.render_and_out(
         ctx: ctx,
         data: {
@@ -138,7 +141,7 @@ module CrystalWorld::AdminControllers
         )
         return
       end
-      Controllers.error_404 ctx
+      PublicControllers.error_404 ctx
       return
     end
     ctx.response.redirect "/"
@@ -187,6 +190,9 @@ module CrystalWorld::AdminControllers
           options = Markd::Options.new(smart: true, safe: true)
           html = Markd.to_html(md, options)
           html = html.gsub("/bucket/", IMGBUCKET)
+          sanitizer = Sanitize::Policy::HTMLSanitizer.common
+          sanitizer.valid_classes << /language-.+/
+          html = sanitizer.process(html)
           TemplateRenderer.render_and_out(ctx: ctx,
             data: {
               "article"       => article,
@@ -207,11 +213,36 @@ module CrystalWorld::AdminControllers
     if u = self.authenticated_user ctx
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
       if article_id = params["article_id"].to_i?
+
+        # VALIDATION
+        # ====================
+
+        # Date
+        # --------------------
+        #
+        begin
+          proper_date = Time.parse_utc(params["date"], "%Y-%m-%d").to_s
+        rescue Time::Format::Error
+          p "date format error"
+          return
+        end
+        # proper_date might now contain e.g., "2016-04-05 00:00:00.0 UTC"
+        # But for Sqlite we need YYYY-MM-DD HH:MM:SS.SSS
+        proper_date = "#{proper_date.split(' ')[0]} 00:00:00.000"
+
+        # Sanitize HTML
+        # --------------------
+        #
+        #sanitizer = Sanitize::Policy::HTMLSanitizer.common
+        #sanitizer.valid_classes << /language-.+/
+        #sanitized_md = sanitizer.process(params["md"])
+
+
         Data.publish_article(
           article_id: article_id,
           slug:       params["slug"],
           title:      params["title"],
-          date:       params["date"],
+          date:       proper_date,
           tags:       params["tags"],
           main_image: params["main_image"],
           image_class:params["image_class"],
@@ -221,7 +252,7 @@ module CrystalWorld::AdminControllers
         ctx.response.print json_text
         return
       end
-      Controllers.error_404 ctx
+      PublicControllers.error_404 ctx
     end
   end
 
@@ -255,7 +286,7 @@ module CrystalWorld::AdminControllers
           name: "sidebar_collapsed",
           value: state,
           path: "/",
-          max_age: Time::Span.new(hours: 12),
+          max_age: Time::Span.new(days: 30),
           secure: false,
           samesite: HTTP::Cookie::SameSite.new(1),
           http_only: true,
@@ -267,7 +298,7 @@ module CrystalWorld::AdminControllers
           name: "sidebar_collapsed",
           value: state,
           path: "/",
-          max_age: Time::Span.new(hours: 12),
+          max_age: Time::Span.new(days: 30),
           secure: false,
           samesite: HTTP::Cookie::SameSite.new(1),
           http_only: true
@@ -282,27 +313,39 @@ module CrystalWorld::AdminControllers
 
 
   def save_article(ctx)
+
+    #
+    # POSSIBLY NOT USING
+    #
+
     if u = self.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)
       slug = urlbits[-1]?
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
-      # -------------------------
-      # TODO:
-      # VALIDATION
-      # -------------------------
 
+      # VALIDATION
+      #
+      #
+      # Date
+      #
       begin
         proper_date = Time.parse_utc(params["date"], "%Y-%m-%d").to_s
       rescue Time::Format::Error
         p "date format error"
         return
       end
-
       # proper_date might now contain e.g., "2016-04-05 00:00:00.0 UTC"
       # But for Sqlite we need YYYY-MM-DD HH:MM:SS.SSS
       proper_date = "#{proper_date.split(' ')[0]} 00:00:00.000"
 
-      p! proper_date
+      #
+      # Markdown
+      #
+      sanitizer = Sanitize::Policy::HTMLSanitizer.common
+      sanitizer.valid_classes << /language-.+/
+      sanitized = sanitizer.process(params["md"])
+
+
       return
 
       Data.save_article(

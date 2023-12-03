@@ -10,7 +10,7 @@
     <label for="">Tags</label>
     <input type="text" name="tags" id="inpTags" value="{{ article.tags }}">
     <label for="">Main image</label>
-    <input type="file" name="mainImage" id="inpMainImage">
+    <input type="file" name="mainImage" id="inpMainImage" accept="image/png, image/jpeg">
     <label for="">Main image size</label>
     <select name="imageclass" id="selImageClass">
       <option value="">--Choose--</option>
@@ -21,9 +21,8 @@
     </select>
 
     <div class="button-group">
-      {% if not article.draft %}
       <button
-        class="fullwidth green"
+        class="fullwidth green {% if article.draft %}hidden{% endif %}"
         id="unpublish"
         hx-post="/admin/article/{{ article.slug }}/unpublish"
         hx-swap="none"
@@ -38,7 +37,6 @@
         <span id="unpublishAction">Unpublish</span>
         <span class="spinner spinner--hidden" id="unpublishLoading"></span>
       </button>
-      {% endif %}
 
       <button
         data-articleid="{{ article.id }}"
@@ -74,7 +72,7 @@
     if action is 'publish'
       localStorage.removeItem('article_' + #publish.dataset.articleid)
       put "Publish changes" into #publishAction
-      show <button#unpublish/>
+      remove .hidden from <button#unpublish/>
       put "published" into #article-status
       put "✓ Published" into #confirm-published
     end

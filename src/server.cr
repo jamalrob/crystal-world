@@ -1,4 +1,3 @@
-require "http/client"
 require "markd"
 require "front_matter"
 require "poncho"
@@ -8,6 +7,7 @@ require "http/server"
 require "sqlite3"
 require "./*"
 require "./lib/*"
+require "sanitize"
 
 module CrystalWorld
   extend self
@@ -100,7 +100,7 @@ module CrystalWorld
       PublicControllers.article_page(ctx)
 
     else
-      Controllers.error_404(ctx)
+      PublicControllers.error_404(ctx)
 
     end
   end

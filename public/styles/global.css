@@ -121,6 +121,11 @@ input, textarea, #editBox, select {
     background: rgb(232, 229, 229);
 }
 
+pre code {
+  -moz-tab-size : 2;
+  -o-tab-size : 2;
+  tab-size : 2;
+}
 
 /* header */
 header {
@@ -273,4 +278,7 @@ form.login {
 form .error {
     color: rgb(255, 160, 160);
     margin-top: 20px;
+}
+.hidden {
+  display: none;
 }

@@ -16,7 +16,7 @@ module CrystalWorld::AuthControllers
             name: "sessionid",
             value: sessionid,
             path: "/",
-            max_age: Time::Span.new(hours: 12),
+            max_age: Time::Span.new(days: 30),
             secure: false,
             samesite: HTTP::Cookie::SameSite.new(1),
             http_only: true
@@ -25,7 +25,7 @@ module CrystalWorld::AuthControllers
             name: "csrftoken",
             value: csrftoken,
             path: "/",
-            max_age: Time::Span.new(hours: 12),
+            max_age: Time::Span.new(days: 30),
             secure: false,
             samesite: HTTP::Cookie::SameSite.new(1),
             http_only: true,

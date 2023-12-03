@@ -42,7 +42,7 @@ module CrystalWorld::PublicControllers
       )
       return
     end
-    Controllers.error_404 ctx
+    PublicControllers.error_404 ctx
   end
 
 
@@ -73,7 +73,7 @@ module CrystalWorld::PublicControllers
       )
       return
     end
-    Controllers.error_404 ctx
+    PublicControllers.error_404 ctx
   end
 
 
@@ -83,6 +83,15 @@ module CrystalWorld::PublicControllers
         "title" => "Sign in to admin",
       },
       template_path: "admin/login.html"
+    )
+  end
+
+
+  def error_404(ctx)
+    ctx.response.status = HTTP::Status.new(404)
+    TemplateRenderer.render_basic(
+      ctx: ctx,
+      template_path: "errors/404.html"
     )
   end
 

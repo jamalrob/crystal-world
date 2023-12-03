@@ -91,7 +91,7 @@
     >
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
     </a>
-    <div id="pre-preview">
+    <div id="pre-preview" _="on load call hljs.highlightAll()">
     {{ article.html|safe }}
     </div>
   </section>
@@ -129,7 +129,7 @@
     make a showdown.Converter called converter
     set html to converter.makeHtml(md.replaceAll('/bucket/', '{{ imagekit_bucket }}/'))
     put html into #pre-preview
-    hljs.highlightAll()
+    call hljs.highlightAll()
   end
 
   def showModal(content)
@@ -145,7 +145,7 @@
     end
     add .visible to .modal-container
     if content is 'preview'
-      hljs.highlightAll()
+      call hljs.highlightAll()
     end
   end
 

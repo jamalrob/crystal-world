@@ -14,3 +14,5 @@ dependencies:
         github: straight-shoota/crinja
     crystal-argon2:
         github: sushichain/crystal-argon2
+    sanitize:
+        github: straight-shoota/sanitize
