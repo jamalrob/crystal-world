@@ -2,6 +2,7 @@ module CrystalWorld::AuthControllers
   extend self
 
   def do_login(ctx)
+
     params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
     username = params["username"] || ""
     password = params["password"] || ""
@@ -9,7 +10,6 @@ module CrystalWorld::AuthControllers
       begin
         res = Argon2::Password.verify_password(password, u["password"].to_s)
         if res == Argon2::Response::ARGON2_OK
-          # Set new sessionid and CSRF for this session
           sessionid = Random::Secure.hex(16)
           csrftoken = Random::Secure.hex(16)
           ctx.response.cookies["sessionid"] = HTTP::Cookie.new(
@@ -55,10 +55,12 @@ module CrystalWorld::AuthControllers
     # Adding an error status to the response here trips up
     # the HTMX replacement, so we don't do it
     ctx.response.print "Your credentials were not recognized."
+
   end
 
 
   def do_logout(ctx)
+
     if u = AdminControllers.authenticated_user(ctx)
       #
       # SETTING A COOKIE'S EXPIRES IN THE PAST PROMPTS THE BROWSER TO DELETE IT
@@ -88,6 +90,7 @@ module CrystalWorld::AuthControllers
       return
     end
     ctx.response.redirect "/"
+
   end
 
 end

@@ -148,6 +148,7 @@ module CrystalWorld::Data
 
 
     def get_articles_for_tag(tag)
+
       DB.open "sqlite3://./crw.db" do |db|
         articles = [] of Hash(String, String)
         begin
@@ -173,10 +174,12 @@ module CrystalWorld::Data
           return nil
         end
       end
+
     end
 
 
     def get_article(slug, return_draft=false)
+
       DB.open "sqlite3://./crw.db" do |db|
         begin
           if return_draft
@@ -215,6 +218,7 @@ module CrystalWorld::Data
           return nil
         end
       end
+
     end
 
 
@@ -248,10 +252,12 @@ module CrystalWorld::Data
           return nil
         end
       end
+
     end
 
 
     def unpublish_article(article_id)
+
       DB.open "sqlite3://./crw.db" do |db|
         begin
           db.exec "UPDATE articles " \
@@ -262,19 +268,11 @@ module CrystalWorld::Data
           return nil
         end
       end
+
     end
 
 
-    def save_article(
-      slug,
-      title,
-      date,
-      tags,
-      main_image,
-      image_class,
-      draft,
-      md
-    )
+    def save_article(slug, title, date, tags, main_image, image_class, draft, md)
 
       DB.open "sqlite3://./crw.db" do |db|
         db.exec "UPDATE articles " \

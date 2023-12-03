@@ -2,23 +2,28 @@ module CrystalWorld::AdminControllers
   extend self
 
   def sidebar_collapsed_classname(ctx)
+
     if ctx.request.cookies.has_key?("sidebar_collapsed")
       return ctx.request.cookies["sidebar_collapsed"].value
     end
     return "normal"
+
   end
 
 
   def authenticated_user(ctx)
+
     if ctx.request.cookies.has_key?("sessionid") && ctx.request.cookies.has_key?("csrftoken")
       sessionid = ctx.request.cookies["sessionid"].value
       csrftoken = ctx.request.cookies["csrftoken"].value
       return Data.get_authenticated_user(sessionid, csrftoken)
     end
+
   end
 
 
   def admin_articles(ctx)
+
     if u = self.authenticated_user ctx
       articles = Data.get_articles(
         include_drafts: true,
@@ -39,10 +44,12 @@ module CrystalWorld::AdminControllers
       return
     end
     ctx.response.redirect "/"
+
   end
 
 
   def admin_settings(ctx)
+
     if u = self.authenticated_user ctx
       TemplateRenderer.render_and_out(ctx: ctx,
         data: {
@@ -57,10 +64,12 @@ module CrystalWorld::AdminControllers
       return
     end
     ctx.response.redirect "/"
+
   end
 
 
   def admin_authors(ctx)
+
     if u = self.authenticated_user ctx
       TemplateRenderer.render_and_out(ctx: ctx,
         data: {
@@ -76,10 +85,12 @@ module CrystalWorld::AdminControllers
       return
     end
     ctx.response.redirect "/"
+
   end
 
 
   def admin_customize(ctx)
+
     if u = self.authenticated_user ctx
       TemplateRenderer.render_and_out(
         ctx: ctx,
@@ -95,10 +106,12 @@ module CrystalWorld::AdminControllers
       return
     end
     ctx.response.redirect "/"
+
   end
 
 
   def admin_pages(ctx)
+
     if u = self.authenticated_user ctx
       TemplateRenderer.render_and_out(ctx: ctx,
         data: {
@@ -114,10 +127,12 @@ module CrystalWorld::AdminControllers
       return
     end
     ctx.response.redirect "/"
+
   end
 
 
   def edit_article_page(ctx)
+
     if u = self.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)
       slug = urlbits[-1]?
@@ -145,10 +160,12 @@ module CrystalWorld::AdminControllers
       return
     end
     ctx.response.redirect "/"
+
   end
 
 
   def article_properties(ctx)
+
     urlbits = ctx.request.path.split('/', remove_empty: true)
     slug = urlbits[1]?
     article = Data.get_article(slug: slug, return_draft: true)
@@ -162,10 +179,12 @@ module CrystalWorld::AdminControllers
         template_path: "admin/article_properties.html"
       )
     end
+
   end
 
 
   def admin_markdown_cheatsheet(ctx)
+
     if u = self.authenticated_user ctx
       TemplateRenderer.render_basic(
         ctx: ctx,
@@ -174,11 +193,15 @@ module CrystalWorld::AdminControllers
       return
     end
     ctx.response.redirect "/"
+
   end
 
 
   def get_preview_html(ctx)
-    # Using because showdown.js doesn't do smart quotes etc
+    #
+    # Returns the full preview HTML. Done on the server-side because
+    # showdown.js doesn't do smart quotes etc.
+    #
     if u = self.authenticated_user(ctx) && ctx.request.body
       urlbits = ctx.request.path.split('/', remove_empty: true)
       slug = urlbits[2]?
@@ -206,19 +229,21 @@ module CrystalWorld::AdminControllers
       end
     end
     ctx.response.status = HTTP::Status.new(403)
+
   end
 
 
   def publish_article(ctx)
+
     if u = self.authenticated_user ctx
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
       if article_id = params["article_id"].to_i?
 
+        #
         # VALIDATION
-        # ====================
+        #
 
         # Date
-        # --------------------
         #
         begin
           proper_date = Time.parse_utc(params["date"], "%Y-%m-%d").to_s
@@ -230,8 +255,7 @@ module CrystalWorld::AdminControllers
         # But for Sqlite we need YYYY-MM-DD HH:MM:SS.SSS
         proper_date = "#{proper_date.split(' ')[0]} 00:00:00.000"
 
-        # Sanitize HTML
-        # --------------------
+        # Sanitize
         #
         #sanitizer = Sanitize::Policy::HTMLSanitizer.common
         #sanitizer.valid_classes << /language-.+/
@@ -254,10 +278,12 @@ module CrystalWorld::AdminControllers
       end
       PublicControllers.error_404 ctx
     end
+
   end
 
 
   def unpublish_article(ctx)
+
     if u = self.authenticated_user ctx
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
       if article_id = params["article_id"].to_i?
@@ -267,21 +293,25 @@ module CrystalWorld::AdminControllers
         return
       end
     end
+
   end
 
 
   def save_sidebar_state(ctx)
+
     if u = self.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)
       state = urlbits[2] # 'collapsed' or 'normal'
       if ctx.request.cookies.has_key?("sidebar_collapsed")
+        #
         # Update existing cookie
-        # STEP 1: expire the old one
+        #
+        # 1: expire the old one
         ck_sidebar_collapsed = HTTP::Cookie.new(
           "sidebar_collapsed", "",
           expires: Time.utc - 1.day
         )
-        # STEP 2: create a new one
+        # 2: create a new one
         ck_sidebar_collapsed = HTTP::Cookie.new(
           name: "sidebar_collapsed",
           value: state,
@@ -293,7 +323,9 @@ module CrystalWorld::AdminControllers
         )
         ctx.response.headers["Set-Cookie"] = ck_sidebar_collapsed.to_set_cookie_header
       else
-        # Add new cookie
+        #
+        # Create a new cookie
+        #
         ctx.response.cookies["sidebar_collapsed"] = HTTP::Cookie.new(
           name: "sidebar_collapsed",
           value: state,
@@ -309,6 +341,7 @@ module CrystalWorld::AdminControllers
       return
     end
     ctx.response.status = HTTP::Status.new(403)
+
   end
 
 
@@ -359,6 +392,7 @@ module CrystalWorld::AdminControllers
         md: params["md"]
       )
     end
+    
   end
 
 end

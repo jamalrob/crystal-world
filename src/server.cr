@@ -103,6 +103,7 @@ module CrystalWorld
       PublicControllers.error_404(ctx)
 
     end
+    
   end
 
   address = server.bind_tcp 8123
