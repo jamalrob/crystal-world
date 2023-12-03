@@ -74,14 +74,14 @@
       put "Publish changes" into #publishAction
       remove .hidden from <button#unpublish/>
       put "published" into #article-status
-      put "✓ Published" into #confirm-published
+      put "✔ Published" into #confirm-published
     end
     if action is 'unpublish'
       localStorage.removeItem('article_' + #publish.dataset.articleid)
-      put "draft" into #article-status
-      hide <button#unpublish/>
       put "Publish" into #publishAction
-      put '✓ Unpublished' into #confirm-published
+      add .hidden to <button#unpublish/>
+      put "draft" into #article-status
+      put '✔ Unpublished' into #confirm-published
     end
     wait for 3s
     if #confirm-published is not empty

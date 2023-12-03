@@ -25,12 +25,12 @@ module CrystalWorld::AdminControllers
       TemplateRenderer.render_and_out(
         ctx: ctx,
         data: {
-          "title"              => "Admin: articles",
-          "admin_section"      => "Admin: articles",
-          "articles"           => articles,
-          "user_authenticated" => true,
-          "sidebar_collapsed"  => self.sidebar_collapsed_classname(ctx),
-          "admin"              => true,
+          "title"               => "Admin: articles",
+          "admin_section"       => "Admin: articles",
+          "articles"            => articles,
+          "user_authenticated"  => true,
+          "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
+          "admin"               => true,
         },
         template_path: "admin/articles.html"
       )
@@ -43,11 +43,11 @@ module CrystalWorld::AdminControllers
     if u = self.authenticated_user ctx
       TemplateRenderer.render_and_out(ctx: ctx,
         data: {
-          "title"              => "Admin: articles",
-          "admin_section"      => "Admin: articles",
-          "user_authenticated" => true,
-          "sidebar_collapsed"  => self.sidebar_collapsed_classname(ctx),
-          "admin"              => true,
+          "title"               => "Admin: articles",
+          "admin_section"       => "Admin: articles",
+          "user_authenticated"  => true,
+          "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
+          "admin"               => true,
         },
         template_path: "admin/settings.html"
       )
@@ -60,12 +60,12 @@ module CrystalWorld::AdminControllers
     if u = self.authenticated_user ctx
       TemplateRenderer.render_and_out(ctx: ctx,
         data: {
-          "title"         => "Admin: articles",
-          "admin_section" => "Admin: articles",
-          # "authors"            => authors,
-          "user_authenticated" => true,
-          "sidebar_collapsed"  => self.sidebar_collapsed_classname(ctx),
-          "admin"              => true,
+          "title"               => "Admin: articles",
+          "admin_section"       => "Admin: articles",
+          # "authors"           => authors,
+          "user_authenticated"  => true,
+          "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
+          "admin"               => true,
         },
         template_path: "admin/authors.html"
       )
@@ -79,11 +79,11 @@ module CrystalWorld::AdminControllers
       TemplateRenderer.render_and_out(
         ctx: ctx,
         data: {
-          "title"              => "Admin: articles",
-          "admin_section"      => "Admin: articles",
-          "user_authenticated" => true,
-          "sidebar_collapsed"  => self.sidebar_collapsed_classname(ctx),
-          "admin"              => true,
+          "title"               => "Admin: articles",
+          "admin_section"       => "Admin: articles",
+          "user_authenticated"  => true,
+          "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
+          "admin"               => true,
         },
         template_path: "admin/customize.html"
       )
@@ -96,12 +96,12 @@ module CrystalWorld::AdminControllers
     if u = self.authenticated_user ctx
       TemplateRenderer.render_and_out(ctx: ctx,
         data: {
-          "title"         => "Admin: articles",
-          "admin_section" => "Admin: articles",
+          "title"               => "Admin: articles",
+          "admin_section"       => "Admin: articles",
           # "articles" => articles,
-          "user_authenticated" => true,
-          "sidebar_collapsed"  => self.sidebar_collapsed_classname(ctx),
-          "admin"              => true,
+          "user_authenticated"  => true,
+          "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
+          "admin"               => true,
         },
         template_path: "admin/pages.html"
       )
@@ -121,14 +121,14 @@ module CrystalWorld::AdminControllers
         TemplateRenderer.render_and_out(
           ctx: ctx,
           data: {
-            "title"              => "Editing: #{article["title"]}",
-            "admin_section"      => "Admin: articles",
-            "article"            => article,
-            "user_authenticated" => true,
-            "admin"              => true,
-            "extended_main"      => true,
-            "sidebar_collapsed"  => self.sidebar_collapsed_classname(ctx),
-            "imagekit_bucket"    => IMGBUCKET,
+            "title"               => "Editing: #{article["title"]}",
+            "admin_section"       => "Admin: articles",
+            "article"             => article,
+            "user_authenticated"  => true,
+            "admin"               => true,
+            "extended_main"       => true,
+            "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
+            "imagekit_bucket"     => IMGBUCKET,
           },
           template_path: "admin/edit-article.html"
         )
@@ -208,7 +208,6 @@ module CrystalWorld::AdminControllers
         #
         # VALIDATION
         #
-
         # Date
         #
         begin
@@ -302,50 +301,4 @@ module CrystalWorld::AdminControllers
     ctx.response.status = HTTP::Status.new(403)
   end
 
-  def save_article(ctx)
-    #
-    # POSSIBLY NOT USING
-    #
-
-    if u = self.authenticated_user ctx
-      urlbits = ctx.request.path.split('/', remove_empty: true)
-      slug = urlbits[-1]?
-      params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
-
-      # VALIDATION
-      #
-      #
-      # Date
-      #
-      begin
-        proper_date = Time.parse_utc(params["date"], "%Y-%m-%d").to_s
-      rescue Time::Format::Error
-        p "date format error"
-        return
-      end
-      # proper_date might now contain e.g., "2016-04-05 00:00:00.0 UTC"
-      # But for Sqlite we need YYYY-MM-DD HH:MM:SS.SSS
-      proper_date = "#{proper_date.split(' ')[0]} 00:00:00.000"
-
-      #
-      # Markdown
-      #
-      sanitizer = Sanitize::Policy::HTMLSanitizer.common
-      sanitizer.valid_classes << /language-.+/
-      sanitized = sanitizer.process(params["md"])
-
-      return
-
-      Data.save_article(
-        slug: slug,
-        title: params["title"],
-        date: params["date"],
-        tags: params["tags"],
-        main_image: params["main_image"],
-        image_class: params["image_class"],
-        draft: params["draft"],
-        md: params["md"]
-      )
-    end
-  end
 end

@@ -22,62 +22,6 @@ main.admin.extended.collapsed {
   width: unset;
   margin: 0 10px 0 50px !important;
 }
-
-table.admin-table {
-  width: 100%;
-  /*border: 1px solid rgba(84, 143, 211, 0.3);*/
-  table-layout: fixed;
-  width: 100%;
-  border-collapse: collapse;
-  background-color: #165a8f34;
-  overflow: hidden;
-  border-radius: 2px;
-  box-shadow: 0 0 3px #0b2a42;
-  /*background-color: #f1f1e6;*/
-  /*color: #222;*/
-}
-.oddrow {
-  background-color: #08416d;
-  /*background-color: #f3faff;*/
-}
-table.admin-table caption {
-  color: #e3dfd4;
-  text-align: left;
-  font-size: 1.3rem;
-  margin-bottom: 15px;
-  font-family: 'Roboto Condensed', Ubuntu, Helvetica, Arial, sans-serif;
-}
-table.admin-table tr td:nth-child(1) {
-  padding: 6px 0 6px 10px;
-  width: 85%;
-}
-table.admin-table tr td:nth-child(2) {
-  padding-right: 5px;
-  width: 15%;
-  text-align: right;
-}
-table.admin-table tr td {
-  border-bottom: 1px solid rgba(84, 143, 211, 0.3);
-}
-table.admin-table tr:last-child td {
-  border-bottom: none;
-}
-table.admin-table button {
-  padding: 7px 15px 3px;
-  font-weight: normal;
-  position: relative;
-  top: -2px;
-}
-span.tag{
-  background-color: #366a93;
-  padding: 3px 10px;
-  border-radius: 3px;
-  color: #ddd;
-  font-size: 0.7rem;
-}
-.showing {
-  display: table-row;
-}
 button svg {
   height: 1.3rem;
   vertical-align: bottom;

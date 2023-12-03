@@ -108,26 +108,30 @@ module CrystalWorld::Data
       articles = [] of Hash(String, String | Array(String) | Int32)
       begin
         if include_drafts
-          results = (db.query_all "SELECT slug, title, date, tags, draft FROM articles " \
-                                  "ORDER BY #{order_by};",
-            as: {String, String, String, String, Int32}
+          results = (db.query_all "SELECT slug, title, date, date_created, tags, draft " \
+                                  "FROM articles ORDER BY #{order_by};",
+                                  as: {String, String, String, String, String, Int32}
             )
         else
-          results = (db.query_all "SELECT slug, title, date, tags, draft FROM articles " \
-                                  "WHERE draft = 0 ORDER BY #{order_by};",
-            as: {String, String, String, String, Int32}
+          results = (db.query_all "SELECT slug, title, date, date_created, tags, draft " \
+                                  "FROM articles WHERE draft = 0 ORDER BY #{order_by};",
+                                  as: {String, String, String, String, String, Int32}
             )
         end
         results.each do |result|
           dt = result[2].split(' ')[0]
           day, month, year = dt.split('-')[2].to_i, dt.split('-')[1].to_i, dt.split('-')[0].to_i
+          dt_created = result[3].split(' ')[0]
+          day_created, month_created, year_created = dt_created.split('-')[2].to_i, dt_created.split('-')[1].to_i, dt_created.split('-')[0].to_i
           this_row = {
-            "slug"          => result[0],
-            "title"         => result[1],
-            "date"          => Time.utc(year, month, day).to_s("%Y-%m-%d"),
-            "friendly_date" => Time.utc(year, month, day).to_s("%d %B %Y"),
-            "draft"         => result[4],
-            "tags"          => result[3].delete(' ').split(","),
+            "slug"                  => result[0],
+            "title"                 => result[1],
+            "date"                  => Time.utc(year, month, day).to_s("%Y-%m-%d"),
+            "friendly_date"         => Time.utc(year, month, day).to_s("%d %B %Y"),
+            "date_created"          => Time.utc(year_created, month_created, day_created).to_s("%Y-%m-%d"),
+            "friendly_date_created" => Time.utc(year_created, month_created, day_created).to_s("%d %B %Y"),
+            "draft"                 => result[5],
+            "tags"                  => result[4].delete(' ').split(","),
           }
           articles.push(this_row)
         end
