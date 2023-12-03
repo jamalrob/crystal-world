@@ -34,6 +34,7 @@ small {
 }
 h1, h2, h3, h4 {
     font-family: 'Roboto Condensed', Ubuntu, Helvetica, Arial, sans-serif;
+    font-weight: normal;
 }
 h2, h3, h4 {
     margin-top: 2rem;
@@ -233,7 +234,6 @@ ul.article-list li {
     margin-bottom: 0.65rem;
 }
 ul.article-list li > a:first-child {
-    font-weight: 900;
     font-size: 1.3rem;
     line-height: 1.3rem;
     display:block;

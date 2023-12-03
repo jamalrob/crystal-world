@@ -29,7 +29,7 @@
 
 <div class="edit-container">
   <section class="edit">
-    <div class="editable" contenteditable="true" id="editBox"
+    <div class="editable" contenteditable="true" id="edit-box"
     _="
         --- ################################################################################
         --- #
@@ -84,7 +84,7 @@
         target="previewArticle"
         hx-post="/admin/edit/{{ article.slug }}/preview"
         hx-vals="js:{
-            markdown: document.querySelector('.editable').innerText
+            markdown: document.querySelector('#edit-box').innerText
         }"
         hx-target=".modal-inner"
         hx-on::after-request="showModal('preview')"
@@ -154,7 +154,7 @@
       // Prevent user pasting in anything other than usual stuff
       // NOTE: Currently not using (doesn't quite work correctly)
       // --------------------------------------------------------
-      const el = document.querySelector('.editable');
+      const el = document.querySelector('#edit-box');
       el.addEventListener('paste', (e) => {
         let data = e.clipboardData.getData('text/html') ||
             e.clipboardData.getData('text/plain');
@@ -192,10 +192,6 @@ small > svg {
   width: 17px;
   height: 17px;
   vertical-align: text-top;
-}
-.biggles {
-  font-size: 1.2rem;
-  font-weight: bold;
 }
 button.close {
   position: sticky;
@@ -249,7 +245,7 @@ button.close {
 .edit-container section:first-child {
   margin-right: 25px;
 }
-.edit-container div.editable {
+.edit-container #edit-box {
   white-space: pre-wrap;
   background-color: #f3eeee;
   color: #222;
@@ -275,7 +271,7 @@ section.preview svg {
   float: right;
   margin-top: -30px
 }
-div#pre-preview, div.editable {
+div#pre-preview, #edit-box {
   height: 80vh;
   overflow: auto;
   font-size: 0.84rem;

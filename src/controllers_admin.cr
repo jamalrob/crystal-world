@@ -25,6 +25,7 @@ module CrystalWorld::AdminControllers
         ctx: ctx,
         data: {
           "title"               => "Admin: articles",
+          "admin_section"       => "Admin: articles",
           "articles"            => articles,
           "user_authenticated"  => true,
           "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
@@ -43,6 +44,7 @@ module CrystalWorld::AdminControllers
       TemplateRenderer.render_and_out(ctx: ctx,
         data: {
           "title"               => "Admin: articles",
+          "admin_section"       => "Admin: articles",
           "user_authenticated"  => true,
           "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
           "admin"               => true
@@ -60,6 +62,7 @@ module CrystalWorld::AdminControllers
       TemplateRenderer.render_and_out(ctx: ctx,
         data: {
           "title"               => "Admin: articles",
+          "admin_section"       => "Admin: articles",
           #"authors"            => authors,
           "user_authenticated"  => true,
           "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
@@ -79,6 +82,7 @@ module CrystalWorld::AdminControllers
         ctx: ctx,
         data: {
           "title"               => "Admin: articles",
+          "admin_section"       => "Admin: articles",
           "user_authenticated"  => true,
           "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
           "admin"               => true
@@ -96,6 +100,7 @@ module CrystalWorld::AdminControllers
       TemplateRenderer.render_and_out(ctx: ctx,
         data: {
           "title"               => "Admin: articles",
+          "admin_section"       => "Admin: articles",
           #"articles" => articles,
           "user_authenticated"  => true,
           "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
@@ -103,6 +108,37 @@ module CrystalWorld::AdminControllers
         },
         template_path: "admin/pages.html"
       )
+      return
+    end
+    ctx.response.redirect "/"
+  end
+
+
+  def edit_article_page(ctx)
+    if u = self.authenticated_user ctx
+      urlbits = ctx.request.path.split('/', remove_empty: true)
+      slug = urlbits[-1]?
+      if article = Data.get_article(slug: slug, return_draft: true)
+        options = Markd::Options.new(smart: true, safe: true)
+        html = Markd.to_html(article["md"].as(String), options)
+        article["html"] = html.gsub("/bucket/", IMGBUCKET)
+        TemplateRenderer.render_and_out(
+          ctx: ctx,
+          data: {
+            "title"               => "Editing: #{article["title"]}",
+            "admin_section"       => "Admin: articles",
+            "article"             => article,
+            "user_authenticated"  => true,
+            "admin"               => true,
+            "extended_main"       => true,
+            "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
+            "imagekit_bucket"     => IMGBUCKET
+          },
+          template_path: "admin/edit-article.html"
+        )
+        return
+      end
+      Controllers.error_404 ctx
       return
     end
     ctx.response.redirect "/"
@@ -242,36 +278,6 @@ module CrystalWorld::AdminControllers
       return
     end
     ctx.response.status = HTTP::Status.new(403)
-  end
-
-
-  def edit_article_page(ctx)
-    if u = self.authenticated_user ctx
-      urlbits = ctx.request.path.split('/', remove_empty: true)
-      slug = urlbits[-1]?
-      if article = Data.get_article(slug: slug, return_draft: true)
-        options = Markd::Options.new(smart: true, safe: true)
-        html = Markd.to_html(article["md"].as(String), options)
-        article["html"] = html.gsub("/bucket/", IMGBUCKET)
-        TemplateRenderer.render_and_out(
-          ctx: ctx,
-          data: {
-            "title"               => "Editing: #{article["title"]}",
-            "article"             => article,
-            "user_authenticated"  => true,
-            "admin"               => true,
-            "extended_main"       => true,
-            "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
-            "imagekit_bucket"     => IMGBUCKET
-          },
-          template_path: "admin/edit-article.html"
-        )
-        return
-      end
-      Controllers.error_404 ctx
-      return
-    end
-    ctx.response.redirect "/"
   end
 
 

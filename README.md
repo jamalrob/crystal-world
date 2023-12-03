@@ -1,6 +1,8 @@
 # The Crystal World
 
-A reinventing-the-wheel project, mainly for learning: a blog application written in the [Crystal](https://crystal-lang.org/) compiled programming language, with neither a front-end nor a back-end framework (inspired by the [Frameworkless Manifesto](https://github.com/frameworkless-movement/manifesto)).
+A reinventing-the-wheel project, mainly for learning and consolidating my knowledge. It's a blog application written in the [Crystal](https://crystal-lang.org/) compiled programming language, with neither a front-end nor a back-end framework (inspired by the [Frameworkless Manifesto](https://github.com/frameworkless-movement/manifesto)).
+
+And although it's _prima facie_ an old-fashioned dynamic website and thin-client CRUD application, it actually feels like a Next.js ot Astro SSG website, thanks to the judicious use of HTMX and Hyperscript.
 
 The main objectives here are:
 
@@ -13,7 +15,7 @@ The main objectives here are:
   - CSRF and XSS prevention
 - Testing different patterns and architectures
 - Learning a new programming language that's as nice to read as Python or Ruby, but _fast_
-- Building a groundwork for small real-world projects that's easy and enjoyable to use
+- Building a usable groundwork for small real-world projects which is enjoyable to use
 - On the client-side, replacing all (self-written) JavaScript with HTMX and Hyperscript while retaining a fast, SPA-like user experience
 
 ### Features

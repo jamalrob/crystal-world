@@ -8,12 +8,21 @@ main.admin.extended { /* for e.g., article edit */
   max-width: 77%;
   margin-left: 19%;
   padding-top: 75px;
+  height: 100%;
 }
 main.admin.collapsed { /* when sidebar is collapsed */
   margin: 0 0 0 80px;
   width: 91%;
   max-width: 91%;
 }
+main.admin.extended.collapsed {
+  max-width: unset;
+  margin-left: unset;
+  margin-right: unset;
+  width: unset;
+  margin: 0 10px 0 50px !important;
+}
+
 table.admin-table {
   width: 100%;
   /*border: 1px solid rgba(84, 143, 211, 0.3);*/
@@ -35,7 +44,6 @@ table.admin-table caption {
   color: #e3dfd4;
   text-align: left;
   font-size: 1.3rem;
-  font-weight: bold;
   margin-bottom: 15px;
   font-family: 'Roboto Condensed', Ubuntu, Helvetica, Arial, sans-serif;
 }

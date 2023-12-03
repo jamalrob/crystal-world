@@ -48,7 +48,7 @@
         hx-swap="none"
         hx-indicator="#publishLoading"
         hx-vals="js:{
-            md:           localStorage.getItem('article_{{ article.id }}') || document.getElementById('editBox').innerText,
+            md:           localStorage.getItem('article_{{ article.id }}') || document.getElementById('edit-box').innerText,
             article_id:   {{ article.id }},
             slug:         document.getElementById('inpSlug').value,
             title:        document.getElementById('inpTitle').value,
@@ -73,7 +73,21 @@
   def afterRequest(action, elementId, waitms)
     if action is 'publish'
       localStorage.removeItem('article_' + #publish.dataset.articleid)
-      put "✓ Published" into #confirm-published then wait for 3s then put '' into #confirm-published
+      put "Publish changes" into #publishAction
+      show <button#unpublish/>
+      put "published" into #article-status
+      put "✓ Published" into #confirm-published
+    end
+    if action is 'unpublish'
+      localStorage.removeItem('article_' + #publish.dataset.articleid)
+      put "draft" into #article-status
+      hide <button#unpublish/>
+      put "Publish" into #publishAction
+      put '✓ Unpublished' into #confirm-published
+    end
+    wait for 3s
+    if #confirm-published is not empty
+      put '' into #confirm-published
     end
   end
 </script>
