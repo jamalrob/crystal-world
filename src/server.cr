@@ -14,96 +14,71 @@ module CrystalWorld
 
   @@env : Poncho::Parser
   @@env = Poncho.from_file ".env"
-  IMGBUCKET = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-70/"
-  LOCAL     = @@env["ENV"] == "local"
-  CACHEBUST = Time.monotonic.to_s.split(".")[-1]
+  IMGBUCKET       = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-70/"
+  LOCAL           = @@env["ENV"] == "local"
+  CACHEBUST       = Time.monotonic.to_s.split(".")[-1]
   TEMPLATE_FOLDER = "src/templates/"
-  SLUG_PATTERN = "[a-z0-9]+(?:[_-][a-z0-9]+)*"
+  SLUG_PATTERN    = "[a-z0-9]+(?:[_-][a-z0-9]+)*"
 
   server = HTTP::Server.new([
     HTTP::StaticFileHandler.new(public_dir = "./public", fallthrough = true, directory_listing = false),
     HTTP::CompressHandler.new,
     CrystalWorld::HttpHandler.new,
   ]) do |ctx|
-
     puts "Request for #{ctx.request.path}"
 
     case ctx.request.path
-
     when "/"
       PublicControllers.home_page(ctx)
-
     when "/tags"
       PublicControllers.tags_page(ctx)
-
     when .match /\/tag\/#{SLUG_PATTERN}$/
       PublicControllers.tag_page(ctx)
-
     when "/about"
       PublicControllers.about_page(ctx)
-
     when "/admin/signup"
       # Probably not implementing here / see dump
 
     when "/admin/login"
       PublicControllers.login_page(ctx)
-
     when "/admin/logout"
       AuthControllers.do_logout(ctx)
-
     when "/admin/login/auth"
       AuthControllers.do_login(ctx)
-
     when "/admin", "/admin/articles"
       AdminControllers.admin_articles(ctx)
-
     when "/admin/pages"
       AdminControllers.admin_pages(ctx)
-
     when "/admin/customize"
       AdminControllers.admin_customize(ctx)
-
     when "/admin/authors"
       AdminControllers.admin_authors(ctx)
-
     when "/admin/settings"
       AdminControllers.admin_settings(ctx)
-
     when "/admin/markdown-cheatsheet"
       AdminControllers.admin_markdown_cheatsheet(ctx)
-
     when .match /^\/api\/save_sidebar_state\/[a-z]*$/
       AdminControllers.save_sidebar_state(ctx)
-
     when .match /^\/admin\/article\/#{SLUG_PATTERN}\/publish$/
       AdminControllers.publish_article(ctx)
-
     when .match /^\/admin\/article\/#{SLUG_PATTERN}\/unpublish$/
       AdminControllers.unpublish_article(ctx)
-
     when .match /^\/admin\/article\/#{SLUG_PATTERN}\/save_draft$/
       AdminControllers.save_article(ctx)
-
     when .match /^\/admin\/edit\/#{SLUG_PATTERN}\/preview$/
       AdminControllers.get_preview_html(ctx)
-
     when .match /^\/admin\/#{SLUG_PATTERN}\/properties$/
       AdminControllers.article_properties(ctx)
-
     when .match /^\/admin\/edit\/#{SLUG_PATTERN}$/
       AdminControllers.edit_article_page(ctx)
-
-    #when .match /^\/admin\/edit\/#{SLUG_PATTERN}\/preview$/
-    #  Controllers.admin_edit_preview(ctx)
+      # when .match /^\/admin\/edit\/#{SLUG_PATTERN}\/preview$/
+      #  Controllers.admin_edit_preview(ctx)
 
     when .match /^\/#{SLUG_PATTERN}$/
       PublicControllers.article_page(ctx)
-
     else
       PublicControllers.error_404(ctx)
-
     end
-    
   end
 
   address = server.bind_tcp 8123

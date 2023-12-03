@@ -2,17 +2,17 @@ name: CrystalWorld
 version: 0.1.0
 
 dependencies:
-    markd:
-        github: icyleaf/markd
-    poncho:
-        github: icyleaf/poncho
-    front_matter:
-        github: chris-huxtable/front_matter.cr
-    sqlite3:
-        github: crystal-lang/crystal-sqlite3
-    crinja:
-        github: straight-shoota/crinja
-    crystal-argon2:
-        github: sushichain/crystal-argon2
-    sanitize:
-        github: straight-shoota/sanitize
+  markd:
+    github: icyleaf/markd
+  poncho:
+    github: icyleaf/poncho
+  front_matter:
+    github: chris-huxtable/front_matter.cr
+  sqlite3:
+    github: crystal-lang/crystal-sqlite3
+  crinja:
+    github: straight-shoota/crinja
+  crystal-argon2:
+    github: sushichain/crystal-argon2
+  sanitize:
+    github: straight-shoota/sanitize

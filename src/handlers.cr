@@ -1,10 +1,8 @@
 module CrystalWorld
-
   class HttpHandler
     include HTTP::Handler
 
     def call(context)
-
       context.request.path = context.request.path.rstrip("/") # Remove trailing slash
       if context.request.path.starts_with?("/api/")
         context.response.content_type = "application/json"
@@ -18,9 +16,6 @@ module CrystalWorld
         context.response.content_type = "text/html; charset=UTF-8"
       end
       call_next(context)
-      
     end
-
   end
-
 end

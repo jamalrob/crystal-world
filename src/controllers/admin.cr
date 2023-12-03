@@ -2,28 +2,21 @@ module CrystalWorld::AdminControllers
   extend self
 
   def sidebar_collapsed_classname(ctx)
-
     if ctx.request.cookies.has_key?("sidebar_collapsed")
       return ctx.request.cookies["sidebar_collapsed"].value
     end
     return "normal"
-
   end
 
-
   def authenticated_user(ctx)
-
     if ctx.request.cookies.has_key?("sessionid") && ctx.request.cookies.has_key?("csrftoken")
       sessionid = ctx.request.cookies["sessionid"].value
       csrftoken = ctx.request.cookies["csrftoken"].value
       return Data.get_authenticated_user(sessionid, csrftoken)
     end
-
   end
 
-
   def admin_articles(ctx)
-
     if u = self.authenticated_user ctx
       articles = Data.get_articles(
         include_drafts: true,
@@ -32,107 +25,92 @@ module CrystalWorld::AdminControllers
       TemplateRenderer.render_and_out(
         ctx: ctx,
         data: {
-          "title"               => "Admin: articles",
-          "admin_section"       => "Admin: articles",
-          "articles"            => articles,
-          "user_authenticated"  => true,
-          "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
-          "admin"               => true
+          "title"              => "Admin: articles",
+          "admin_section"      => "Admin: articles",
+          "articles"           => articles,
+          "user_authenticated" => true,
+          "sidebar_collapsed"  => self.sidebar_collapsed_classname(ctx),
+          "admin"              => true,
         },
         template_path: "admin/articles.html"
       )
       return
     end
     ctx.response.redirect "/"
-
   end
 
-
   def admin_settings(ctx)
-
     if u = self.authenticated_user ctx
       TemplateRenderer.render_and_out(ctx: ctx,
         data: {
-          "title"               => "Admin: articles",
-          "admin_section"       => "Admin: articles",
-          "user_authenticated"  => true,
-          "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
-          "admin"               => true
+          "title"              => "Admin: articles",
+          "admin_section"      => "Admin: articles",
+          "user_authenticated" => true,
+          "sidebar_collapsed"  => self.sidebar_collapsed_classname(ctx),
+          "admin"              => true,
         },
         template_path: "admin/settings.html"
       )
       return
     end
     ctx.response.redirect "/"
-
   end
 
-
   def admin_authors(ctx)
-
     if u = self.authenticated_user ctx
       TemplateRenderer.render_and_out(ctx: ctx,
         data: {
-          "title"               => "Admin: articles",
-          "admin_section"       => "Admin: articles",
-          #"authors"            => authors,
-          "user_authenticated"  => true,
-          "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
-          "admin" => true
+          "title"         => "Admin: articles",
+          "admin_section" => "Admin: articles",
+          # "authors"            => authors,
+          "user_authenticated" => true,
+          "sidebar_collapsed"  => self.sidebar_collapsed_classname(ctx),
+          "admin"              => true,
         },
         template_path: "admin/authors.html"
       )
       return
     end
     ctx.response.redirect "/"
-
   end
 
-
   def admin_customize(ctx)
-
     if u = self.authenticated_user ctx
       TemplateRenderer.render_and_out(
         ctx: ctx,
         data: {
-          "title"               => "Admin: articles",
-          "admin_section"       => "Admin: articles",
-          "user_authenticated"  => true,
-          "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
-          "admin"               => true
+          "title"              => "Admin: articles",
+          "admin_section"      => "Admin: articles",
+          "user_authenticated" => true,
+          "sidebar_collapsed"  => self.sidebar_collapsed_classname(ctx),
+          "admin"              => true,
         },
         template_path: "admin/customize.html"
       )
       return
     end
     ctx.response.redirect "/"
-
   end
 
-
   def admin_pages(ctx)
-
     if u = self.authenticated_user ctx
       TemplateRenderer.render_and_out(ctx: ctx,
         data: {
-          "title"               => "Admin: articles",
-          "admin_section"       => "Admin: articles",
-          #"articles" => articles,
-          "user_authenticated"  => true,
-          "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
-          "admin"               => true
+          "title"         => "Admin: articles",
+          "admin_section" => "Admin: articles",
+          # "articles" => articles,
+          "user_authenticated" => true,
+          "sidebar_collapsed"  => self.sidebar_collapsed_classname(ctx),
+          "admin"              => true,
         },
         template_path: "admin/pages.html"
       )
       return
     end
     ctx.response.redirect "/"
-
   end
 
-
   def edit_article_page(ctx)
-
     if u = self.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)
       slug = urlbits[-1]?
@@ -143,14 +121,14 @@ module CrystalWorld::AdminControllers
         TemplateRenderer.render_and_out(
           ctx: ctx,
           data: {
-            "title"               => "Editing: #{article["title"]}",
-            "admin_section"       => "Admin: articles",
-            "article"             => article,
-            "user_authenticated"  => true,
-            "admin"               => true,
-            "extended_main"       => true,
-            "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
-            "imagekit_bucket"     => IMGBUCKET
+            "title"              => "Editing: #{article["title"]}",
+            "admin_section"      => "Admin: articles",
+            "article"            => article,
+            "user_authenticated" => true,
+            "admin"              => true,
+            "extended_main"      => true,
+            "sidebar_collapsed"  => self.sidebar_collapsed_classname(ctx),
+            "imagekit_bucket"    => IMGBUCKET,
           },
           template_path: "admin/edit-article.html"
         )
@@ -160,12 +138,9 @@ module CrystalWorld::AdminControllers
       return
     end
     ctx.response.redirect "/"
-
   end
 
-
   def article_properties(ctx)
-
     urlbits = ctx.request.path.split('/', remove_empty: true)
     slug = urlbits[1]?
     article = Data.get_article(slug: slug, return_draft: true)
@@ -174,17 +149,14 @@ module CrystalWorld::AdminControllers
         data: {
           "article"         => article,
           "title"           => "Article properties",
-          "imagekit_bucket" => IMGBUCKET
+          "imagekit_bucket" => IMGBUCKET,
         },
         template_path: "admin/article_properties.html"
       )
     end
-
   end
 
-
   def admin_markdown_cheatsheet(ctx)
-
     if u = self.authenticated_user ctx
       TemplateRenderer.render_basic(
         ctx: ctx,
@@ -193,9 +165,7 @@ module CrystalWorld::AdminControllers
       return
     end
     ctx.response.redirect "/"
-
   end
-
 
   def get_preview_html(ctx)
     #
@@ -220,7 +190,7 @@ module CrystalWorld::AdminControllers
             data: {
               "article"       => article,
               "html"          => html,
-              "admin_preview" => true
+              "admin_preview" => true,
             },
             template_path: "admin/article_preview.html"
           )
@@ -229,16 +199,12 @@ module CrystalWorld::AdminControllers
       end
     end
     ctx.response.status = HTTP::Status.new(403)
-
   end
 
-
   def publish_article(ctx)
-
     if u = self.authenticated_user ctx
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
       if article_id = params["article_id"].to_i?
-
         #
         # VALIDATION
         #
@@ -257,20 +223,19 @@ module CrystalWorld::AdminControllers
 
         # Sanitize
         #
-        #sanitizer = Sanitize::Policy::HTMLSanitizer.common
-        #sanitizer.valid_classes << /language-.+/
-        #sanitized_md = sanitizer.process(params["md"])
-
+        # sanitizer = Sanitize::Policy::HTMLSanitizer.common
+        # sanitizer.valid_classes << /language-.+/
+        # sanitized_md = sanitizer.process(params["md"])
 
         Data.publish_article(
           article_id: article_id,
-          slug:       params["slug"],
-          title:      params["title"],
-          date:       proper_date,
-          tags:       params["tags"],
+          slug: params["slug"],
+          title: params["title"],
+          date: proper_date,
+          tags: params["tags"],
           main_image: params["main_image"],
-          image_class:params["image_class"],
-          md:         params["md"]
+          image_class: params["image_class"],
+          md: params["md"]
         )
         json_text = %({"result": "Published"})
         ctx.response.print json_text
@@ -278,12 +243,9 @@ module CrystalWorld::AdminControllers
       end
       PublicControllers.error_404 ctx
     end
-
   end
 
-
   def unpublish_article(ctx)
-
     if u = self.authenticated_user ctx
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
       if article_id = params["article_id"].to_i?
@@ -293,12 +255,9 @@ module CrystalWorld::AdminControllers
         return
       end
     end
-
   end
 
-
   def save_sidebar_state(ctx)
-
     if u = self.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)
       state = urlbits[2] # 'collapsed' or 'normal'
@@ -341,12 +300,9 @@ module CrystalWorld::AdminControllers
       return
     end
     ctx.response.status = HTTP::Status.new(403)
-
   end
 
-
   def save_article(ctx)
-
     #
     # POSSIBLY NOT USING
     #
@@ -378,7 +334,6 @@ module CrystalWorld::AdminControllers
       sanitizer.valid_classes << /language-.+/
       sanitized = sanitizer.process(params["md"])
 
-
       return
 
       Data.save_article(
@@ -392,7 +347,5 @@ module CrystalWorld::AdminControllers
         md: params["md"]
       )
     end
-    
   end
-
 end
