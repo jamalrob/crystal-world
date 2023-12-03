@@ -76,7 +76,7 @@ module CrystalWorld::PublicControllers
     Controllers.error_404 ctx
   end
 
-  
+
   def login_page(ctx)
     TemplateRenderer.render_and_out(ctx: ctx,
       data: {

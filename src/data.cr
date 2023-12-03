@@ -20,6 +20,7 @@ module CrystalWorld::Data
               )
           end
         rescue DB::NoResultsError
+          puts "No results"
           return nil
         end
         return {
@@ -43,6 +44,7 @@ module CrystalWorld::Data
                 as: {Int32, String, String?, String?, String?, String?}
               )
         rescue DB::NoResultsError
+          puts "No results"
           return nil
         end
         return {
@@ -166,10 +168,7 @@ module CrystalWorld::Data
             }
             articles.<<(this_row)
           end
-          if articles.empty?
-            articles = nil
-          end
-          return articles
+          return articles.empty? ? nil : articles
         rescue DB::NoResultsError
           return nil
         end

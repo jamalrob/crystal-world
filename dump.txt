@@ -339,3 +339,14 @@ on keydown[key is 'i' and ctrlKey is true]
       return
     end
   end
+
+
+
+
+# DELAY
+i = 0
+s = ""
+while i < 20000
+  s += Random.rand.to_s
+  i += 1
+end

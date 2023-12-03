@@ -15,10 +15,10 @@ module CrystalWorld
   @@env : Poncho::Parser
   @@env = Poncho.from_file ".env"
   IMGBUCKET = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-70/"
-  SLUG_PATTERN = "[a-z0-9]+(?:[_-][a-z0-9]+)*"
   LOCAL     = @@env["ENV"] == "local"
   CACHEBUST = Time.monotonic.to_s.split(".")[-1]
   TEMPLATE_FOLDER = "src/templates/"
+  SLUG_PATTERN = "[a-z0-9]+(?:[_-][a-z0-9]+)*"
 
   server = HTTP::Server.new([
     HTTP::StaticFileHandler.new(public_dir = "./public", fallthrough = true, directory_listing = false),
@@ -36,7 +36,7 @@ module CrystalWorld
     when "/tags"
       PublicControllers.tags_page(ctx)
 
-    when .starts_with? "/tag/"
+    when .match /\/tag\/#{SLUG_PATTERN}$/
       PublicControllers.tag_page(ctx)
 
     when "/about"
@@ -72,7 +72,7 @@ module CrystalWorld
     when "/admin/markdown-cheatsheet"
       AdminControllers.admin_markdown_cheatsheet(ctx)
 
-    when .starts_with? "/api/save_sidebar_state"
+    when .match /^\/api\/save_sidebar_state\/[a-z]*$/
       AdminControllers.save_sidebar_state(ctx)
 
     when .match /^\/admin\/article\/#{SLUG_PATTERN}\/publish$/
@@ -81,20 +81,14 @@ module CrystalWorld
     when .match /^\/admin\/article\/#{SLUG_PATTERN}\/unpublish$/
       AdminControllers.unpublish_article(ctx)
 
+    when .match /^\/admin\/article\/#{SLUG_PATTERN}\/save_draft$/
+      AdminControllers.save_article(ctx)
+
     when .match /^\/admin\/edit\/#{SLUG_PATTERN}\/preview$/
       AdminControllers.get_preview_html(ctx)
 
     when .match /^\/admin\/#{SLUG_PATTERN}\/properties$/
       AdminControllers.article_properties(ctx)
-
-    when .match /^\/admin\/#{SLUG_PATTERN}\/publish$/
-      AdminControllers.save_article(ctx)
-
-    when .match /^\/admin\/#{SLUG_PATTERN}\/unpublish$/
-      AdminControllers.save_article(ctx)
-
-    when .match /^\/admin\/#{SLUG_PATTERN}\/save_draft$/
-      AdminControllers.save_article(ctx)
 
     when .match /^\/admin\/edit\/#{SLUG_PATTERN}$/
       AdminControllers.edit_article_page(ctx)
