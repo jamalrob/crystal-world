@@ -13,6 +13,7 @@ The main objectives here are:
   - Template rendering
   - Database access
   - CSRF and XSS prevention
+  - Reactive user-interface, with no full page-loads
 - Testing different patterns and architectures
 - Learning a new programming language that's as nice to read as Python or Ruby, but _fast_
 - Building a usable groundwork for small real-world projects which is enjoyable to use
