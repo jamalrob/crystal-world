@@ -217,7 +217,9 @@ module CrystalWorld::AdminControllers
 
   def new_article_page(ctx)
     if u = self.authenticated_user ctx
-      article = Data.create_draft()
+      newslug = Data.create_draft()
+      #self.edit_article_page(ctx)
+      ctx.response.headers["HX-Location"] = %({"path": "/admin/articles/#{newslug}/edit", "target": "body"})
       #TemplateRenderer.render_and_out(
       #  ctx: ctx,
       #  data: {
@@ -247,7 +249,10 @@ module CrystalWorld::AdminControllers
         begin
           proper_date = Time.parse_utc(params["date"], "%Y-%m-%d").to_s("%Y-%m-%d")
         rescue Time::Format::Error
-          p "date format error"
+          puts "date format error"
+          #ctx.response.status = HTTP::Status.new(500)
+          ctx.response.status_code = 500
+          ctx.response.print %({"error": "Date format error"})
           return
         end
 
@@ -257,7 +262,7 @@ module CrystalWorld::AdminControllers
         # sanitizer.valid_classes << /language-.+/
         # sanitized_md = sanitizer.process(params["md"])
 
-        Data.publish_article(
+        publish = Data.publish_article(
           article_id: article_id,
           slug: params["slug"],
           title: params["title"],
@@ -267,8 +272,7 @@ module CrystalWorld::AdminControllers
           image_class: params["image_class"],
           md: params["md"]
         )
-        json_text = %({"result": "Published"})
-        ctx.response.print json_text
+        ctx.response.print %({"result": "Published"})
         return
       end
       PublicControllers.error_404 ctx

@@ -76,7 +76,7 @@ module CrystalWorld
     when .match /^\/admin\/articles\/#{SLUG_PATTERN}\/delete$/
       AdminControllers.delete_article(ctx)
 
-    when .match /^\/admin\/articles\/#{SLUG_PATTERN}\/publish$/
+    when .match /^\/api\/admin\/articles\/#{SLUG_PATTERN}\/publish$/
       AdminControllers.publish_article(ctx)
 
     when .match /^\/admin\/articles\/#{SLUG_PATTERN}\/unpublish$/

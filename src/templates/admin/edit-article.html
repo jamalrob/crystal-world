@@ -29,7 +29,7 @@
 
 <div class="edit-container">
   <section class="edit">
-    <div class="editable" contenteditable="true" id="edit-box"
+    <div class="editable" contenteditable="true" id="edit-box" placeholder="Start writing here! NOTE: don't put the article title here; just define it in 'Article properties'."
     _="
         --- ################################################################################
         --- #
@@ -188,6 +188,11 @@
   end
 </script>
 <style>
+[contenteditable=true]:empty:before {
+  content: attr(placeholder);
+  pointer-events: none;
+  display: block; /* For Firefox */
+}
 small > svg {
   width: 17px;
   height: 17px;

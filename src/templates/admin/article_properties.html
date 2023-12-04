@@ -25,7 +25,7 @@
         class="fullwidth green {% if article.draft %}hidden{% endif %}"
         id="unpublish"
         hx-post="/admin/articles/{{ article.slug }}/unpublish"
-        hx-swap="none"
+        hx-target="#confirm-published"
         hx-indicator="#unpublishLoading"
         hx-vals="js:{
             md: localStorage.getItem('article_{{ article.id }}'),
@@ -42,8 +42,9 @@
         data-articleid="{{ article.id }}"
         class="fullwidth"
         id="publish"
-        hx-post="/admin/articles/{{ article.slug }}/publish"
-        hx-swap="none"
+        hx-post="/api/admin/articles/{{ article.slug }}/publish"
+        hx-target="#confirm-published"
+        hx-swap="innerHTML"
         hx-indicator="#publishLoading"
         hx-vals="js:{
             md:           localStorage.getItem('article_{{ article.id }}') || document.getElementById('edit-box').innerText,
@@ -74,20 +75,26 @@
       put "Publish changes" into #publishAction
       remove .hidden from <button#unpublish/>
       put "published" into #article-status
-      put "✔ Published" into #confirm-published
+      ---put "✔ Published" into #confirm-published
     end
     if action is 'unpublish'
       localStorage.removeItem('article_' + #publish.dataset.articleid)
       put "Publish" into #publishAction
       add .hidden to <button#unpublish/>
       put "draft" into #article-status
-      put '✔ Unpublished' into #confirm-published
+      ---put '✔ Unpublished' into #confirm-published
     end
     wait for 3s
     if #confirm-published is not empty
       put '' into #confirm-published
     end
   end
+</script>
+<script>
+  document.getElementById("publish").addEventListener('htmx:afterRequest', function(evt) {
+    //alert(evt.detail.failed);
+    document.getElementById("confirm-published").innerHTML = JSON.parse(evt.detail.xhr.response).error;
+  });
 </script>
 <style>
   #confirm-published {

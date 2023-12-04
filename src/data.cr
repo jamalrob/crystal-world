@@ -93,12 +93,14 @@ module CrystalWorld::Data
                           "WHERE name = 'articles' LIMIT 1;",
                           as: {Int32}
           ) + 1
+      newslug = "new-draft-#{newid}"
       insert = db.exec("INSERT INTO articles " \
               "(slug, title, tags, date, date_created, main_image, image_class, draft, content) " \
               " VALUES (?, ?, ?, ?, DATE('now'), ?, ?, ?, ?);",
-        "new-draft-#{newid}", "New Draft #{newid}", "", "", "", "", 1, ""
+        "#{newslug}", "New Draft #{newid}", "", "", "", "", 1, ""
       )
-      return self.get_article(insert.last_insert_id)
+      #return self.get_article(insert.last_insert_id)
+      return newslug
     rescue e
       p! e
     end
