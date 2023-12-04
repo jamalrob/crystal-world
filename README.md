@@ -2,7 +2,7 @@
 
 A reinventing-the-wheel project, mainly for learning and consolidating my knowledge. It's a blog application written in the [Crystal](https://crystal-lang.org/) compiled programming language, with neither a front-end nor a back-end framework (inspired by the [Frameworkless Manifesto](https://github.com/frameworkless-movement/manifesto)).
 
-And although it's _prima facie_ an old-fashioned server-centric dynamic website and thin-client CRUD application, it actually feels like a Next.js ot Astro SSG website, thanks to the judicious use of HTMX and Hyperscript.
+And although it's _prima facie_ an old-fashioned server-centric dynamic website and thin-client CRUD application, in terms of UX it feels more like a Next.js or Astro SSG website, thanks to the judicious use of HTMX and Hyperscript.
 
 The main objectives here are:
 
