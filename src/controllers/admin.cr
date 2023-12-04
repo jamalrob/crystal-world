@@ -21,7 +21,7 @@ module CrystalWorld::AdminControllers
       articles = Data.get_articles(
         include_drafts: true,
         order_by: "date_created DESC"
-      )
+        )
       TemplateRenderer.render_and_out(
         ctx: ctx,
         data: {
@@ -110,10 +110,24 @@ module CrystalWorld::AdminControllers
     ctx.response.redirect "/"
   end
 
+  def delete_article(ctx)
+    if u = self.authenticated_user ctx
+      urlbits = ctx.request.path.split('/', remove_empty: true)
+      slug = urlbits[2]?
+      begin
+        Data.delete_article(slug)
+        self.admin_articles(ctx)
+      rescue e
+        p! e
+        return e.message
+      end
+    end
+  end
+
   def edit_article_page(ctx)
     if u = self.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)
-      slug = urlbits[-1]?
+      slug = urlbits[2]?
       if article = Data.get_article(slug: slug, return_draft: true)
         options = Markd::Options.new(smart: true, safe: true)
         html = Markd.to_html(article["md"].as(String), options)
@@ -142,7 +156,7 @@ module CrystalWorld::AdminControllers
 
   def article_properties(ctx)
     urlbits = ctx.request.path.split('/', remove_empty: true)
-    slug = urlbits[1]?
+    slug = urlbits[2]?
     article = Data.get_article(slug: slug, return_draft: true)
     if article
       TemplateRenderer.render_and_out(ctx: ctx,
@@ -201,6 +215,26 @@ module CrystalWorld::AdminControllers
     ctx.response.status = HTTP::Status.new(403)
   end
 
+  def new_article_page(ctx)
+    if u = self.authenticated_user ctx
+      article = Data.create_draft()
+      #TemplateRenderer.render_and_out(
+      #  ctx: ctx,
+      #  data: {
+      #    "title"               => "Editing: #{article["title"]}",
+      #    "admin_section"       => "Admin: articles",
+      #    "article"             => article,
+      #    "user_authenticated"  => true,
+      #    "admin"               => true,
+      #    "extended_main"       => true,
+      #    "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
+      #    "imagekit_bucket"     => IMGBUCKET,
+      #  },
+      #  template_path: "admin/edit-article.html"
+      #)
+    end
+  end
+
   def publish_article(ctx)
     if u = self.authenticated_user ctx
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
@@ -211,14 +245,11 @@ module CrystalWorld::AdminControllers
         # Date
         #
         begin
-          proper_date = Time.parse_utc(params["date"], "%Y-%m-%d").to_s
+          proper_date = Time.parse_utc(params["date"], "%Y-%m-%d").to_s("%Y-%m-%d")
         rescue Time::Format::Error
           p "date format error"
           return
         end
-        # proper_date might now contain e.g., "2016-04-05 00:00:00.0 UTC"
-        # But for Sqlite we need YYYY-MM-DD HH:MM:SS.SSS
-        proper_date = "#{proper_date.split(' ')[0]} 00:00:00.000"
 
         # Sanitize
         #

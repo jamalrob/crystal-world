@@ -82,6 +82,7 @@ module CrystalWorld::PublicControllers
   end
 
   def error_404(ctx)
+    puts "404 not found"
     ctx.response.status = HTTP::Status.new(404)
     TemplateRenderer.render_basic(
       ctx: ctx,

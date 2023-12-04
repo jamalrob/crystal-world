@@ -24,7 +24,7 @@
       <button
         class="fullwidth green {% if article.draft %}hidden{% endif %}"
         id="unpublish"
-        hx-post="/admin/article/{{ article.slug }}/unpublish"
+        hx-post="/admin/articles/{{ article.slug }}/unpublish"
         hx-swap="none"
         hx-indicator="#unpublishLoading"
         hx-vals="js:{
@@ -42,7 +42,7 @@
         data-articleid="{{ article.id }}"
         class="fullwidth"
         id="publish"
-        hx-post="/admin/article/{{ article.slug }}/publish"
+        hx-post="/admin/articles/{{ article.slug }}/publish"
         hx-swap="none"
         hx-indicator="#publishLoading"
         hx-vals="js:{

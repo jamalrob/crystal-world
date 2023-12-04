@@ -42,55 +42,61 @@ module CrystalWorld
 
     when "/admin/login"
       PublicControllers.login_page(ctx)
-      
+
     when "/admin/logout"
       AuthControllers.do_logout(ctx)
-      
+
     when "/admin/login/auth"
       AuthControllers.do_login(ctx)
-      
+
     when "/admin", "/admin/articles"
       AdminControllers.admin_articles(ctx)
-      
+
     when "/admin/pages"
       AdminControllers.admin_pages(ctx)
-      
+
     when "/admin/customize"
       AdminControllers.admin_customize(ctx)
-      
+
     when "/admin/authors"
       AdminControllers.admin_authors(ctx)
-      
+
     when "/admin/settings"
       AdminControllers.admin_settings(ctx)
-      
+
     when "/admin/markdown-cheatsheet"
       AdminControllers.admin_markdown_cheatsheet(ctx)
-      
+
     when .match /^\/api\/save_sidebar_state\/[a-z]*$/
       AdminControllers.save_sidebar_state(ctx)
-      
-    when .match /^\/admin\/article\/#{SLUG_PATTERN}\/publish$/
+
+    when .match /^\/admin\/articles\/new$/
+      AdminControllers.new_article_page(ctx)
+
+    when .match /^\/admin\/articles\/#{SLUG_PATTERN}\/delete$/
+      AdminControllers.delete_article(ctx)
+
+    when .match /^\/admin\/articles\/#{SLUG_PATTERN}\/publish$/
       AdminControllers.publish_article(ctx)
-      
-    when .match /^\/admin\/article\/#{SLUG_PATTERN}\/unpublish$/
+
+    when .match /^\/admin\/articles\/#{SLUG_PATTERN}\/unpublish$/
       AdminControllers.unpublish_article(ctx)
-      
-    when .match /^\/admin\/edit\/#{SLUG_PATTERN}\/preview$/
+
+    when .match /^\/admin\/articles\/#{SLUG_PATTERN}\/preview$/
       AdminControllers.get_preview_html(ctx)
-      
-    when .match /^\/admin\/#{SLUG_PATTERN}\/properties$/
+
+    when .match /^\/admin\/articles\/#{SLUG_PATTERN}\/properties$/
       AdminControllers.article_properties(ctx)
-      
-    when .match /^\/admin\/edit\/#{SLUG_PATTERN}$/
+
+    when .match /^\/admin\/articles\/#{SLUG_PATTERN}\/edit$/
       AdminControllers.edit_article_page(ctx)
-      
+
     when .match /^\/#{SLUG_PATTERN}$/
       PublicControllers.article_page(ctx)
-      
+
     else
       PublicControllers.error_404(ctx)
-      
+
     end
   end
 
