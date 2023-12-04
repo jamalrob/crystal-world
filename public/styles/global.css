@@ -275,9 +275,15 @@ form.login {
         width: 60%;
     }
 }
-form .error {
-    color: rgb(255, 160, 160);
-    margin-top: 20px;
+form .error-message {
+    color: rgb(250, 138, 157);
+    text-align: right;
+}
+form .error-message.small {
+  font-size: 0.7rem;
+}
+form .error input {
+  background-color: pink;
 }
 .hidden {
   display: none;

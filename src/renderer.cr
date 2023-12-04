@@ -1,7 +1,7 @@
 module CrystalWorld::TemplateRenderer
   extend self
 
-  def render_and_out(ctx : HTTP::Server::Context, data : Hash, template_path : String)
+  def render_page(ctx : HTTP::Server::Context, data : Hash, template_path : String)
     if LOCAL
       # In development, get a fresh string to append
       # to static file URLs on every request
@@ -31,6 +31,14 @@ module CrystalWorld::TemplateRenderer
     # tengine.filters["customfilter"] = myfilter
     # IN THE TEMPLATE: {{ "Hello World" | customfilter(attribute="super") }}
 
+    final_html = template.render(data)
+    ctx.response.print final_html
+  end
+
+  def render_partial(ctx : HTTP::Server::Context, data : Hash, template_path : String)
+    tengine = Crinja.new
+    tengine.loader = Crinja::Loader::FileSystemLoader.new(TEMPLATE_FOLDER)
+    template = tengine.get_template(template_path)
     final_html = template.render(data)
     ctx.response.print final_html
   end

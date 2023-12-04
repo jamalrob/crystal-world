@@ -3,10 +3,17 @@
   <form>
     <label for="">Title</label>
     <input autofocus type="text" name="title" id="inpTitle" value="{{ article.title }}">
-    <label for="">Slug</label>
-    <input type="text" name="slug" id="inpSlug" value="{{ article.slug }}">
-    <label for="">Date</label>
-    <input type="date" name="date" id="inpDate" value="{{ article.date }}">
+
+    <div hx-target="this" hx-swap="outerHTML">
+      <label for="">Slug</label>
+      <input type="text" hx-post="/admin/validate_slug" hx-trigger="changed, blur" name="slug" id="inpSlug" value="{{ article.slug }}">
+    </div>
+
+    <div hx-target="this" hx-swap="outerHTML">
+      <label for="">Date</label>
+      <input type="date" hx-post="/admin/validate_date" hx-trigger="changed, blur" name="date" id="inpDate" value="{{ article.date }}">
+    </div>
+    
     <label for="">Tags</label>
     <input type="text" name="tags" id="inpTags" value="{{ article.tags }}">
     <label for="">Main image</label>
@@ -75,26 +82,20 @@
       put "Publish changes" into #publishAction
       remove .hidden from <button#unpublish/>
       put "published" into #article-status
-      ---put "✔ Published" into #confirm-published
+      put "✔ Published" into #confirm-published
     end
     if action is 'unpublish'
       localStorage.removeItem('article_' + #publish.dataset.articleid)
       put "Publish" into #publishAction
       add .hidden to <button#unpublish/>
       put "draft" into #article-status
-      ---put '✔ Unpublished' into #confirm-published
+      put '✔ Unpublished' into #confirm-published
     end
     wait for 3s
     if #confirm-published is not empty
       put '' into #confirm-published
     end
   end
-</script>
-<script>
-  document.getElementById("publish").addEventListener('htmx:afterRequest', function(evt) {
-    //alert(evt.detail.failed);
-    document.getElementById("confirm-published").innerHTML = JSON.parse(evt.detail.xhr.response).error;
-  });
 </script>
 <style>
   #confirm-published {

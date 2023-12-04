@@ -3,7 +3,7 @@
 <h1>{{ title }}</h1>
 <form   class="login"
         hx-post="/admin/login/auth"
-        hx-target=".error" hx-swap="innerHTML"
+        hx-target=".error-message" hx-swap="innerHTML"
 >
   <label>Username</label>
   <input type="text" name="username">
@@ -12,6 +12,6 @@
   <div class="button-row">
     <button>Sign in</button>
   </div>
-  <div class="error"></div>
+  <div class="error-message"></div>
 </form>
 {% endblock %}

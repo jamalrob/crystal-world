@@ -22,7 +22,7 @@ module CrystalWorld::AdminControllers
         include_drafts: true,
         order_by: "date_created DESC"
         )
-      TemplateRenderer.render_and_out(
+      TemplateRenderer.render_page(
         ctx: ctx,
         data: {
           "title"               => "Admin: articles",
@@ -41,7 +41,7 @@ module CrystalWorld::AdminControllers
 
   def admin_settings(ctx)
     if u = self.authenticated_user ctx
-      TemplateRenderer.render_and_out(ctx: ctx,
+      TemplateRenderer.render_page(ctx: ctx,
         data: {
           "title"               => "Admin: articles",
           "admin_section"       => "Admin: articles",
@@ -58,7 +58,7 @@ module CrystalWorld::AdminControllers
 
   def admin_authors(ctx)
     if u = self.authenticated_user ctx
-      TemplateRenderer.render_and_out(ctx: ctx,
+      TemplateRenderer.render_page(ctx: ctx,
         data: {
           "title"               => "Admin: articles",
           "admin_section"       => "Admin: articles",
@@ -76,7 +76,7 @@ module CrystalWorld::AdminControllers
 
   def admin_customize(ctx)
     if u = self.authenticated_user ctx
-      TemplateRenderer.render_and_out(
+      TemplateRenderer.render_page(
         ctx: ctx,
         data: {
           "title"               => "Admin: articles",
@@ -94,7 +94,7 @@ module CrystalWorld::AdminControllers
 
   def admin_pages(ctx)
     if u = self.authenticated_user ctx
-      TemplateRenderer.render_and_out(ctx: ctx,
+      TemplateRenderer.render_page(ctx: ctx,
         data: {
           "title"               => "Admin: articles",
           "admin_section"       => "Admin: articles",
@@ -132,7 +132,7 @@ module CrystalWorld::AdminControllers
         options = Markd::Options.new(smart: true, safe: true)
         html = Markd.to_html(article["md"].as(String), options)
         article["html"] = html.gsub("/bucket/", IMGBUCKET)
-        TemplateRenderer.render_and_out(
+        TemplateRenderer.render_page(
           ctx: ctx,
           data: {
             "title"               => "Editing: #{article["title"]}",
@@ -159,7 +159,7 @@ module CrystalWorld::AdminControllers
     slug = urlbits[2]?
     article = Data.get_article(slug: slug, return_draft: true)
     if article
-      TemplateRenderer.render_and_out(ctx: ctx,
+      TemplateRenderer.render_page(ctx: ctx,
         data: {
           "article"         => article,
           "title"           => "Article properties",
@@ -200,7 +200,7 @@ module CrystalWorld::AdminControllers
           sanitizer = Sanitize::Policy::HTMLSanitizer.common
           sanitizer.valid_classes << /language-.+/
           html = sanitizer.process(html)
-          TemplateRenderer.render_and_out(ctx: ctx,
+          TemplateRenderer.render_page(ctx: ctx,
             data: {
               "article"       => article,
               "html"          => html,
@@ -220,7 +220,7 @@ module CrystalWorld::AdminControllers
       newslug = Data.create_draft()
       #self.edit_article_page(ctx)
       ctx.response.headers["HX-Location"] = %({"path": "/admin/articles/#{newslug}/edit", "target": "body"})
-      #TemplateRenderer.render_and_out(
+      #TemplateRenderer.render_page(
       #  ctx: ctx,
       #  data: {
       #    "title"               => "Editing: #{article["title"]}",
@@ -237,12 +237,54 @@ module CrystalWorld::AdminControllers
     end
   end
 
+  def validate_slug(ctx)
+    if u = self.authenticated_user ctx
+      params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
+      slug = params["slug"]
+      articles = Data.get_articles_by_slug(slug)
+      p! articles
+      error_message = nil
+      if !articles.empty?
+        error_message = "Duplicate slug found. It must be unique."
+      end
+      TemplateRenderer.render_partial(
+        ctx: ctx,
+        data: {
+          "error_message" => error_message,
+          "user_slug"     => params["slug"]
+        },
+        template_path: "admin/_validate_slug.html"
+      )
+    end
+  end
+
+  def validate_date(ctx)
+    if u = self.authenticated_user ctx
+      params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
+      error_message = nil
+      begin
+        proper_date = Time.parse_utc(params["date"], "%Y-%m-%d").to_s("%Y-%m-%d")
+      rescue Time::Format::Error
+        puts "date format error"
+        error_message = "Please enter a valid date"
+      end
+      TemplateRenderer.render_partial(
+        ctx: ctx,
+        data: {
+          "error_message" => error_message,
+          "user_date"     => params["date"]
+        },
+        template_path: "admin/_validate_date.html"
+      )
+    end
+  end
+
   def publish_article(ctx)
     if u = self.authenticated_user ctx
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
       if article_id = params["article_id"].to_i?
         #
-        # VALIDATION
+        # FINAL VALIDATION
         #
         # Date
         #
@@ -250,8 +292,7 @@ module CrystalWorld::AdminControllers
           proper_date = Time.parse_utc(params["date"], "%Y-%m-%d").to_s("%Y-%m-%d")
         rescue Time::Format::Error
           puts "date format error"
-          #ctx.response.status = HTTP::Status.new(500)
-          ctx.response.status_code = 500
+          #ctx.response.status_code = 500
           ctx.response.print %({"error": "Date format error"})
           return
         end

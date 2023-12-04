@@ -79,6 +79,12 @@ module CrystalWorld
     when .match /^\/api\/admin\/articles\/#{SLUG_PATTERN}\/publish$/
       AdminControllers.publish_article(ctx)
 
+    when .match /^\/admin\/validate_date$/
+      AdminControllers.validate_date(ctx)
+
+    when .match /^\/admin\/validate_slug$/
+      AdminControllers.validate_slug(ctx)
+
     when .match /^\/admin\/articles\/#{SLUG_PATTERN}\/unpublish$/
       AdminControllers.unpublish_article(ctx)
 

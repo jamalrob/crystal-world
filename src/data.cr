@@ -120,6 +120,26 @@ module CrystalWorld::Data
     return all_tags
   end
 
+
+  # ************************************************************************
+  #
+  # TODO: REMOVE THE DB::NORESULTS ERROR STUFF EVERYWHERE EXCEPT query_one
+  #
+  # ************************************************************************
+
+  def get_articles_by_slug(slug)
+    DB.open "sqlite3://./crw.db" do |db|
+      #articles = [] of Int32 | Nil
+      p! slug
+      articles = (db.query_all "SELECT id " \
+                              "FROM articles WHERE slug = ?;",
+                              slug,
+                              as: {Int32}
+        )
+      return articles
+    end
+  end
+
   def get_articles(include_drafts=false, order_by="date DESC")
     DB.open "sqlite3://./crw.db" do |db|
       articles = [] of Hash(String, String | Array(String) | Int32 | Nil)
@@ -147,7 +167,6 @@ module CrystalWorld::Data
           day_created, month_created, year_created = dt_created.split('-')[2].to_i, dt_created.split('-')[1].to_i, dt_created.split('-')[0].to_i
           date_created = Time.utc(year_created, month_created, day_created).to_s("%Y-%m-%d")
           date_created_friendly = Time.utc(year_created, month_created, day_created).to_s("%d %B %Y")
-
 
           tags = result[4]
           if tags

@@ -3,7 +3,7 @@ module CrystalWorld::PublicControllers
 
   def home_page(ctx)
     articles = Data.get_articles
-    TemplateRenderer.render_and_out(
+    TemplateRenderer.render_page(
       ctx: ctx,
       data: {
         "articles" => articles,
@@ -14,7 +14,7 @@ module CrystalWorld::PublicControllers
   end
 
   def about_page(ctx)
-    TemplateRenderer.render_and_out(
+    TemplateRenderer.render_page(
       ctx: ctx,
       data: {
         "title" => "About me",
@@ -30,7 +30,7 @@ module CrystalWorld::PublicControllers
       options = Markd::Options.new(smart: true, safe: true)
       html = Markd.to_html(article["md"].as(String), options)
       article["html"] = html.gsub("/bucket/", IMGBUCKET)
-      TemplateRenderer.render_and_out(
+      TemplateRenderer.render_page(
         ctx: ctx,
         data: {
           "article" => article,
@@ -45,7 +45,7 @@ module CrystalWorld::PublicControllers
 
   def tags_page(ctx)
     tags = Data.get_tags
-    TemplateRenderer.render_and_out(ctx: ctx,
+    TemplateRenderer.render_page(ctx: ctx,
       data: {
         "tags"  => tags,
         "title" => "Tags",
@@ -59,7 +59,7 @@ module CrystalWorld::PublicControllers
     tag = urlbits[1]?
     articles = Data.get_articles_for_tag(tag)
     if articles
-      TemplateRenderer.render_and_out(ctx: ctx,
+      TemplateRenderer.render_page(ctx: ctx,
         data: {
           "articles" => articles,
           "tag"      => tag,
@@ -73,7 +73,7 @@ module CrystalWorld::PublicControllers
   end
 
   def login_page(ctx)
-    TemplateRenderer.render_and_out(ctx: ctx,
+    TemplateRenderer.render_page(ctx: ctx,
       data: {
         "title" => "Sign in to admin",
       },

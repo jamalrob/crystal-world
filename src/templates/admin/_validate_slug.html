@@ -1,0 +1,5 @@
+<div hx-target="this" hx-swap="outerHTML" {% if error_message %}class="error"{% endif %}>
+  <label for="">Slug</label>
+  <input type="text" hx-post="/admin/validate_slug" hx-trigger="changed, blur" name="slug" id="inpSlug" value="{{ user_slug }}">
+  {% if error_message %}<div class='error-message small'>{{ error_message }}</div>{% endif %}
+</div>
