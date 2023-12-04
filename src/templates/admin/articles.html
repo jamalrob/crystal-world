@@ -4,13 +4,29 @@
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
   New article
 </button>
-<table class="admin-table" _="on load call colourTheRows()" hx-boost="true">
+<table
+  class="admin-table"
+  _="on load call colourTheRows()"
+  hx-boost="true"
+>
   <caption>Articles</caption>
   <thead>
     <tr>
       <th></th>
-      <th><button _="on click call sortTable(2)">Published</button></th>
-      <th><button _="on click call sortTable(3)">Created</button></th>
+      <th>
+          <button id="btSortByPublished" data-sortdirection="unsorted" data-sortby="published" _=" on click
+                        call sortTable(2, me) then call colourTheRows()
+                        "
+          >Published&nbsp; ▴▾
+          </button>
+      </th>
+      <th>
+        <button id="btSortByCreated" data-sortdirection="desc" data-sortby="created" _=" on click
+                      call sortTable(3, me)  then call colourTheRows()
+                      "
+        >Created&nbsp; ▾
+        </button>
+      </th>
       <th></th>
     </tr>
   </thead>
@@ -33,66 +49,53 @@
 </table>
 <script>
 
-  function compareValues(a, b) {
-    // return -1/0/1 based on what you "know" a and b
-    // are here. Numbers, text, some custom case-insensitive
-    // and natural number ordering, etc. That's up to you.
-    // A typical "do whatever JS would do" is:
-    return (a<b) ? -1 : (a>b) ? 1 : 0;
-  }
-
-  function sortTable(colnum) {
-    // get all the rows in this table:
+  function sortTable(colnum, me) {
     const table = document.querySelector(".admin-table");
     let rows = Array.from(table.querySelectorAll("tr"));
-
-    // but ignore the heading row:
     rows = rows.slice(1);
-
-    // set up the queryselector for getting the indicated
-    // column from a row, so we can compare using its value:
     let qs = `td:nth-child(${colnum})`;
 
-    // and then just... sort the rows:
     rows.sort( (r1,r2) => {
       // get each row's relevant column
       let t1 = r1.querySelector(qs);
       let t2 = r2.querySelector(qs);
 
-      // and then effect sorting by comparing their content:
-      //return compareValues(t1.textContent,t2.textContent);
-
-      //return t1.textContent.localeCompare(t2.textContent);
-      return t2.textContent.localeCompare(t1.textContent);
+      if(me.dataset.sortdirection=='asc' || me.dataset.sortdirection=='unsorted'){
+        return t2.textContent.localeCompare(t1.textContent);
+      }
+      else{
+        return t1.textContent.localeCompare(t2.textContent);
+      }
     });
 
-    // and then the magic part that makes the sorting appear on-page:
+
+    if(me.dataset.sortdirection=='asc' || me.dataset.sortdirection=='unsorted'){
+      me.dataset.sortdirection = 'desc';
+      if(me.innerHTML.indexOf('▴▾') > -1){
+        me.innerHTML = me.innerHTML.replace('▴▾', '▾');
+      }
+      else{
+        me.innerHTML = me.innerHTML.replace('▴', '▾');
+      }
+    } else {
+      me.dataset.sortdirection = 'asc';
+      if(me.innerHTML.indexOf('▴▾') > -1){
+        me.innerHTML = me.innerHTML.replace('▴▾', '▴');
+      }
+      else{
+        me.innerHTML = me.innerHTML.replace('▾', '▴');
+      }
+    }
+
+    const otherElId = me.id == 'btSortByCreated' ? 'btSortByPublished' : 'btSortByCreated'
+    const otherEl = document.getElementById(otherElId);
+    if(otherEl.innerHTML.indexOf('▴▾') < 0){
+      console.log(otherEl.innerHTML);
+      otherEl.innerHTML = otherEl.innerHTML.replace(/▴|▾/, '▴▾');
+    }
+
     rows.forEach(row => table.appendChild(row));
   }
-
-  /*
-  const allTables = document.querySelectorAll("table");
-
-  for (const table of allTables) {
-    const tBody = table.tBodies[0];
-    const rows = Array.from(tBody.rows);
-    const headerCells = table.tHead.rows[0].cells;
-
-    for (const th of headerCells) {
-      const cellIndex = th.cellIndex;
-
-      th.addEventListener("click", () => {
-        rows.sort((tr1, tr2) => {
-          const tr1Text = tr1.cells[cellIndex].textContent;
-          const tr2Text = tr2.cells[cellIndex].textContent;
-          return tr1Text.localeCompare(tr2Text);
-        });
-
-        tBody.append(...rows);
-      });
-    }
-  }
-  */
 </script>
 <script type="text/hyperscript">
   def colourTheRows()
