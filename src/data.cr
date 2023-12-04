@@ -271,15 +271,15 @@ module CrystalWorld::Data
               as: {Int32, String, String, String?, String, String?, String?, Int32, String}
             )
         end
-        #dt = date.split(' ')[0]
-        #day, month, year = dt.split('-')[2].to_i, dt.split('-')[1].to_i, dt.split('-')[0].to_i
+        dt = date.split(' ')[0]
+        day, month, year = dt.split('-')[2].to_i, dt.split('-')[1].to_i, dt.split('-')[0].to_i
 
         return {
           "id"            => id,
           "slug"          => slug,
           "title"         => title,
-          #"date"          => Time.utc(year, month, day).to_s("%Y-%m-%d"),
-          #"friendly_date" => Time.utc(year, month, day).to_s("%d %B %Y"),
+          "date"          => Time.utc(year, month, day).to_s("%Y-%m-%d"),
+          "friendly_date" => Time.utc(year, month, day).to_s("%d %B %Y"),
           "tags"          => tags,
           "image"         => image,
           "imageclass"    => imageclass,

@@ -13,30 +13,30 @@
       <label for="">Date</label>
       <input type="date" hx-post="/admin/validate_date" hx-trigger="changed, blur" name="date" id="inpDate" value="{{ article.date }}">
     </div>
-    
+
     <label for="">Tags</label>
     <input type="text" name="tags" id="inpTags" value="{{ article.tags }}">
     <label for="">Main image</label>
     <input type="file" name="mainImage" id="inpMainImage" accept="image/png, image/jpeg">
     <label for="">Main image size</label>
-    <select name="imageclass" id="selImageClass">
+    <select name="imageClass" id="selImageClass">
       <option value="">--Choose--</option>
-      <option value="small">Small</option>
-      <option value="medium">Medium</option>
-      <option value="large">Full column</option>
-      <option value="full">Full screen-width</option>
+      <option value="small" {% if article.imageclass == "small" %}selected{% endif %}>Small</option>
+      <option value="medium" {% if article.imageclass == "medium" %}selected{% endif %}>Medium</option>
+      <option value="large" {% if article.imageclass == "large" %}selected{% endif %}>Full column</option>
+      <option value="full" {% if article.imageclass == "full" %}selected{% endif %}>Full screen-width</option>
     </select>
 
     <div class="button-group">
       <button
+        data-articleid="{{ article.id }}"
         class="fullwidth green {% if article.draft %}hidden{% endif %}"
         id="unpublish"
         hx-post="/admin/articles/{{ article.slug }}/unpublish"
         hx-target="#confirm-published"
         hx-indicator="#unpublishLoading"
         hx-vals="js:{
-            md: localStorage.getItem('article_{{ article.id }}'),
-            article_id: {{ article.id }}
+            article_id: document.getElementById('unpublish').dataset.articleid
         }"
         hx-select=".status"
         hx-on::after-request="afterRequest('unpublish')"
@@ -45,6 +45,14 @@
         <span class="spinner spinner--hidden" id="unpublishLoading"></span>
       </button>
 
+      <!--article_id:   {{ article.id }},
+            slug:         document.getElementById('inpSlug').value,
+            title:        document.getElementById('inpTitle').value,
+            date:         document.getElementById('inpDate').value,
+            tags:         document.getElementById('inpTags').value,
+            main_image:   document.getElementById('inpMainImage').value,
+            image_class:  document.getElementById('selImageClass').value
+      -->
       <button
         data-articleid="{{ article.id }}"
         class="fullwidth"
@@ -54,14 +62,8 @@
         hx-swap="innerHTML"
         hx-indicator="#publishLoading"
         hx-vals="js:{
-            md:           localStorage.getItem('article_{{ article.id }}') || document.getElementById('edit-box').innerText,
-            article_id:   {{ article.id }},
-            slug:         document.getElementById('inpSlug').value,
-            title:        document.getElementById('inpTitle').value,
-            date:         document.getElementById('inpDate').value,
-            tags:         document.getElementById('inpTags').value,
-            main_image:   document.getElementById('inpMainImage').value,
-            image_class:  document.getElementById('selImageClass').value
+            md:           localStorage.getItem(`article_${document.getElementById('publish').dataset.articleid}`) || document.getElementById('edit-box').innerText,
+            article_id:   document.getElementById('publish').dataset.articleid
         }"
         hx-select=".status"
         hx-on::after-request="afterRequest('publish')"

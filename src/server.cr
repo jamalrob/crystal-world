@@ -18,7 +18,7 @@ module CrystalWorld
   LOCAL           = @@env["ENV"] == "local"
   CACHEBUST       = Time.monotonic.to_s.split(".")[-1]
   TEMPLATE_FOLDER = "src/templates/"
-  SLUG_PATTERN    = "[a-z0-9]+(?:[_-][a-z0-9]+)*"
+  SLUG_PATTERN    = "[a-z0-9-]+"
 
   server = HTTP::Server.new([
     HTTP::StaticFileHandler.new(public_dir = "./public", fallthrough = true, directory_listing = false),

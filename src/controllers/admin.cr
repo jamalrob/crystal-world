@@ -240,18 +240,27 @@ module CrystalWorld::AdminControllers
   def validate_slug(ctx)
     if u = self.authenticated_user ctx
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
-      slug = params["slug"]
-      articles = Data.get_articles_by_slug(slug)
-      p! articles
+      user_slug = params["slug"]
+
       error_message = nil
-      if !articles.empty?
-        error_message = "Duplicate slug found. It must be unique."
+      if !user_slug.match /^#{SLUG_PATTERN}$/
+        error_message = "Only lower case letters, numbers, and hyphens"
+      else
+        articles = Data.get_articles_by_slug(user_slug)
+        if !articles.empty?
+          #error_message = "Duplicate slug found. It must be unique."
+          r = Random.new
+          user_slug = "#{user_slug}-#{r.hex(3)}"
+        else
       end
+
+      end
+
       TemplateRenderer.render_partial(
         ctx: ctx,
         data: {
           "error_message" => error_message,
-          "user_slug"     => params["slug"]
+          "user_slug"     => user_slug
         },
         template_path: "admin/_validate_slug.html"
       )
@@ -302,6 +311,9 @@ module CrystalWorld::AdminControllers
         # sanitizer = Sanitize::Policy::HTMLSanitizer.common
         # sanitizer.valid_classes << /language-.+/
         # sanitized_md = sanitizer.process(params["md"])
+        params.each do |param|
+          p! param
+        end
 
         publish = Data.publish_article(
           article_id: article_id,
@@ -309,8 +321,9 @@ module CrystalWorld::AdminControllers
           title: params["title"],
           date: proper_date,
           tags: params["tags"],
-          main_image: params["main_image"],
-          image_class: params["image_class"],
+          #main_image: params["mainImage"],
+          main_image: "",
+          image_class: params["imageClass"],
           md: params["md"]
         )
         ctx.response.print %({"result": "Published"})
