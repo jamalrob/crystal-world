@@ -1,5 +1,6 @@
 <div id="article-props-container">
   <h1>Article status: <span id="article-status">{% if article.draft %}draft{% else %}published{% endif %}</span></h1>
+
   <form>
     <label for="">Title</label>
     <input type="hidden" name="article_id" value="{{ article.id }}">
@@ -18,7 +19,7 @@
     <label for="">Tags</label>
     <input type="text" name="tags" id="inpTags" value="{{ article.tags }}">
     <label for="">Main image</label>
-    <input type="file" name="mainImage" id="inpMainImage" accept="image/png, image/jpeg">
+    <input type="file" name="main_image" id="inpMainImage" accept="image/png, image/jpeg">
     <label for="">Main image size</label>
     <select name="imageClass" id="selImageClass">
       <option value="">--Choose--</option>
@@ -27,6 +28,9 @@
       <option value="large" {% if article.imageclass == "large" %}selected{% endif %}>Full column</option>
       <option value="full" {% if article.imageclass == "full" %}selected{% endif %}>Full screen-width</option>
     </select>
+
+    <div id="confirm-published">
+    </div>
 
     <div class="button-group">
       <!--
@@ -44,20 +48,12 @@
             article_id: document.getElementById('unpublish').dataset.articleid
         }"
         hx-select=".status"
-        hx-on::after-request="afterRequest('unpublish')"
       >
+      <!-- hx-on::after-request="afterRequest('unpublish')" -->
         <span id="unpublishAction">Unpublish</span>
         <span class="spinner spinner--hidden" id="unpublishLoading"></span>
       </button>
 
-      <!--article_id:   {{ article.id }},
-            slug:         document.getElementById('inpSlug').value,
-            title:        document.getElementById('inpTitle').value,
-            date:         document.getElementById('inpDate').value,
-            tags:         document.getElementById('inpTags').value,
-            main_image:   document.getElementById('inpMainImage').value,
-            image_class:  document.getElementById('selImageClass').value
-      -->
       <button
         data-articleid="{{ article.id }}"
         class="fullwidth has-icon green"
@@ -71,48 +67,86 @@
             article_id:   document.getElementById('publish').dataset.articleid
         }"
         hx-select=".status"
-        hx-on::after-request="afterRequest('publish')"
+        hx-on::after-request="after_request(event.detail)"
       >
+      <!-- hx-on::after-request="afterRequest(event.detail)" -->
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         <span id="publishAction">Publish {% if not article.draft %}changes{% endif %}</span>
         <span class="spinner spinner--hidden" id="publishLoading"></span>
       </button>
     </div>
-    <div id="confirm-published">
-    </div>
-
   </form>
+
 </div>
 <script>
-  document.getElementById("publish").addEventListener('htmx:afterRequest', function(evt) {
-    document.getElementById("confirm-published").innerHTML = JSON.parse(evt.detail.xhr.response).error;
-  });
+  //document.getElementById("publish").addEventListener('htmx:afterRequest', function(evt) {
+  //  fields = JSON.parse(evt.detail.xhr.response)
+  //  are_errors = false;
+  //  for (var field of fields) {
+  //    if (field.error_message !== undefined){
+  //      are_errors = true;
+  //      console.log(`${field.name}: ${field.error_message}`);
+  //    }
+  //  }
+  //  if(are_errors) {
+  //    // put the message(s) into #confirm-published and highlight the field too
+  //    console.log('are errors')
+  //  } else {
+  //    // put "✔ Published" into #confirm-published
+  //    console.log('all ok')
+  //  }
+  //  document.getElementById("confirm-published").innerHTML = JSON.parse(evt.detail.xhr.response);
+  //});
 </script>
 <script type="text/hyperscript">
-  def afterRequest(action, elementId, waitms)
-    if action is 'publish'
-      localStorage.removeItem('article_' + #publish.dataset.articleid)
-      put "Publish changes" into #publishAction
-      remove .hidden from <button#unpublish/>
-      put "published" into #article-status
-      put "✔ Published" into #confirm-published
+  def after_request(event_detail)
+    set fields to JSON.parse(event_detail.xhr.response)
+    set msgs to ""
+    repeat for field in fields
+      if field.error_message is not really equal to undefined
+        if msgs is not equal to ""
+          append "<br>" to msgs
+        else
+          append "There are errors:<br>" to msgs
+        end
+        append `${field.name}: ${field.error_message}` to msgs
+      end
     end
-    if action is 'unpublish'
-      localStorage.removeItem('article_' + #publish.dataset.articleid)
-      put "Publish" into #publishAction
-      add .hidden to <button#unpublish/>
-      put "draft" into #article-status
-      put '✔ Unpublished' into #confirm-published
-    end
-    wait for 3s
-    if #confirm-published is not empty
-      put '' into #confirm-published
-    end
+    put msgs into #confirm-published
+    add .error-message to #confirm-published
   end
+  ---
+  ---def afterRequest(action, event_detail)
+  ---  if action is 'publish'
+  ---    localStorage.removeItem('article_' + #publish.dataset.articleid)
+  ---    put "Publish changes" into #publishAction
+  ---    remove .hidden from <button#unpublish/>
+  ---    put "published" into #article-status
+  ---    put "✔ Published" into #confirm-published
+  ---  end
+  ---  if action is 'unpublish'
+  ---    localStorage.removeItem('article_' + #publish.dataset.articleid)
+  ---    put "Publish" into #publishAction
+  ---    add .hidden to <button#unpublish/>
+  ---    put "draft" into #article-status
+  ---    put '✔ Unpublished' into #confirm-published
+  ---  end
+  ---  wait for 3s
+  ---  if #confirm-published is not empty
+  ---    put '' into #confirm-published
+  ---  end
+  ---end
 </script>
 <style>
   #confirm-published {
-    height: 30px;
+    height: 80px;
+    font-size: 16px;
+  }
+  #confirm-published.error-message {
+    color: white;
+    background-color: rgb(198, 57, 57);
+    padding: 5px 10px;
+    border-radius: 3px;
   }
   .spinner {
     position: absolute;
@@ -145,14 +179,33 @@
     }
   }
 .button-group {
-  margin: 40px 0 20px;
+  margin: 20px 0 20px;
 }
 #article-props-container {
   padding: 30px;
   font-size: 0.8rem;
+  /*display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;*/
+  /*display: grid;
+  grid: auto-flow / 50%;*/
 }
+
+.col {
+  flex: 1;
+}
+/*first-of-type*/
+#article-props-container div.col:first-of-type {
+  padding-right: 15px;
+}
+#article-props-container div.col:last-child {
+  padding-left: 15px;
+}
+
 #article-props-container h1 {
   font-size: 1rem;
+  flex-wrap: wrap;
+  flex-basis: 100%;
 }
 input[type=checkbox] {
   width: 20px;

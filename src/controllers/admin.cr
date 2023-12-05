@@ -252,76 +252,44 @@ module CrystalWorld::AdminControllers
         # FINAL VALIDATION
         #
         validation_errors = [
-          {
-            "field" => "date",
-            "errors" => Validators.validate_date(value: params["date"])
-          },
-          {
-            "field" => "slug",
-            "errors" => Validators.validate_slug(
-              value: params["slug"],
-              article_id: params["article_id"]
-            )
-          },
-          {
-            "field" => "tags",
-            "errors" => Validators.validate_tags(value: params["tags"])
-          }
+          Validators.validate_date(
+            value: params["date"]
+          ),
+          Validators.validate_slug(
+            value: params["slug"],
+            article_id: params["article_id"]
+          ),
+          Validators.validate_tags(
+            value: params["tags"]
+          )
         ]
 
         validation_errors.each do |e|;
-          if !e["errors"]["error_message"].to_s.empty?
-            #
-            # EXAMPLE JSON SENT IN RESPONSE:
-            #
-            # {
-            #   "validation_errors":
-            #   [
-            #     {
-            #       "field":"date",
-            #       "errors": {
-            #         "value":"2016-02-05"
-            #       }
-            #     },
-            #     {
-            #       "field":"slug",
-            #       "errors": {
-            #         "value":"the-argument-for-indirect-realism-337331",
-            #         "error_message":"Duplicate slug found and unique ID added",
-            #         "show_as_error":false
-            #       }
-            #     },
-            #     {
-            #       "field":"tags",
-            #       "errors": {
-            #         "value":"philosophy, perception",
-            #         "error_message": "Please enter some better tags!",
-            #         "show_as_error":true
-            #       }
-            #     }
-            #   ]
-            # }
-            ctx.response.print %({"validation_errors": #{validation_errors.to_json}})
+          if e.has_key?("error_message")
+            ctx.response.print %(#{validation_errors.to_json})
             return
           end
         end
 
-        pp "Got here"
+        puts "NO ERRORS"
+        params.each do |pm|
+          if pm[0] != "md"
+            pp pm
+          end
+        end
 
-
-
-        #publish = Data.publish_article(
-        #  article_id: article_id,
-        #  slug: params["slug"],
-        #  title: params["title"],
-        #  date: params["date"],
-        #  tags: params["tags"],
-        #  #main_image: params["mainImage"],
-        #  main_image: "",
-        #  image_class: params["imageClass"],
-        #  md: params["md"]
-        #)
-        #ctx.response.print %({"result": "Published"})
+        publish = Data.publish_article(
+          article_id: article_id,
+          slug: params["slug"],
+          title: params["title"],
+          date: params["date"],
+          tags: params["tags"],
+          #main_image: params["main_image"],
+          main_image: "",
+          image_class: params["imageClass"],
+          md: params["md"]
+        )
+        ctx.response.print %({"result": "Published"})
         return
       end
       PublicControllers.error_404 ctx
