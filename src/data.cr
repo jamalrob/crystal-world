@@ -153,37 +153,45 @@ module CrystalWorld::Data
     DB.open "sqlite3://./crw.db" do |db|
       articles = [] of Hash(String, String | Array(String) | Int32 | Nil)
       begin
+        # 0 id
+        # 1 slug
+        # 2 title
+        # 3 date
+        # 4 date_created
+        # 5 tags
+        # 6 draft
         if include_drafts
-          results = (db.query_all "SELECT slug, title, date, date_created, tags, draft " \
+          results = (db.query_all "SELECT id, slug, title, date, date_created, tags, draft " \
                                   "FROM articles ORDER BY #{order_by};",
-                                  as: {String, String, String?, String, String?, Int32}
+                                  as: {Int32, String, String, String?, String, String?, Int32}
             )
         else
-          results = (db.query_all "SELECT slug, title, date, date_created, tags, draft " \
+          results = (db.query_all "SELECT id, slug, title, date, date_created, tags, draft " \
                                   "FROM articles WHERE draft = 0 ORDER BY #{order_by};",
-                                  as: {String, String, String?, String, String?, Int32}
+                                  as: {Int32, String, String, String?, String, String?, Int32}
             )
         end
         results.each do |result|
           begin
-            pub_date = Time.parse_utc(result[2].to_s, "%Y-%m-%d").to_s("%Y-%m-%d")
-            pub_date_friendly = Time.parse_utc(result[2].to_s, "%Y-%m-%d").to_s("%d %B %Y")
+            pub_date = Time.parse_utc(result[3].to_s, "%Y-%m-%d").to_s("%Y-%m-%d")
+            pub_date_friendly = Time.parse_utc(result[3].to_s, "%Y-%m-%d").to_s("%d %B %Y")
           rescue e
             puts "Currently not published or bad pub date format"
           end
 
-          tags = result[4]
+          tags = result[5]
           if tags
             tags = tags.delete(' ').split(",")
           end
           this_row = {
-            "slug"                  => result[0],
-            "title"                 => result[1],
+            "id"                    => result[0],
+            "slug"                  => result[1],
+            "title"                 => result[2],
             "date"                  => pub_date,
             "friendly_date"         => pub_date_friendly,
-            "date_created"          => Time.parse_utc(result[3], "%Y-%m-%d").to_s("%Y-%m-%d"),
-            "friendly_date_created" => Time.parse_utc(result[3], "%Y-%m-%d").to_s("%d %B %Y"),
-            "draft"                 => result[5],
+            "date_created"          => Time.parse_utc(result[4], "%Y-%m-%d").to_s("%Y-%m-%d"),
+            "friendly_date_created" => Time.parse_utc(result[4], "%Y-%m-%d").to_s("%d %B %Y"),
+            "draft"                 => result[6],
             "tags"                  => tags,
           }
           articles.push(this_row)
@@ -198,20 +206,21 @@ module CrystalWorld::Data
 
   def get_articles_for_tag(tag)
     DB.open "sqlite3://./crw.db" do |db|
-      articles = [] of Hash(String, String)
+      articles = [] of Hash(String, String | Int32)
       begin
-        results = db.query_all("SELECT slug, title, date, tags FROM articles " \
+        results = db.query_all("SELECT id, slug, title, date, tags FROM articles " \
                                "WHERE draft = 0 AND tags LIKE '%' || ? || '%' " \
                                "ORDER BY date DESC;",
           tag,
-          as: {String, String, String, String}
+          as: {Int32, String, String, String, String}
         )
         results.each do |result|
           this_row = {
-            "slug"          => result[0],
-            "title"         => result[1],
-            "date"          => Time.parse_utc(result[2], "%Y-%m-%d").to_s("%Y-%m-%d"),
-            "friendly_date" => Time.parse_utc(result[2], "%Y-%m-%d").to_s("%d %B %Y"),
+            "id"            => result[0],
+            "slug"          => result[1],
+            "title"         => result[2],
+            "date"          => Time.parse_utc(result[3], "%Y-%m-%d").to_s("%Y-%m-%d"),
+            "friendly_date" => Time.parse_utc(result[3], "%Y-%m-%d").to_s("%d %B %Y"),
           }
           articles.<<(this_row)
         end
@@ -222,7 +231,15 @@ module CrystalWorld::Data
     end
   end
 
-  def get_article(id)
+  def get_article(id=nil, slug=nil, return_draft=false)
+    if id
+      return self.get_article_by_id(id)
+    else
+      return self.get_article_by_slug(slug: slug, return_draft: return_draft)
+    end
+  end
+
+  private def get_article_by_id(id)
     DB.open "sqlite3://./crw.db" do |db|
       begin
         id, slug, title, tags, date, image, imageclass, draft, md =
@@ -251,7 +268,7 @@ module CrystalWorld::Data
     end
   end
 
-  def get_article(slug, return_draft = false)
+  private def get_article_by_slug(slug, return_draft = false)
     DB.open "sqlite3://./crw.db" do |db|
       begin
         if return_draft
