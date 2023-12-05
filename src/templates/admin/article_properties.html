@@ -100,9 +100,13 @@
 </script>
 <script type="text/hyperscript">
   def after_request(event_detail)
-    set fields to JSON.parse(event_detail.xhr.response)
+    set res to JSON.parse(event_detail.xhr.response)
+    if res.published
+      put "✔ Published" into #confirm-published
+      return true
+    end
     set msgs to ""
-    repeat for field in fields
+    repeat for field in res.errors
       if field.error_message is not really equal to undefined
         if msgs is not equal to ""
           append "<br>" to msgs
@@ -110,8 +114,10 @@
         append `${field.name}: ${field.error_message}` to msgs
       end
     end
-    put msgs into #confirm-published
-    add .error-message to #confirm-published
+    if msgs is not really equal to ""
+      put msgs into #confirm-published
+      add .error-message to #confirm-published
+    end
   end
   ---
   ---def afterRequest(action, event_detail)

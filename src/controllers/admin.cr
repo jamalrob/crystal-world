@@ -266,7 +266,7 @@ module CrystalWorld::AdminControllers
 
         validation_errors.each do |e|;
           if e.has_key?("error_message")
-            ctx.response.print %(#{validation_errors.to_json})
+            ctx.response.print %({"errors": #{validation_errors.to_json}, "published": false})
             return
           end
         end
@@ -289,7 +289,9 @@ module CrystalWorld::AdminControllers
           image_class: params["imageClass"],
           md: params["md"]
         )
-        ctx.response.print %({"result": "Published"})
+        #ctx.response.print %({"result": "Published"})
+        pp validation_errors
+        ctx.response.print %({"errors": #{validation_errors.to_json}, "published": true})
         return
       end
       PublicControllers.error_404 ctx

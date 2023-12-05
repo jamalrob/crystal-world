@@ -43,15 +43,21 @@ module CrystalWorld::Validators
   end
 
   def validate_tags(value)
+
+    #
+    # TODO: sanitize
+    #
+
     error = {
       "name" => "tags",
       "value" => value
     } of String => String | Bool
-    error.merge!({
-        "error_message" => "Please enter some better tags!",
-        "value" => value,
-        "show_as_error" => true
-    })
+
+    #error.merge!({
+    #    "error_message" => "Please enter some better tags!",
+    #    "value" => value,
+    #    "show_as_error" => true
+    #})
     return error
   end
 
