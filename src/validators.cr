@@ -15,10 +15,9 @@ module CrystalWorld::Validators
     else
       articles = Data.get_articles_by_slug(value, exclude_article_id: article_id.to_i)
       if !articles.empty?
-        r = Random.new
         error.merge!({
           "error_message" => "Duplicate slug found and unique ID added",
-          "value" => "#{value}-#{r.hex(3)}",
+          "value" => "#{value}-#{Random.new.hex(3)}",
           "show_as_error" => false
         })
       end

@@ -41,7 +41,7 @@
         data-articleid="{{ article.id }}"
         class="fullwidth {% if article.draft %}hidden{% endif %}"
         id="unpublish"
-        hx-post="/admin/articles/{{ article.slug }}/unpublish"
+        hx-post="/admin/articles/{{ article.id }}/unpublish"
         hx-target="#confirm-published"
         hx-indicator="#unpublishLoading"
         hx-vals="js:{
@@ -58,7 +58,7 @@
         data-articleid="{{ article.id }}"
         class="fullwidth has-icon green"
         id="publish"
-        hx-post="/api/admin/articles/{{ article.slug }}/publish"
+        hx-post="/api/admin/articles/{{ article.id }}/publish"
         hx-target="#confirm-published"
         hx-swap="innerHTML"
         hx-indicator="#publishLoading"

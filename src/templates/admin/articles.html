@@ -51,13 +51,13 @@
     {% for a in articles %}
     <tr class="row-showing">
       <td>
-        <a href="/admin/articles/{{ a.slug }}/edit">{{ a.title }}</a>
+        <a href="/admin/articles/{{ a.id }}/edit">{{ a.title }}</a>
       </td>
       <td>{% if a.draft %}<span class="tag">Draft</span>{% else %}{{ a.date }}{% endif %}</td>
       <td>{{ a.date_created }}</td>
       <td>
-        <button hx-get="/admin/articles/{{ a.slug }}/edit" hx-target="body" hx-push-url="true">Edit</button>
-        <button hx-delete="/admin/articles/{{ a.slug }}/delete" hx-target="body" class="delete" >Delete</button>
+        <button hx-get="/admin/articles/{{ a.id }}/edit" hx-target="body" hx-push-url="true">Edit</button>
+        <button hx-delete="/admin/articles/{{ a.id }}/delete" hx-target="body" class="delete" >Delete</button>
       </td>
     </tr>
     {% endfor %}

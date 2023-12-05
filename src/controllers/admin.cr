@@ -113,9 +113,9 @@ module CrystalWorld::AdminControllers
   def delete_article(ctx)
     if u = self.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)
-      slug = urlbits[2]?
+      id = urlbits[2]?
       begin
-        Data.delete_article(slug)
+        Data.delete_article(id)
         self.admin_articles(ctx)
       rescue e
         p! e
@@ -127,8 +127,8 @@ module CrystalWorld::AdminControllers
   def edit_article_page(ctx)
     if u = self.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)
-      slug = urlbits[2]?
-      if article = Data.get_article(slug: slug, return_draft: true)
+      id = urlbits[2]?
+      if article = Data.get_article(id: id)
         options = Markd::Options.new(smart: true, safe: true)
         html = Markd.to_html(article["md"].as(String), options)
         article["html"] = html.gsub("/bucket/", IMGBUCKET)
@@ -156,8 +156,8 @@ module CrystalWorld::AdminControllers
 
   def article_properties(ctx)
     urlbits = ctx.request.path.split('/', remove_empty: true)
-    slug = urlbits[2]?
-    article = Data.get_article(slug: slug, return_draft: true)
+    id = urlbits[2]?
+    article = Data.get_article(id: id)
     if article
       TemplateRenderer.render_page(ctx: ctx,
         data: {
@@ -188,8 +188,8 @@ module CrystalWorld::AdminControllers
     #
     if u = self.authenticated_user(ctx) && ctx.request.body
       urlbits = ctx.request.path.split('/', remove_empty: true)
-      slug = urlbits[2]?
-      article = Data.get_article(slug: slug, return_draft: true)
+      id = urlbits[2]?
+      article = Data.get_article(id: id)
       if article
         params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
         if params.has_key?("markdown")
@@ -246,6 +246,9 @@ module CrystalWorld::AdminControllers
 
   def publish_article(ctx)
     if u = self.authenticated_user ctx
+
+      # WE HAVE THE ID IN THE url NOW SO THERES NO NEED TO GET IT FROM PARAMS
+      # OR SEND IT IN PARAMS
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
       if article_id = params["article_id"].to_i?
         #
@@ -299,6 +302,11 @@ module CrystalWorld::AdminControllers
   end
 
   def unpublish_article(ctx)
+
+
+    # WE HAVE THE ID IN THE url NOW SO THERES NO NEED TO GET IT FROM PARAMS
+    # OR SEND IT IN PARAMS
+
     if u = self.authenticated_user ctx
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
       if article_id = params["article_id"].to_i?

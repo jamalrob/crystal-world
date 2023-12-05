@@ -19,6 +19,7 @@ module CrystalWorld
   CACHEBUST       = Time.monotonic.to_s.split(".")[-1]
   TEMPLATE_FOLDER = "src/templates/"
   SLUG_PATTERN    = "[a-z0-9-]+"
+  ID_PATTERN      = "[0-9]+"
 
   server = HTTP::Server.new([
     HTTP::StaticFileHandler.new(public_dir = "./public", fallthrough = true, directory_listing = false),
@@ -73,10 +74,10 @@ module CrystalWorld
     when .match /^\/admin\/articles\/new$/
       AdminControllers.new_article_page(ctx)
 
-    when .match /^\/admin\/articles\/#{SLUG_PATTERN}\/delete$/
+    when .match /^\/admin\/articles\/#{ID_PATTERN}\/delete$/
       AdminControllers.delete_article(ctx)
 
-    when .match /^\/api\/admin\/articles\/#{SLUG_PATTERN}\/publish$/
+    when .match /^\/api\/admin\/articles\/#{ID_PATTERN}\/publish$/
       AdminControllers.publish_article(ctx)
 
     when .match /^\/admin\/validate_date$/
@@ -85,16 +86,16 @@ module CrystalWorld
     when .match /^\/admin\/validate_slug$/
       AdminControllers.validate_slug_inline(ctx)
 
-    when .match /^\/admin\/articles\/#{SLUG_PATTERN}\/unpublish$/
+    when .match /^\/admin\/articles\/#{ID_PATTERN}\/unpublish$/
       AdminControllers.unpublish_article(ctx)
 
-    when .match /^\/admin\/articles\/#{SLUG_PATTERN}\/preview$/
+    when .match /^\/admin\/articles\/#{ID_PATTERN}\/preview$/
       AdminControllers.get_preview_html(ctx)
 
-    when .match /^\/admin\/articles\/#{SLUG_PATTERN}\/properties$/
+    when .match /^\/admin\/articles\/#{ID_PATTERN}\/properties$/
       AdminControllers.article_properties(ctx)
 
-    when .match /^\/admin\/articles\/#{SLUG_PATTERN}\/edit$/
+    when .match /^\/admin\/articles\/#{ID_PATTERN}\/edit$/
       AdminControllers.edit_article_page(ctx)
 
     when .match /^\/#{SLUG_PATTERN}$/

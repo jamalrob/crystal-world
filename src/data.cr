@@ -77,10 +77,10 @@ module CrystalWorld::Data
     end
   end
 
-  def delete_article(slug)
+  def delete_article(id)
     DB.open "sqlite3://./crw.db" do |db|
       begin
-        return db.exec("DELETE FROM articles where slug = ?", slug)
+        return db.exec("DELETE FROM articles where id = ?", id)
       rescue e
         puts e.message
       end
@@ -165,8 +165,6 @@ module CrystalWorld::Data
             )
         end
         results.each do |result|
-          pub_date = nil
-          pub_date_friendly = nil
           begin
             pub_date = Time.parse_utc(result[2].to_s, "%Y-%m-%d").to_s("%Y-%m-%d")
             pub_date_friendly = Time.parse_utc(result[2].to_s, "%Y-%m-%d").to_s("%d %B %Y")
@@ -275,7 +273,6 @@ module CrystalWorld::Data
         end
 
         pub_date = !date || date == "" ? nil : date
-        friendly_date = nil
         if pub_date
           pub_date = Time.parse_utc(date, "%Y-%m-%d").to_s("%Y-%m-%d")
           friendly_date = Time.parse_utc(date, "%Y-%m-%d").to_s("%d %B %Y")
