@@ -2,6 +2,7 @@
   <h1>Article status: <span id="article-status">{% if article.draft %}draft{% else %}published{% endif %}</span></h1>
   <form>
     <label for="">Title</label>
+    <input type="hidden" name="article_id" value="{{ article.id }}">
     <input autofocus type="text" name="title" id="inpTitle" value="{{ article.title }}">
 
     <div hx-target="this" hx-swap="outerHTML">
@@ -28,6 +29,10 @@
     </select>
 
     <div class="button-group">
+      <!--
+            NOTE: hx-vals might not be need below now that there's
+            a hidden form input above
+      -->
       <button
         data-articleid="{{ article.id }}"
         class="fullwidth {% if article.draft %}hidden{% endif %}"

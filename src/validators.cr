@@ -1,7 +1,7 @@
 module CrystalWorld::Validators
   extend self
 
-  def validate_slug(value)
+  def validate_slug(value, article_id)
     error = {"value" => value} of String => String | Bool
     if !value.match /^#{SLUG_PATTERN}$/
       error_message = "Only lower case letters, numbers, and hyphens"
@@ -11,7 +11,7 @@ module CrystalWorld::Validators
         "show_as_error" => true
       })
     else
-      articles = Data.get_articles_by_slug(value)
+      articles = Data.get_articles_by_slug(value, exclude_article_id: article_id.to_i)
       if !articles.empty?
         r = Random.new
         error.merge!({

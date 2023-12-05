@@ -127,14 +127,24 @@ module CrystalWorld::Data
   #
   # ************************************************************************
 
-  def get_articles_by_slug(slug)
+  def get_articles_by_slug(slug, exclude_article_id : Int32 = 0)
     DB.open "sqlite3://./crw.db" do |db|
       #articles = [] of Int32 | Nil
-      articles = (db.query_all "SELECT id " \
-                              "FROM articles WHERE slug = ?;",
-                              slug,
-                              as: {Int32}
+      if exclude_article_id > 0
+        articles = (db.query_all  "SELECT id " \
+                                  "FROM articles " \
+                                  "WHERE slug = ? AND id != ?;",
+                                  slug, exclude_article_id,
+                                  as: {Int32}
         )
+      else
+        articles = (db.query_all  "SELECT id " \
+                                  "FROM articles " \
+                                  "WHERE slug = ?;",
+                                  slug,
+                                  as: {Int32}
+        )
+      end
       return articles
     end
   end

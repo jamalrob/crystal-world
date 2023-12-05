@@ -225,14 +225,9 @@ module CrystalWorld::AdminControllers
   def validate_slug_inline(ctx)
     if u = self.authenticated_user ctx
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
-      #errors = Validators.validate_slug(params["slug"])
       TemplateRenderer.render_partial(
         ctx: ctx,
-        data: Validators.validate_slug(params["slug"]),
-        #data: {
-        #  "error_message" => errors["error_message"],
-        #  "user_slug"     => errors["extra"]
-        #},
+        data: Validators.validate_slug(params["slug"], params["article_id"]),
         template_path: "admin/_validate_slug.html"
       )
     end
@@ -241,14 +236,9 @@ module CrystalWorld::AdminControllers
   def validate_date_inline(ctx)
     if u = self.authenticated_user ctx
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
-      #errors = Validators.validate_date(params["date"])
       TemplateRenderer.render_partial(
         ctx: ctx,
         data: Validators.validate_date(params["date"]),
-        #data: {
-        #  "error_message" => errors["error_message"],
-        #  "user_date"     => errors["extra"]
-        #},
         template_path: "admin/_validate_date.html"
       )
     end
@@ -261,21 +251,64 @@ module CrystalWorld::AdminControllers
         #
         # FINAL VALIDATION
         #
-        p! params
-
         validation_errors = [
-          { "field" => "date", "errors" => Validators.validate_date(value: params["date"]) },
-          { "field" => "slug", "errors" => Validators.validate_slug(value: params["slug"]) },
-          { "field" => "tags", "errors" => Validators.validate_tags(value: params["tags"]) }
+          {
+            "field" => "date",
+            "errors" => Validators.validate_date(value: params["date"])
+          },
+          {
+            "field" => "slug",
+            "errors" => Validators.validate_slug(
+              value: params["slug"],
+              article_id: params["article_id"]
+            )
+          },
+          {
+            "field" => "tags",
+            "errors" => Validators.validate_tags(value: params["tags"])
+          }
         ]
 
         validation_errors.each do |e|;
-          if e["errors"]
-            #return validation_errors
-            ctx.response.print %({"validation_errors": validation_errors})
-            break
+          if !e["errors"]["error_message"].to_s.empty?
+            #
+            # EXAMPLE JSON SENT IN RESPONSE:
+            #
+            # {
+            #   "validation_errors":
+            #   [
+            #     {
+            #       "field":"date",
+            #       "errors": {
+            #         "value":"2016-02-05"
+            #       }
+            #     },
+            #     {
+            #       "field":"slug",
+            #       "errors": {
+            #         "value":"the-argument-for-indirect-realism-337331",
+            #         "error_message":"Duplicate slug found and unique ID added",
+            #         "show_as_error":false
+            #       }
+            #     },
+            #     {
+            #       "field":"tags",
+            #       "errors": {
+            #         "value":"philosophy, perception",
+            #         "error_message": "Please enter some better tags!",
+            #         "show_as_error":true
+            #       }
+            #     }
+            #   ]
+            # }
+            ctx.response.print %({"validation_errors": #{validation_errors.to_json}})
+            return
           end
         end
+
+        pp "Got here"
+
+
 
         #publish = Data.publish_article(
         #  article_id: article_id,
