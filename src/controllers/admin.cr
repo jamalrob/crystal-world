@@ -218,71 +218,37 @@ module CrystalWorld::AdminControllers
   def new_article_page(ctx)
     if u = self.authenticated_user ctx
       newslug = Data.create_draft()
-      #self.edit_article_page(ctx)
       ctx.response.headers["HX-Location"] = %({"path": "/admin/articles/#{newslug}/edit", "target": "body"})
-      #TemplateRenderer.render_page(
-      #  ctx: ctx,
-      #  data: {
-      #    "title"               => "Editing: #{article["title"]}",
-      #    "admin_section"       => "Admin: articles",
-      #    "article"             => article,
-      #    "user_authenticated"  => true,
-      #    "admin"               => true,
-      #    "extended_main"       => true,
-      #    "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
-      #    "imagekit_bucket"     => IMGBUCKET,
-      #  },
-      #  template_path: "admin/edit-article.html"
-      #)
     end
   end
 
-  def validate_slug(ctx)
+  def validate_slug_inline(ctx)
     if u = self.authenticated_user ctx
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
-      user_slug = params["slug"]
-
-      error_message = nil
-      if !user_slug.match /^#{SLUG_PATTERN}$/
-        error_message = "Only lower case letters, numbers, and hyphens"
-      else
-        articles = Data.get_articles_by_slug(user_slug)
-        if !articles.empty?
-          #error_message = "Duplicate slug found. It must be unique."
-          r = Random.new
-          user_slug = "#{user_slug}-#{r.hex(3)}"
-        else
-      end
-
-      end
-
+      #errors = Validators.validate_slug(params["slug"])
       TemplateRenderer.render_partial(
         ctx: ctx,
-        data: {
-          "error_message" => error_message,
-          "user_slug"     => user_slug
-        },
+        data: Validators.validate_slug(params["slug"]),
+        #data: {
+        #  "error_message" => errors["error_message"],
+        #  "user_slug"     => errors["extra"]
+        #},
         template_path: "admin/_validate_slug.html"
       )
     end
   end
 
-  def validate_date(ctx)
+  def validate_date_inline(ctx)
     if u = self.authenticated_user ctx
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
-      error_message = nil
-      begin
-        proper_date = Time.parse_utc(params["date"], "%Y-%m-%d").to_s("%Y-%m-%d")
-      rescue Time::Format::Error
-        puts "date format error"
-        error_message = "Please enter a valid date"
-      end
+      #errors = Validators.validate_date(params["date"])
       TemplateRenderer.render_partial(
         ctx: ctx,
-        data: {
-          "error_message" => error_message,
-          "user_date"     => params["date"]
-        },
+        data: Validators.validate_date(params["date"]),
+        #data: {
+        #  "error_message" => errors["error_message"],
+        #  "user_date"     => errors["extra"]
+        #},
         template_path: "admin/_validate_date.html"
       )
     end
@@ -295,38 +261,34 @@ module CrystalWorld::AdminControllers
         #
         # FINAL VALIDATION
         #
-        # Date
-        #
-        begin
-          proper_date = Time.parse_utc(params["date"], "%Y-%m-%d").to_s("%Y-%m-%d")
-        rescue Time::Format::Error
-          puts "date format error"
-          #ctx.response.status_code = 500
-          ctx.response.print %({"error": "Date format error"})
-          return
+        p! params
+
+        validation_errors = [
+          { "field" => "date", "errors" => Validators.validate_date(value: params["date"]) },
+          { "field" => "slug", "errors" => Validators.validate_slug(value: params["slug"]) },
+          { "field" => "tags", "errors" => Validators.validate_tags(value: params["tags"]) }
+        ]
+
+        validation_errors.each do |e|;
+          if e["errors"]
+            #return validation_errors
+            ctx.response.print %({"validation_errors": validation_errors})
+            break
+          end
         end
 
-        # Sanitize
-        #
-        # sanitizer = Sanitize::Policy::HTMLSanitizer.common
-        # sanitizer.valid_classes << /language-.+/
-        # sanitized_md = sanitizer.process(params["md"])
-        params.each do |param|
-          p! param
-        end
-
-        publish = Data.publish_article(
-          article_id: article_id,
-          slug: params["slug"],
-          title: params["title"],
-          date: proper_date,
-          tags: params["tags"],
-          #main_image: params["mainImage"],
-          main_image: "",
-          image_class: params["imageClass"],
-          md: params["md"]
-        )
-        ctx.response.print %({"result": "Published"})
+        #publish = Data.publish_article(
+        #  article_id: article_id,
+        #  slug: params["slug"],
+        #  title: params["title"],
+        #  date: params["date"],
+        #  tags: params["tags"],
+        #  #main_image: params["mainImage"],
+        #  main_image: "",
+        #  image_class: params["imageClass"],
+        #  md: params["md"]
+        #)
+        #ctx.response.print %({"result": "Published"})
         return
       end
       PublicControllers.error_404 ctx

@@ -10,7 +10,7 @@
     </div>
 
     <div hx-target="this" hx-swap="outerHTML">
-      <label for="">Date</label>
+      <label for="">Publication date</label>
       <input type="date" hx-post="/admin/validate_date" hx-trigger="changed, blur" name="date" id="inpDate" value="{{ article.date }}">
     </div>
 
@@ -30,7 +30,7 @@
     <div class="button-group">
       <button
         data-articleid="{{ article.id }}"
-        class="fullwidth green {% if article.draft %}hidden{% endif %}"
+        class="fullwidth {% if article.draft %}hidden{% endif %}"
         id="unpublish"
         hx-post="/admin/articles/{{ article.slug }}/unpublish"
         hx-target="#confirm-published"
@@ -55,7 +55,7 @@
       -->
       <button
         data-articleid="{{ article.id }}"
-        class="fullwidth"
+        class="fullwidth has-icon green"
         id="publish"
         hx-post="/api/admin/articles/{{ article.slug }}/publish"
         hx-target="#confirm-published"
@@ -68,6 +68,7 @@
         hx-select=".status"
         hx-on::after-request="afterRequest('publish')"
       >
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         <span id="publishAction">Publish {% if not article.draft %}changes{% endif %}</span>
         <span class="spinner spinner--hidden" id="publishLoading"></span>
       </button>
@@ -77,6 +78,11 @@
 
   </form>
 </div>
+<script>
+  document.getElementById("publish").addEventListener('htmx:afterRequest', function(evt) {
+    document.getElementById("confirm-published").innerHTML = JSON.parse(evt.detail.xhr.response).error;
+  });
+</script>
 <script type="text/hyperscript">
   def afterRequest(action, elementId, waitms)
     if action is 'publish'

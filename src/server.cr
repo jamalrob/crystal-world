@@ -80,10 +80,10 @@ module CrystalWorld
       AdminControllers.publish_article(ctx)
 
     when .match /^\/admin\/validate_date$/
-      AdminControllers.validate_date(ctx)
+      AdminControllers.validate_date_inline(ctx)
 
     when .match /^\/admin\/validate_slug$/
-      AdminControllers.validate_slug(ctx)
+      AdminControllers.validate_slug_inline(ctx)
 
     when .match /^\/admin\/articles\/#{SLUG_PATTERN}\/unpublish$/
       AdminControllers.unpublish_article(ctx)

@@ -130,7 +130,6 @@ module CrystalWorld::Data
   def get_articles_by_slug(slug)
     DB.open "sqlite3://./crw.db" do |db|
       #articles = [] of Int32 | Nil
-      p! slug
       articles = (db.query_all "SELECT id " \
                               "FROM articles WHERE slug = ?;",
                               slug,
@@ -156,17 +155,14 @@ module CrystalWorld::Data
             )
         end
         results.each do |result|
-          pub_date = !result[2] || result[2] == "" ? nil : result[2]
-          if pub_date
-            dt = pub_date.split(' ')[0]
-            day, month, year = dt.split('-')[2].to_i, dt.split('-')[1].to_i, dt.split('-')[0].to_i
-            pub_date = Time.utc(year, month, day).to_s("%Y-%m-%d")
-            pub_date_friendly = Time.utc(year, month, day).to_s("%d %B %Y")
+          pub_date = nil
+          pub_date_friendly = nil
+          begin
+            pub_date = Time.parse_utc(result[2].to_s, "%Y-%m-%d").to_s("%Y-%m-%d")
+            pub_date_friendly = Time.parse_utc(result[2].to_s, "%Y-%m-%d").to_s("%d %B %Y")
+          rescue e
+            puts "Currently not published or bad pub date format"
           end
-          dt_created = result[3].split(' ')[0]
-          day_created, month_created, year_created = dt_created.split('-')[2].to_i, dt_created.split('-')[1].to_i, dt_created.split('-')[0].to_i
-          date_created = Time.utc(year_created, month_created, day_created).to_s("%Y-%m-%d")
-          date_created_friendly = Time.utc(year_created, month_created, day_created).to_s("%d %B %Y")
 
           tags = result[4]
           if tags
@@ -177,8 +173,8 @@ module CrystalWorld::Data
             "title"                 => result[1],
             "date"                  => pub_date,
             "friendly_date"         => pub_date_friendly,
-            "date_created"          => date_created,
-            "friendly_date_created" => date_created_friendly,
+            "date_created"          => Time.parse_utc(result[3], "%Y-%m-%d").to_s("%Y-%m-%d"),
+            "friendly_date_created" => Time.parse_utc(result[3], "%Y-%m-%d").to_s("%d %B %Y"),
             "draft"                 => result[5],
             "tags"                  => tags,
           }
@@ -203,13 +199,11 @@ module CrystalWorld::Data
           as: {String, String, String, String}
         )
         results.each do |result|
-          dt = result[2].split(' ')[0]
-          day, month, year = dt.split('-')[2].to_i, dt.split('-')[1].to_i, dt.split('-')[0].to_i
           this_row = {
             "slug"          => result[0],
             "title"         => result[1],
-            "date"          => Time.utc(year, month, day).to_s("%Y-%m-%d"),
-            "friendly_date" => Time.utc(year, month, day).to_s("%d %B %Y"),
+            "date"          => Time.parse_utc(result[2], "%Y-%m-%d").to_s("%Y-%m-%d"),
+            "friendly_date" => Time.parse_utc(result[2], "%Y-%m-%d").to_s("%d %B %Y"),
           }
           articles.<<(this_row)
         end
@@ -230,15 +224,13 @@ module CrystalWorld::Data
                         id,
             as: {Int32, String, String, String?, String, String?, String?, Int32, String}
           )
-        dt = date.split(' ')[0]
-        day, month, year = dt.split('-')[2].to_i, dt.split('-')[1].to_i, dt.split('-')[0].to_i
 
-        return {
+          return {
           "id"            => id,
           "slug"          => slug,
           "title"         => title,
-          "date"          => Time.utc(year, month, day).to_s("%Y-%m-%d"),
-          "friendly_date" => Time.utc(year, month, day).to_s("%d %B %Y"),
+          "date"          => Time.parse_utc(date, "%Y-%m-%d").to_s("%Y-%m-%d"),
+          "friendly_date" => Time.parse_utc(date, "%Y-%m-%d").to_s("%d %B %Y"),
           "tags"          => tags,
           "image"         => image,
           "imageclass"    => imageclass,
@@ -271,15 +263,20 @@ module CrystalWorld::Data
               as: {Int32, String, String, String?, String, String?, String?, Int32, String}
             )
         end
-        dt = date.split(' ')[0]
-        day, month, year = dt.split('-')[2].to_i, dt.split('-')[1].to_i, dt.split('-')[0].to_i
+
+        pub_date = !date || date == "" ? nil : date
+        friendly_date = nil
+        if pub_date
+          pub_date = Time.parse_utc(date, "%Y-%m-%d").to_s("%Y-%m-%d")
+          friendly_date = Time.parse_utc(date, "%Y-%m-%d").to_s("%d %B %Y")
+        end
 
         return {
           "id"            => id,
           "slug"          => slug,
           "title"         => title,
-          "date"          => Time.utc(year, month, day).to_s("%Y-%m-%d"),
-          "friendly_date" => Time.utc(year, month, day).to_s("%d %B %Y"),
+          "date"          => pub_date,
+          "friendly_date" => friendly_date,
           "tags"          => tags,
           "image"         => image,
           "imageclass"    => imageclass,

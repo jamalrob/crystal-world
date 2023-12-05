@@ -72,6 +72,7 @@ h3 {
     justify-content: right;
 }
 button {
+    box-shadow: 0 0 3px #0b2a4287;
     position: relative;
     background-color: #2f837d;
     color: #fff;
@@ -277,10 +278,10 @@ form.login {
 }
 form .error-message {
     color: rgb(250, 138, 157);
-    text-align: right;
 }
-form .error-message.small {
+form input + div.small {
   font-size: 0.7rem;
+  text-align: right;
 }
 form .error input {
   background-color: pink;
