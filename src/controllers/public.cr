@@ -25,7 +25,7 @@ module CrystalWorld::PublicControllers
 
   def article_page(ctx)
     urlbits = ctx.request.path.split('/', remove_empty: true)
-    slug = urlbits[0]?
+    slug = urlbits[0]
     if article = Data.get_article(slug: slug, return_draft: false)
       options = Markd::Options.new(smart: true, safe: true)
       html = Markd.to_html(article["md"].as(String), options)

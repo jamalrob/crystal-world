@@ -231,15 +231,15 @@ module CrystalWorld::Data
     end
   end
 
-  def get_article(id=nil, slug=nil, return_draft=false)
-    if id
-      return self.get_article_by_id(id)
-    else
-      return self.get_article_by_slug(slug: slug, return_draft: return_draft)
-    end
-  end
+  #def get_article(id=nil, slug=nil, return_draft=false)
+  #  if id
+  #    return self.get_article_by_id(id)
+  #  else
+  #    return self.get_article_by_slug(slug: slug, return_draft: return_draft)
+  #  end
+  #end
 
-  private def get_article_by_id(id)
+  def get_article(id : Int32)
     DB.open "sqlite3://./crw.db" do |db|
       begin
         id, slug, title, tags, date, image, imageclass, draft, md =
@@ -268,7 +268,7 @@ module CrystalWorld::Data
     end
   end
 
-  private def get_article_by_slug(slug, return_draft = false)
+  def get_article(slug : String, return_draft : Bool = false)
     DB.open "sqlite3://./crw.db" do |db|
       begin
         if return_draft
