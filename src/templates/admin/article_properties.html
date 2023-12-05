@@ -106,8 +106,6 @@
       if field.error_message is not really equal to undefined
         if msgs is not equal to ""
           append "<br>" to msgs
-        else
-          append "There are errors:<br>" to msgs
         end
         append `${field.name}: ${field.error_message}` to msgs
       end
@@ -138,15 +136,13 @@
   ---end
 </script>
 <style>
-  #confirm-published {
-    height: 80px;
-    font-size: 16px;
-  }
   #confirm-published.error-message {
     color: white;
     background-color: rgb(198, 57, 57);
     padding: 5px 10px;
     border-radius: 3px;
+    line-height: 0.9rem;
+    font-size: 16px;
   }
   .spinner {
     position: absolute;
