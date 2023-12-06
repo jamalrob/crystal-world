@@ -170,18 +170,16 @@
   js
     // AUTOSAVE AFTER 1s NOT TYPING
     function doAutosave(inputElm) {
-      var duration = 1000;
+      var duration = 1500;
       clearTimeout(inputElm._timer);
       inputElm._timer = setTimeout(()=>{
         console.log("Saving")
         localStorage.setItem("article_{{ article.id }}", inputElm.innerText)
         let signalEl = document.getElementById("revision-message")
-        signalEl.classList.add("saved");
+        signalEl.classList.add("autosaved");
           setTimeout(function() {
-            signalEl.classList.remove("saved");
+            signalEl.classList.remove("autosaved");
         }, 2000);
-
-
       }, duration);
     }
     return { doAutosave }
@@ -206,6 +204,7 @@ button.close {
 .narrow {
   width: 500px !important;
   min-width: unset !important;
+  height: 91vh;
 }
 .supertitle {
   font-size: 0.78rem;
@@ -235,7 +234,7 @@ button.close {
 #revision-message svg {
   vertical-align: text-bottom;
 }
-#revision-message.saved {
+.autosaved {
   background: #28ea62;
   color: #111;
 }

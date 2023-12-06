@@ -100,7 +100,7 @@ module CrystalWorld::Data
         "#{newslug}", "New Draft #{newid}", "", "", "", "", 1, ""
       )
       #return self.get_article(insert.last_insert_id)
-      return newslug
+      return newid
     rescue e
       p! e
     end
@@ -231,14 +231,6 @@ module CrystalWorld::Data
     end
   end
 
-  #def get_article(id=nil, slug=nil, return_draft=false)
-  #  if id
-  #    return self.get_article_by_id(id)
-  #  else
-  #    return self.get_article_by_slug(slug: slug, return_draft: return_draft)
-  #  end
-  #end
-
   def get_article(id : Int32)
     DB.open "sqlite3://./crw.db" do |db|
       begin
@@ -250,12 +242,18 @@ module CrystalWorld::Data
             as: {Int32, String, String, String?, String, String?, String?, Int32, String}
           )
 
-          return {
+        pub_date = !date || date == "" ? nil : date
+        if pub_date
+          pub_date = Time.parse_utc(date, "%Y-%m-%d").to_s("%Y-%m-%d")
+          friendly_date = Time.parse_utc(date, "%Y-%m-%d").to_s("%d %B %Y")
+        end
+
+        return {
           "id"            => id,
           "slug"          => slug,
           "title"         => title,
-          "date"          => Time.parse_utc(date, "%Y-%m-%d").to_s("%Y-%m-%d"),
-          "friendly_date" => Time.parse_utc(date, "%Y-%m-%d").to_s("%d %B %Y"),
+          "date"          => pub_date,
+          "friendly_date" => friendly_date,
           "tags"          => tags,
           "image"         => image,
           "imageclass"    => imageclass,

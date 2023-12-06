@@ -217,8 +217,8 @@ module CrystalWorld::AdminControllers
 
   def new_article_page(ctx)
     if u = self.authenticated_user ctx
-      newslug = Data.create_draft()
-      ctx.response.headers["HX-Location"] = %({"path": "/admin/articles/#{newslug}/edit", "target": "body"})
+      newid = Data.create_draft()
+      ctx.response.headers["HX-Location"] = %({"path": "/admin/articles/#{newid}/edit", "target": "body"})
     end
   end
 

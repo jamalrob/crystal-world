@@ -1,26 +1,35 @@
 <div id="article-props-container">
-  <h1>Article status: <span id="article-status">{% if article.draft %}draft{% else %}published{% endif %}</span></h1>
+  <div>
+    <h1>Article status: <span id="article-status">{% if article.draft %}draft{% else %}published{% endif %}</span></h1>
+    <div id="confirm-published"></div>
+  </div>
 
-  <form>
-    <label for="">Title</label>
+  <form id="frm-article-properties">
+    <label for="inpTitle">
+      Title
+      <span class="autosaved hidden">✔ Autosaved</span>
+    </label>
     <input type="hidden" name="article_id" value="{{ article.id }}">
     <input autofocus type="text" name="title" id="inpTitle" value="{{ article.title }}">
 
     <div hx-target="this" hx-swap="outerHTML">
-      <label for="">Slug</label>
-      <input type="text" hx-post="/admin/validate_slug" hx-trigger="changed, blur" name="slug" id="inpSlug" value="{{ article.slug }}">
+      <label for="inpSlug">
+        Slug
+        <span class="autosaved hidden">✔ Autosaved</span>
+      </label>
+      <input type="text" hx-post="/admin/validate_slug" hx-trigger="change, blur" name="slug" id="inpSlug" value="{{ article.slug }}">
     </div>
 
     <div hx-target="this" hx-swap="outerHTML">
-      <label for="">Publication date</label>
-      <input type="date" hx-post="/admin/validate_date" hx-trigger="changed, blur" name="date" id="inpDate" value="{{ article.date }}">
+      <label for="inpDate">Publication date</label>
+      <input type="date" hx-post="/admin/validate_date" hx-trigger="change, blur" name="date" id="inpDate" value="{{ article.date }}">
     </div>
 
-    <label for="">Tags</label>
+    <label for="inpTags">Tags</label>
     <input type="text" name="tags" id="inpTags" value="{{ article.tags }}">
-    <label for="">Main image</label>
+    <label for="inpMainImage">Main image</label>
     <input type="file" name="main_image" id="inpMainImage" accept="image/png, image/jpeg">
-    <label for="">Main image size</label>
+    <label for="selImageClass">Main image size</label>
     <select name="imageClass" id="selImageClass">
       <option value="">--Choose--</option>
       <option value="small" {% if article.imageclass == "small" %}selected{% endif %}>Small</option>
@@ -29,7 +38,7 @@
       <option value="full" {% if article.imageclass == "full" %}selected{% endif %}>Full screen-width</option>
     </select>
 
-    <div id="confirm-published">
+    <div id="error-message">
     </div>
 
     <div class="button-group">
@@ -37,30 +46,33 @@
             NOTE: hx-vals might not be need below now that there's
             a hidden form input above
       -->
+      <!-- NOT NEEDED? hx-target="#confirm-published" -->
       <button
         data-articleid="{{ article.id }}"
-        class="fullwidth {% if article.draft %}hidden{% endif %}"
+        class="fullwidth {% if article.draft %}hidden{% endif %} has-icon"
         id="unpublish"
         hx-post="/admin/articles/{{ article.id }}/unpublish"
-        hx-target="#confirm-published"
+        hx-swap="none"
         hx-indicator="#unpublishLoading"
         hx-vals="js:{
             article_id: document.getElementById('unpublish').dataset.articleid
         }"
         hx-select=".status"
+        hx-on::after-request="after_request(event.detail)"
       >
       <!-- hx-on::after-request="afterRequest('unpublish')" -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
         <span id="unpublishAction">Unpublish</span>
         <span class="spinner spinner--hidden" id="unpublishLoading"></span>
       </button>
 
+      <!-- NOT NEEDED? hx-target="#confirm-published" -->
       <button
         data-articleid="{{ article.id }}"
         class="fullwidth has-icon green"
         id="publish"
         hx-post="/api/admin/articles/{{ article.id }}/publish"
-        hx-target="#confirm-published"
-        hx-swap="innerHTML"
+        hx-swap="none"
         hx-indicator="#publishLoading"
         hx-vals="js:{
             md:           localStorage.getItem(`article_${document.getElementById('publish').dataset.articleid}`) || document.getElementById('edit-box').innerText,
@@ -78,46 +90,75 @@
   </form>
 
 </div>
-<script>
-  //document.getElementById("publish").addEventListener('htmx:afterRequest', function(evt) {
-  //  fields = JSON.parse(evt.detail.xhr.response)
-  //  are_errors = false;
-  //  for (var field of fields) {
-  //    if (field.error_message !== undefined){
-  //      are_errors = true;
-  //      console.log(`${field.name}: ${field.error_message}`);
-  //    }
-  //  }
-  //  if(are_errors) {
-  //    // put the message(s) into #confirm-published and highlight the field too
-  //    console.log('are errors')
-  //  } else {
-  //    // put "✔ Published" into #confirm-published
-  //    console.log('all ok')
-  //  }
-  //  document.getElementById("confirm-published").innerHTML = JSON.parse(evt.detail.xhr.response);
-  //});
-</script>
+
 <script type="text/hyperscript">
+  js
+    // AUTOSAVE AFTER 1s NOT TYPING
+    function doAutosave(inputElm) {
+      var duration = 1500;
+      clearTimeout(inputElm._timer);
+      inputElm._timer = setTimeout(()=>{
+        console.log("Saving")
+        //localStorage.setItem("article_{{ article.id }}", inputElm.innerText)
+        let signalEl = inputElm.labels[0].querySelector(".autosaved")
+        signalEl.classList.remove("hidden");
+          setTimeout(function() {
+            signalEl.classList.add("hidden");
+        }, 2000);
+      }, duration);
+    }
+    return { doAutosave }
+  end
+
+  on input from < #frm-article-properties input[type=text] />
+    call doAutosave(event.target)
+    ---set inp to event.target
+    ---log inp.labels
+    ---wait 1.5s remove .hidden from .autosaved
+    ---wait 2.5s then add .hidden to .autosaved
+    ---localStorage.setItem("article_{{ article.id }}", inputElm.innerText)
+  end
+
+
   def after_request(event_detail)
-    set res to JSON.parse(event_detail.xhr.response)
-    if res.published
-      put "✔ Published" into #confirm-published
-      return true
-    end
-    set msgs to ""
-    repeat for field in res.errors
-      if field.error_message is not really equal to undefined
-        if msgs is not equal to ""
-          append "<br>" to msgs
+    if event_detail.elt matches < button#publish />
+      --- USER CLICKED PUBLISH
+      set res to JSON.parse(event_detail.xhr.response)
+
+      if res.published
+        put "" into #error-message then remove .showing from #error-message
+        put "✔ Published" into #confirm-published then add .autosaved to #confirm-published
+        put "published" into #article-status
+        put "Publish changes" into #publishAction then remove .hidden from < button#unpublish />
+        wait for 3s
+        remove .autosaved from #confirm-published then put "" into #confirm-published
+      else
+        set msgs to ""
+        repeat for field in res.errors
+          if field.error_message is not really equal to undefined
+            if msgs is not equal to ""
+              append "<br>" to msgs
+            end
+            append `${field.name}: ${field.error_message}` to msgs
+          end
         end
-        append `${field.name}: ${field.error_message}` to msgs
+
+        if msgs is not really equal to ""
+          put msgs into #error-message
+          add .showing to #error-message
+        end
       end
+    else
+      --- USER CLICKED UNPUBLISH
+      localStorage.removeItem('article_' + #publish.dataset.articleid)
+      put "Publish" into #publishAction
+      add .hidden to <button#unpublish/>
+      put "draft" into #article-status
+      put '✔ Unpublished' into #confirm-published then add .autosaved to #confirm-published
+      wait for 3s
+      remove .autosaved from #confirm-published then put "" into #confirm-published
     end
-    if msgs is not really equal to ""
-      put msgs into #confirm-published
-      add .error-message to #confirm-published
-    end
+
   end
   ---
   ---def afterRequest(action, event_detail)
@@ -142,13 +183,31 @@
   ---end
 </script>
 <style>
-  #confirm-published.error-message {
+  label .autosaved {
+    float: right;
+    padding: 0 5px;
+    border-radius: 2px;
+    line-height: 0.98rem;
+    font-size: 0.7rem;
+  }
+  #confirm-published {
+    padding: 0 4px;
+    border-radius: 2px;
+    display: inline-block;
+    margin-left: 15px;
+  }
+  #error-message {
     color: white;
     background-color: rgb(198, 57, 57);
     padding: 5px 10px;
     border-radius: 3px;
     line-height: 0.9rem;
     font-size: 16px;
+    opacity: 0;
+    min-height: 30px;
+  }
+  #error-message.showing {
+    opacity: 1;
   }
   .spinner {
     position: absolute;
@@ -181,7 +240,7 @@
     }
   }
 .button-group {
-  margin: 20px 0 20px;
+  margin: 60px 0 20px;
 }
 #article-props-container {
   padding: 30px;
@@ -193,10 +252,6 @@
   grid: auto-flow / 50%;*/
 }
 
-.col {
-  flex: 1;
-}
-/*first-of-type*/
 #article-props-container div.col:first-of-type {
   padding-right: 15px;
 }
@@ -206,8 +261,7 @@
 
 #article-props-container h1 {
   font-size: 1rem;
-  flex-wrap: wrap;
-  flex-basis: 100%;
+  display: inline-block;
 }
 input[type=checkbox] {
   width: 20px;

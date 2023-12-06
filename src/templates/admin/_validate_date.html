@@ -1,5 +1,5 @@
 <div hx-target="this" hx-swap="outerHTML" {% if show_as_error %}class="error"{% endif %}>
-  <label for="">Date</label>
+  <label for="">Publication date</label>
   <input type="date" hx-post="/admin/validate_date" hx-trigger="changed, blur" name="date" id="inpDate" value="{{ value }}">
   {% if error_message %}<div class='{% if show_as_error %}error-message{% endif %} small'>{{ error_message }}</div>{% endif %}
 </div>
