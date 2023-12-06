@@ -1,5 +1,16 @@
 <div hx-target="this" hx-swap="outerHTML" {% if show_as_error %}class="error"{% endif %}>
-  <label for="">Slug</label>
-  <input type="text" hx-post="/admin/validate_slug" hx-trigger="changed, blur" name="slug" id="inpSlug" value="{{ value }}">
+  <label for="inpSlug">
+    Slug
+    <span class="autosaved hidden">✔ Autosaved</span>
+  </label>
+  <input
+    type="text"
+    hx-post="/admin/validate_slug"
+    hx-trigger="changed, blur"
+    name="slug"
+    id="inpSlug"
+    value="{{ value }}"
+    _="on input call doAutosave(event.target)"
+  >
   {% if error_message %}<div class='{% if show_as_error %}error-message{% endif %} small'>{{ error_message }}</div>{% endif %}
 </div>

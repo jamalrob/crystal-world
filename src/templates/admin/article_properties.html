@@ -5,32 +5,113 @@
   </div>
 
   <form id="frm-article-properties">
+    <input type="hidden" name="article_id" id="inpArticleID" value="{{ article.id }}">
+    <input type="hidden" name="draft" id="inpDraft" value="{{ article.draft }}">
+
     <label for="inpTitle">
       Title
       <span class="autosaved hidden">✔ Autosaved</span>
     </label>
-    <input type="hidden" name="article_id" value="{{ article.id }}">
-    <input autofocus type="text" name="title" id="inpTitle" value="{{ article.title }}">
+    <input
+      type="text"
+      name="title"
+      id="inpTitle"
+      value="{{ article.title }}"
+      autofocus
+      _=" on load call set_my_value(me)
+          on input call doAutosave(event.target)
+            if <#revert/> is not empty
+              remove .hidden from #revert
+            end
+            if #inpDraft.value === '1'
+              set #inpSlug.value to slugify(my value)
+              call doAutosave(#inpSlug)
+            end
+          end
+      "
+    >
 
     <div hx-target="this" hx-swap="outerHTML">
       <label for="inpSlug">
         Slug
         <span class="autosaved hidden">✔ Autosaved</span>
       </label>
-      <input type="text" hx-post="/admin/validate_slug" hx-trigger="change, blur" name="slug" id="inpSlug" value="{{ article.slug }}">
+      <input
+        type="text"
+        hx-post="/admin/validate_slug"
+        hx-trigger="changed, blur"
+        name="slug"
+        id="inpSlug"
+        value="{{ article.slug }}"
+        _=" on load call set_my_value(me)
+            on input
+              call doAutosave(event.target)
+              if <#revert/> is not empty
+                remove .hidden from #revert
+              end
+            end
+            "
+      >
     </div>
 
     <div hx-target="this" hx-swap="outerHTML">
-      <label for="inpDate">Publication date</label>
-      <input type="date" hx-post="/admin/validate_date" hx-trigger="change, blur" name="date" id="inpDate" value="{{ article.date }}">
+      <label for="inpDate">
+        Publication date
+        <span class="autosaved hidden">✔ Autosaved</span>
+      </label>
+      <input
+        type="date"
+        hx-post="/admin/validate_date"
+        hx-trigger="changed, blur"
+        name="date"
+        id="inpDate"
+        value="{{ article.date }}"
+        _=" on load call set_my_value(me)
+            on input call doAutosave(event.target)
+              if <#revert/> is not empty
+                remove .hidden from #revert
+              end
+            end
+            "
+      >
     </div>
 
-    <label for="inpTags">Tags</label>
-    <input type="text" name="tags" id="inpTags" value="{{ article.tags }}">
+    <label for="inpTags">
+      Tags
+      <span class="autosaved hidden">✔ Autosaved</span>
+    </label>
+    <input
+      type="text"
+      name="tags"
+      id="inpTags"
+      value="{{ article.tags }}"
+      _=" on load call set_my_value(me)
+          on input call doAutosave(event.target)
+            if <#revert/> is not empty
+              remove .hidden from #revert
+            end
+          end
+      "
+    >
+
     <label for="inpMainImage">Main image</label>
     <input type="file" name="main_image" id="inpMainImage" accept="image/png, image/jpeg">
-    <label for="selImageClass">Main image size</label>
-    <select name="imageClass" id="selImageClass">
+
+    <label for="selImageClass">
+      Main image size
+      <span class="autosaved hidden">✔ Autosaved</span>
+    </label>
+    <select
+      name="imageClass"
+      id="selImageClass"
+      _=" on load call set_my_value(me)
+          on change call doAutosave(event.target)
+            if <#revert/> is not empty
+              remove .hidden from #revert
+            end
+          end
+          "
+    >
       <option value="">--Choose--</option>
       <option value="small" {% if article.imageclass == "small" %}selected{% endif %}>Small</option>
       <option value="medium" {% if article.imageclass == "medium" %}selected{% endif %}>Medium</option>
@@ -42,11 +123,32 @@
     </div>
 
     <div class="button-group">
+
+      {% if not article.draft %}
+      <!--  TODO: HAVE TO CHECK IF THERE ARE ANY NEW SAVED UNPUBLISHED VALUES
+            COS WE CAN'T SHOW THIS BUTTON IF THERE AREN'T
+            : on load
+      -->
+      <button
+        id="revert"
+        class="fullwidth has-icon hidden"
+        _=" on load
+              if are_saved_items()
+                remove .hidden from me
+              end
+            end
+          "
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rotate-ccw"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+        Revert properties to published
+      </button>
+      {% endif %}
+
+
       <!--
             NOTE: hx-vals might not be need below now that there's
             a hidden form input above
       -->
-      <!-- NOT NEEDED? hx-target="#confirm-published" -->
       <button
         data-articleid="{{ article.id }}"
         class="fullwidth {% if article.draft %}hidden{% endif %} has-icon"
@@ -66,7 +168,6 @@
         <span class="spinner spinner--hidden" id="unpublishLoading"></span>
       </button>
 
-      <!-- NOT NEEDED? hx-target="#confirm-published" -->
       <button
         data-articleid="{{ article.id }}"
         class="fullwidth has-icon green"
@@ -81,11 +182,11 @@
         hx-select=".status"
         hx-on::after-request="after_request(event.detail)"
       >
-      <!-- hx-on::after-request="afterRequest(event.detail)" -->
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         <span id="publishAction">Publish {% if not article.draft %}changes{% endif %}</span>
         <span class="spinner spinner--hidden" id="publishLoading"></span>
       </button>
+
     </div>
   </form>
 
@@ -93,13 +194,29 @@
 
 <script type="text/hyperscript">
   js
+    function slugify(str) {
+        return String(str)
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9 -]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+    }
+    return { slugify };
+  end
+
+  js
     // AUTOSAVE AFTER 1s NOT TYPING
     function doAutosave(inputElm) {
+      console.log('AUTOSAVE')
+      const article_id = document.getElementById("inpArticleID").value
       var duration = 1500;
       clearTimeout(inputElm._timer);
       inputElm._timer = setTimeout(()=>{
         console.log("Saving")
-        //localStorage.setItem("article_{{ article.id }}", inputElm.innerText)
+        localStorage.setItem(`article_${article_id}_${inputElm.name}`, inputElm.value)
         let signalEl = inputElm.labels[0].querySelector(".autosaved")
         signalEl.classList.remove("hidden");
           setTimeout(function() {
@@ -110,15 +227,30 @@
     return { doAutosave }
   end
 
-  on input from < #frm-article-properties input[type=text] />
-    call doAutosave(event.target)
-    ---set inp to event.target
-    ---log inp.labels
-    ---wait 1.5s remove .hidden from .autosaved
-    ---wait 2.5s then add .hidden to .autosaved
-    ---localStorage.setItem("article_{{ article.id }}", inputElm.innerText)
+  def are_saved_items
+    set article_id to #inpArticleID.value
+    set storage_keys to [
+      'article_' + article_id + '_title',
+      'article_' + article_id + '_slug',
+      'article_' + article_id + '_date',
+      'article_' + article_id + '_tags',
+      'article_' + article_id + '_imageClass'
+    ]
+    repeat for key in storage_keys
+      if localStorage.getItem(key) is not empty
+        return true
+      end
+    end
   end
 
+  def set_my_value(el)
+    log "SET_MY_VALUE"
+    set article_id to #inpArticleID.value
+    set storage_key to 'article_' + article_id + '_' + el.name
+    if localStorage.getItem(storage_key) is not empty
+      set el.value to localStorage.getItem(storage_key)
+    end
+  end
 
   def after_request(event_detail)
     if event_detail.elt matches < button#publish />
@@ -240,7 +372,7 @@
     }
   }
 .button-group {
-  margin: 60px 0 20px;
+  margin: 50px 0 20px;
 }
 #article-props-container {
   padding: 30px;

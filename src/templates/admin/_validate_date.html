@@ -1,5 +1,16 @@
 <div hx-target="this" hx-swap="outerHTML" {% if show_as_error %}class="error"{% endif %}>
-  <label for="">Publication date</label>
-  <input type="date" hx-post="/admin/validate_date" hx-trigger="changed, blur" name="date" id="inpDate" value="{{ value }}">
+  <label for="inpDate">
+    Publication date
+    <span class="autosaved hidden">✔ Autosaved</span>
+  </label>
+  <input
+    type="date"
+    hx-post="/admin/validate_date"
+    hx-trigger="changed, blur"
+    name="date"
+    id="inpDate"
+    value="{{ value }}"
+    _="on input call doAutosave(event.target)"
+  >
   {% if error_message %}<div class='{% if show_as_error %}error-message{% endif %} small'>{{ error_message }}</div>{% endif %}
 </div>
