@@ -1,6 +1,64 @@
 module CrystalWorld::AdminControllers
   extend self
 
+  def get_images(ctx)
+    #p! IMAGEKIT_URL_ENDPOINT
+    #params = URI::Params.encode({"" => "John Doe", "offset" => "20"})
+    #response = HTTP::Client.get URI.new(
+    #  "http",
+    #  "https://api.imagekit.io/v1/files?path=blog",
+    #  query: params
+    #)
+    #enc = Base64.encode("#{IMAGEKIT_PRIVATE_KEY}:")
+    #request = HTTP::Client.new "api.imagekit.io"
+    #request = HTTP::Client.new "api.imagekit.io"
+    #request.basic_auth(IMAGEKIT_PRIVATE_KEY, "")
+    #Authorization: Basic eW91cl9wcml2YXRlX2FwaV9rZXk6
+    #response = request.get("/v1/files", headers: HTTP::Headers{"Authorization" => "Basic #{enc}"})
+    # https://ik.imagekit.io/alistairrobinson
+    #response = request.get("/v1/files")
+
+    #Crest.get(
+    #  "http://httpbin.org/get",
+    #  params: {:lang => "en"},
+    #  user_agent: "Mozilla/5.0"
+    #)
+
+    res = Crest.get(
+      "https://api.imagekit.io/v1/files?path=blog",
+      user: IMAGEKIT_PRIVATE_KEY,
+      password: ""
+    )
+
+    #p! request
+    puts "======================================================="
+    p! res.body
+
+    #Array(Int32).from_json(json_text) # => [1, 2, 3]
+    #ims = Hash(String, String | Hash(String, String)).from_json(res.body)
+    #p! items
+    ims = JSON.parse(res.body)
+    #ims.each do |im|
+    #  puts im
+    #end
+    #puts typeof(json)
+    has_ended = false
+    i = 0
+    while !has_ended
+      begin
+        p! ims[i]["url"]
+      rescue e
+        p! e
+        has_ended = true
+      end
+      i += 1
+    end
+    #p! ims[0]["url"]
+    #json.each do |im|
+    #  p! im["url"]
+    #end
+  end
+
   def sidebar_collapsed_classname(ctx)
     if ctx.request.cookies.has_key?("sidebar_collapsed")
       return ctx.request.cookies["sidebar_collapsed"].value

@@ -1,8 +1,11 @@
 require "http/server"
+require "base64"
+require "json"
 require "sqlite3"
 require "markd"
 require "front_matter"
 require "poncho"
+require "crest"
 require "crinja"
 require "crystal-argon2"
 require "sanitize"
@@ -14,12 +17,14 @@ module CrystalWorld
 
   @@env : Poncho::Parser
   @@env = Poncho.from_file ".env"
-  IMGBUCKET       = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-70/"
-  LOCAL           = @@env["ENV"] == "local"
-  CACHEBUST       = Time.monotonic.to_s.split(".")[-1]
-  TEMPLATE_FOLDER = "src/templates/"
-  SLUG_PATTERN    = "[a-z0-9-]+"
-  ID_PATTERN      = "[0-9]+"
+  IMGBUCKET             = "https://ik.imagekit.io/alistairrobinson/blog/tr:w-800,q-70/"
+  LOCAL                 = @@env["ENV"] == "local"
+  IMAGEKIT_URL_ENDPOINT = @@env["IMAGEKIT_URL_ENDPOINT"]
+  IMAGEKIT_PRIVATE_KEY  = @@env["IMAGEKIT_PRIVATE_KEY"]
+  CACHEBUST             = Time.monotonic.to_s.split(".")[-1]
+  TEMPLATE_FOLDER       = "src/templates/"
+  SLUG_PATTERN          = "[a-z0-9-]+"
+  ID_PATTERN            = "[0-9]+"
 
   server = HTTP::Server.new([
     HTTP::StaticFileHandler.new(public_dir = "./public", fallthrough = true, directory_listing = false),
@@ -97,6 +102,12 @@ module CrystalWorld
 
     when .match /^\/admin\/articles\/#{ID_PATTERN}\/edit$/
       AdminControllers.edit_article_page(ctx)
+
+
+    when "/admin/im"
+      AdminControllers.get_images(ctx)
+
+
 
     when .match /^\/#{SLUG_PATTERN}$/
       PublicControllers.article_page(ctx)

@@ -16,3 +16,5 @@ dependencies:
     github: sushichain/crystal-argon2
   sanitize:
     github: straight-shoota/sanitize
+  crest:
+    github: mamantoha/crest

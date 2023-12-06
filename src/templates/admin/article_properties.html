@@ -220,9 +220,7 @@
   end
 
   js
-    // AUTOSAVE AFTER 1s NOT TYPING
     function doAutosave(inputElm) {
-      console.log('AUTOSAVE')
       const article_id = document.getElementById("inpArticleID").value
       const draft = document.getElementById("inpDraft").value
       var duration = 1500;
@@ -267,7 +265,6 @@
     if event_detail.elt matches < button#publish />
       --- USER CLICKED PUBLISH
       set res to JSON.parse(event_detail.xhr.response)
-
       if res.published
         put "" into #error-message then remove .showing from #error-message
         put "✔ Published" into #confirm-published then add .autosaved to #confirm-published
@@ -308,32 +305,14 @@
       put "draft" into #article-status
       set #inpDraft.value to 1
       put '✔ Unpublished' into #confirm-published then add .autosaved to #confirm-published
+      if < #revert /> is not empty
+        add .hidden to #revert
+      end
       wait for 3s
       remove .autosaved from #confirm-published then put "" into #confirm-published
     end
 
   end
-  ---
-  ---def afterRequest(action, event_detail)
-  ---  if action is 'publish'
-  ---    localStorage.removeItem('article_' + #publish.dataset.articleid)
-  ---    put "Publish changes" into #publishAction
-  ---    remove .hidden from <button#unpublish/>
-  ---    put "published" into #article-status
-  ---    put "✔ Published" into #confirm-published
-  ---  end
-  ---  if action is 'unpublish'
-  ---    localStorage.removeItem('article_' + #publish.dataset.articleid)
-  ---    put "Publish" into #publishAction
-  ---    add .hidden to <button#unpublish/>
-  ---    put "draft" into #article-status
-  ---    put '✔ Unpublished' into #confirm-published
-  ---  end
-  ---  wait for 3s
-  ---  if #confirm-published is not empty
-  ---    put '' into #confirm-published
-  ---  end
-  ---end
 </script>
 <style>
   #unpublished-changes {
