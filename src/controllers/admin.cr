@@ -1,74 +1,6 @@
 module CrystalWorld::AdminControllers
   extend self
 
-  def get_images(ctx)
-    #p! IMAGEKIT_URL_ENDPOINT
-    #params = URI::Params.encode({"" => "John Doe", "offset" => "20"})
-    #response = HTTP::Client.get URI.new(
-    #  "http",
-    #  "https://api.imagekit.io/v1/files?path=blog",
-    #  query: params
-    #)
-    #enc = Base64.encode("#{IMAGEKIT_PRIVATE_KEY}:")
-    #request = HTTP::Client.new "api.imagekit.io"
-    #request = HTTP::Client.new "api.imagekit.io"
-    #request.basic_auth(IMAGEKIT_PRIVATE_KEY, "")
-    #Authorization: Basic eW91cl9wcml2YXRlX2FwaV9rZXk6
-    #response = request.get("/v1/files", headers: HTTP::Headers{"Authorization" => "Basic #{enc}"})
-    # https://ik.imagekit.io/alistairrobinson
-    #response = request.get("/v1/files")
-
-    #Crest.get(
-    #  "http://httpbin.org/get",
-    #  params: {:lang => "en"},
-    #  user_agent: "Mozilla/5.0"
-    #)
-
-    res = Crest.get(
-      "https://api.imagekit.io/v1/files?path=blog",
-      user: IMAGEKIT_PRIVATE_KEY,
-      password: ""
-    )
-
-    #Array(Int32).from_json(json_text) # => [1, 2, 3]
-    #ims = Hash(String, String | Hash(String, String)).from_json(res.body)
-    #p! items
-
-    #
-    # TODO: find out how to do this loop properly
-    # (ims.each do |im| doesn't work.)
-    #
-    #i = 0
-    #html = "<ul>"
-    #array_has_ended = false
-    #while !array_has_ended
-    #  begin
-    #    html += "<li><a href=\"#{ims[i]["url"]}\">#{ims[i]["url"]}</a></li>"
-    #  rescue e
-    #    p! e
-    #    array_has_ended = true
-    #  end
-    #  i += 1
-    #end
-    #html += "</ul>"
-    #p "That's it."
-    #ctx.response.print html
-
-    ims = JSON.parse(res.body)
-    i = 0
-    img_h = [] of String
-    array_has_ended = false
-    while !array_has_ended
-      begin
-        img_h.push(ims[i]["url"].to_s)
-        #html += "<li><a href=\"#{ims[i]["url"]}\">#{ims[i]["url"]}</a></li>"
-      rescue e
-        p! e
-        array_has_ended = true
-      end
-      i += 1
-    end
-
     TemplateRenderer.render_page(ctx: ctx,
       data: {
         "images"              => img_h,
@@ -80,8 +12,6 @@ module CrystalWorld::AdminControllers
       template_path: "admin/images.html"
     )
     return
-
-
   end
 
   def sidebar_collapsed_classname(ctx)

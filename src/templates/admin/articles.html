@@ -122,24 +122,6 @@
   }
 </script>
 <script type="text/hyperscript">
----  def searchLocally(sTerm)
----    set i to 0
----    repeat for row in <table.admin-table tr />
----      if i is not equal to 0
----        log sTerm.toLowerCase()
----        if innerHTML as String of <td.td-title/> in row contains sTerm.toLowerCase()
----            add .row-showing to row
----            remove .hidden from row
----        else
----          remove .row-showing from row
----          add .hidden to row
----        end
----      end
----      increment i
----    end
----    colourTheRows()
----  end
-
   def colourTheRows()
     repeat for tr in <table.admin-table tr.row-showing/> index i
         if i mod 2 == 0

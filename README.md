@@ -31,18 +31,22 @@ The main objectives here are:
 
 ### Screenshots
 
-![Home page](./screenshots/Screenshot-from-2023-12-01-14-50-03.png)
+![Home page](./screenshots/home-page.png)
 
-![Home page](./screenshots/Screenshot-from-2023-12-01-14-52-16.png)
+![Home page](./screenshots/article-page.png)
 
-![Home page](./screenshots/Screenshot-from-2023-12-01-14-33-56.png)
+![Home page](./screenshots/article-page-glassmorphism.png)
 
-![Home page](./screenshots/Screenshot-from-2023-12-01-14-33-14.png)
+![Home page](./screenshots/admin-articles.png)
 
-![Home page](./screenshots/Screenshot-from-2023-12-01-14-35-40.png)
+![Home page](./screenshots/admin-articles-2.png)
 
-![Home page](./screenshots/Screenshot-from-2023-12-01-14-39-08.png)
+![Home page](./screenshots/admin-edit-article.png)
 
-![Home page](./screenshots/Screenshot-from-2023-12-01-14-39-19.png)
+![Home page](./screenshots/admin-article-preview.png)
 
-![Home page](./screenshots/Screenshot-from-2023-12-01-14-33-24.png)
+![Home page](./screenshots/admin-article-properties.png)
+
+![Home page](./screenshots/admin-article-properties-2.png)
+
+![Home page](./screenshots/admin-article-properties-4.png)
