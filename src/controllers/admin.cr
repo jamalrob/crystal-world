@@ -30,33 +30,58 @@ module CrystalWorld::AdminControllers
       password: ""
     )
 
-    #p! request
-    puts "======================================================="
-    p! res.body
-
     #Array(Int32).from_json(json_text) # => [1, 2, 3]
     #ims = Hash(String, String | Hash(String, String)).from_json(res.body)
     #p! items
-    ims = JSON.parse(res.body)
-    #ims.each do |im|
-    #  puts im
+
+    #
+    # TODO: find out how to do this loop properly
+    # (ims.each do |im| doesn't work.)
+    #
+    #i = 0
+    #html = "<ul>"
+    #array_has_ended = false
+    #while !array_has_ended
+    #  begin
+    #    html += "<li><a href=\"#{ims[i]["url"]}\">#{ims[i]["url"]}</a></li>"
+    #  rescue e
+    #    p! e
+    #    array_has_ended = true
+    #  end
+    #  i += 1
     #end
-    #puts typeof(json)
-    has_ended = false
+    #html += "</ul>"
+    #p "That's it."
+    #ctx.response.print html
+
+    ims = JSON.parse(res.body)
     i = 0
-    while !has_ended
+    img_h = [] of String
+    array_has_ended = false
+    while !array_has_ended
       begin
-        p! ims[i]["url"]
+        img_h.push(ims[i]["url"].to_s)
+        #html += "<li><a href=\"#{ims[i]["url"]}\">#{ims[i]["url"]}</a></li>"
       rescue e
         p! e
-        has_ended = true
+        array_has_ended = true
       end
       i += 1
     end
-    #p! ims[0]["url"]
-    #json.each do |im|
-    #  p! im["url"]
-    #end
+
+    TemplateRenderer.render_page(ctx: ctx,
+      data: {
+        "images"              => img_h,
+        "admin_section"       => "Admin: images",
+        "user_authenticated"  => true,
+        "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
+        "admin"               => true,
+      },
+      template_path: "admin/images.html"
+    )
+    return
+
+
   end
 
   def sidebar_collapsed_classname(ctx)
@@ -91,6 +116,46 @@ module CrystalWorld::AdminControllers
           "admin"               => true,
         },
         template_path: "admin/articles.html"
+      )
+      return
+    end
+    ctx.response.redirect "/"
+  end
+
+  def admin_images(ctx)
+    if u = self.authenticated_user ctx
+      res = Crest.get(
+        "https://api.imagekit.io/v1/files?path=blog",
+        user: IMAGEKIT_PRIVATE_KEY,
+        password: ""
+      )
+      #
+      # TODO: find out how to do this parsing and looping properly
+      # - `ims.each do |im|` doesn't work
+      #
+      ims = JSON.parse(res.body)
+      i = 0
+      img_h = [] of String
+      array_has_ended = false
+      while !array_has_ended
+        begin
+          img_h.push(ims[i]["url"].to_s)
+        rescue e
+          p! e
+          array_has_ended = true
+        end
+        i += 1
+      end
+
+      TemplateRenderer.render_page(ctx: ctx,
+        data: {
+          "images"              => img_h,
+          "admin_section"       => "Admin: images",
+          "user_authenticated"  => true,
+          "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
+          "admin"               => true,
+        },
+        template_path: "admin/images.html"
       )
       return
     end

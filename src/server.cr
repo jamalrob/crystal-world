@@ -70,6 +70,9 @@ module CrystalWorld
     when "/admin/settings"
       AdminControllers.admin_settings(ctx)
 
+    when "/admin/images"
+      AdminControllers.admin_images(ctx)
+
     when "/admin/markdown-cheatsheet"
       AdminControllers.admin_markdown_cheatsheet(ctx)
 
@@ -102,12 +105,6 @@ module CrystalWorld
 
     when .match /^\/admin\/articles\/#{ID_PATTERN}\/edit$/
       AdminControllers.edit_article_page(ctx)
-
-
-    when "/admin/im"
-      AdminControllers.get_images(ctx)
-
-
 
     when .match /^\/#{SLUG_PATTERN}$/
       PublicControllers.article_page(ctx)
