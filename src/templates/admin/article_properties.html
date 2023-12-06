@@ -20,7 +20,7 @@
       autofocus
       _=" on load call set_my_value(me)
           on input call doAutosave(event.target)
-            if <#revert/> is not empty
+            if < #revert /> is not empty
               remove .hidden from #revert
             end
             if #inpDraft.value === '1'
@@ -46,7 +46,7 @@
         _=" on load call set_my_value(me)
             on input
               call doAutosave(event.target)
-              if <#revert/> is not empty
+              if < #revert /> is not empty
                 remove .hidden from #revert
               end
             end
@@ -68,7 +68,7 @@
         value="{{ article.date }}"
         _=" on load call set_my_value(me)
             on input call doAutosave(event.target)
-              if <#revert/> is not empty
+              if < #revert /> is not empty
                 remove .hidden from #revert
               end
             end
@@ -87,7 +87,7 @@
       value="{{ article.tags }}"
       _=" on load call set_my_value(me)
           on input call doAutosave(event.target)
-            if <#revert/> is not empty
+            if < #revert /> is not empty
               remove .hidden from #revert
             end
           end
@@ -106,7 +106,7 @@
       id="selImageClass"
       _=" on load call set_my_value(me)
           on change call doAutosave(event.target)
-            if <#revert/> is not empty
+            if < #revert /> is not empty
               remove .hidden from #revert
             end
           end
@@ -119,8 +119,8 @@
       <option value="full" {% if article.imageclass == "full" %}selected{% endif %}>Full screen-width</option>
     </select>
 
-    <div id="error-message">
-    </div>
+    <div id="error-message"></div>
+    <small id="unpublished-changes"></small>
 
     <div class="button-group">
 
@@ -196,6 +196,7 @@
   on load
     set article_id to #inpArticleID.value
     set global articleprops_keys to [
+      'article_' + article_id,
       'article_' + article_id + '_title',
       'article_' + article_id + '_slug',
       'article_' + article_id + '_date',
@@ -223,11 +224,15 @@
     function doAutosave(inputElm) {
       console.log('AUTOSAVE')
       const article_id = document.getElementById("inpArticleID").value
+      const draft = document.getElementById("inpDraft").value
       var duration = 1500;
       clearTimeout(inputElm._timer);
       inputElm._timer = setTimeout(()=>{
         console.log("Saving")
         localStorage.setItem(`article_${article_id}_${inputElm.name}`, inputElm.value)
+        if (draft == 0) {
+          document.getElementById("unpublished-changes").innerText = 'There are unpublished changes';
+        }
         let signalEl = inputElm.labels[0].querySelector(".autosaved")
         signalEl.classList.remove("hidden");
           setTimeout(function() {
@@ -241,6 +246,9 @@
   def are_saved_items
     repeat for key in articleprops_keys
       if localStorage.getItem(key) is not empty
+        if #inpDraft.value === '0'
+          put "There are unpublished changes" into #unpublished-changes
+        end
         return true
       end
     end
@@ -266,6 +274,7 @@
         put "published" into #article-status
         put "Publish changes" into #publishAction then remove .hidden from <button#unpublish/>
         wait for 3s
+        put "" into #unpublished-changes
         remove .autosaved from #confirm-published then put "" into #confirm-published
         repeat for key in articleprops_keys
           localStorage.removeItem(key)
@@ -292,6 +301,7 @@
       put "Publish" into #publishAction
       add .hidden to <button#unpublish/>
       put "draft" into #article-status
+      set #inpDraft.value to 1
       put '✔ Unpublished' into #confirm-published then add .autosaved to #confirm-published
       wait for 3s
       remove .autosaved from #confirm-published then put "" into #confirm-published
@@ -321,6 +331,16 @@
   ---end
 </script>
 <style>
+  #unpublished-changes {
+    display: block;
+    text-align: center;
+    background: #bc6632;
+    width: 240px;
+    margin: 0 auto;
+    border-radius: 3px;
+    margin-top: 5px;
+    color: #fff;
+  }
   label .autosaved {
     float: right;
     padding: 0 5px;
@@ -343,6 +363,14 @@
     font-size: 16px;
     opacity: 0;
     min-height: 30px;
+  }
+  .error {
+    position: relative;
+  }
+  .error .error-message {
+    position: absolute;
+    right: 0;
+    top: 2px;
   }
   #error-message.showing {
     opacity: 1;
@@ -378,7 +406,7 @@
     }
   }
 .button-group {
-  margin: 50px 0 20px;
+  margin: 20px 0 20px;
 }
 #article-props-container {
   padding: 30px;

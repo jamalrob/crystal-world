@@ -16,7 +16,7 @@
 <table
   class="admin-table"
   _=" on load
-        hide #txtSearch
+        ---hide #txtSearch
         call colourTheRows()
     "
   hx-boost="true"
@@ -25,10 +25,12 @@
   <thead>
     <tr>
       <th>
+        <!--
         <button _="on click toggle the *display of #txtSearch">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         </button>
-        <input type="search" placeholder="Search by title" id="txtSearch">
+        <input type="search" placeholder="Search by title" id="txtSearch" _="on keyup call searchLocally(my value)">
+        -->
       </th>
       <th>
           <button
@@ -58,7 +60,7 @@
   <tbody>
     {% for a in articles %}
     <tr class="row-showing">
-      <td>
+      <td class="td-title">
         <a href="/admin/articles/{{ a.id }}/edit">{{ a.title }}</a>
       </td>
       <td>{% if a.draft %}<span class="tag">Draft</span>{% else %}{{ a.date }}{% endif %}</td>
@@ -120,6 +122,24 @@
   }
 </script>
 <script type="text/hyperscript">
+---  def searchLocally(sTerm)
+---    set i to 0
+---    repeat for row in <table.admin-table tr />
+---      if i is not equal to 0
+---        log sTerm.toLowerCase()
+---        if innerHTML as String of <td.td-title/> in row contains sTerm.toLowerCase()
+---            add .row-showing to row
+---            remove .hidden from row
+---        else
+---          remove .row-showing from row
+---          add .hidden to row
+---        end
+---      end
+---      increment i
+---    end
+---    colourTheRows()
+---  end
+
   def colourTheRows()
     repeat for tr in <table.admin-table tr.row-showing/> index i
         if i mod 2 == 0

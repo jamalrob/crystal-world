@@ -49,7 +49,7 @@
         on input
           call do_html(me.innerText)
         on keyup
-          call doAutosave(me)
+          call doMarkdownAutosave(me)
         on scroll
           set scrollTop of #pre-preview to my.scrollTop
         on keydown[key is 'Tab']
@@ -170,7 +170,7 @@
 
   js
     // AUTOSAVE AFTER 1s NOT TYPING
-    function doAutosave(inputElm) {
+    function doMarkdownAutosave(inputElm) {
       var duration = 1500;
       clearTimeout(inputElm._timer);
       inputElm._timer = setTimeout(()=>{
@@ -183,7 +183,7 @@
         }, 2000);
       }, duration);
     }
-    return { doAutosave }
+    return { doMarkdownAutosave }
   end
 </script>
 <style>
@@ -344,7 +344,6 @@ div#pre-preview p:first-child {
   margin: 2.4rem auto;
   width: 80vw;
   min-width: 1000px;
-  max-height: 89vh;
   /*background: #fffdf8;*/
   background-color: #0a4775;
   overflow-y: auto;
