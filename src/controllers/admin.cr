@@ -1,19 +1,6 @@
 module CrystalWorld::AdminControllers
   extend self
 
-    TemplateRenderer.render_page(ctx: ctx,
-      data: {
-        "images"              => img_h,
-        "admin_section"       => "Admin: images",
-        "user_authenticated"  => true,
-        "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
-        "admin"               => true,
-      },
-      template_path: "admin/images.html"
-    )
-    return
-  end
-
   def sidebar_collapsed_classname(ctx)
     if ctx.request.cookies.has_key?("sidebar_collapsed")
       return ctx.request.cookies["sidebar_collapsed"].value
