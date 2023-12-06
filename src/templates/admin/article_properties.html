@@ -193,6 +193,17 @@
 </div>
 
 <script type="text/hyperscript">
+  on load
+    set article_id to #inpArticleID.value
+    set global articleprops_keys to [
+      'article_' + article_id + '_title',
+      'article_' + article_id + '_slug',
+      'article_' + article_id + '_date',
+      'article_' + article_id + '_tags',
+      'article_' + article_id + '_imageClass'
+    ]
+  end
+
   js
     function slugify(str) {
         return String(str)
@@ -228,15 +239,7 @@
   end
 
   def are_saved_items
-    set article_id to #inpArticleID.value
-    set storage_keys to [
-      'article_' + article_id + '_title',
-      'article_' + article_id + '_slug',
-      'article_' + article_id + '_date',
-      'article_' + article_id + '_tags',
-      'article_' + article_id + '_imageClass'
-    ]
-    repeat for key in storage_keys
+    repeat for key in articleprops_keys
       if localStorage.getItem(key) is not empty
         return true
       end
@@ -261,9 +264,12 @@
         put "" into #error-message then remove .showing from #error-message
         put "✔ Published" into #confirm-published then add .autosaved to #confirm-published
         put "published" into #article-status
-        put "Publish changes" into #publishAction then remove .hidden from < button#unpublish />
+        put "Publish changes" into #publishAction then remove .hidden from <button#unpublish/>
         wait for 3s
         remove .autosaved from #confirm-published then put "" into #confirm-published
+        repeat for key in articleprops_keys
+          localStorage.removeItem(key)
+        end
       else
         set msgs to ""
         repeat for field in res.errors
