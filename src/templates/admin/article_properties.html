@@ -274,7 +274,12 @@
         put "published" into #article-status
         put "Publish changes" into #publishAction then remove .hidden from <button#unpublish/>
         wait for 3s
-        put "" into #unpublished-changes
+        if < #unpublished-changes /> is not empty
+          put "" into #unpublished-changes
+        end
+        if < #revert /> is not empty
+          add .hidden to #revert
+        end
         remove .autosaved from #confirm-published then put "" into #confirm-published
         repeat for key in articleprops_keys
           localStorage.removeItem(key)
