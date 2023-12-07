@@ -1,4 +1,7 @@
 {% extends "layouts/base.html" %}
+{% block extra_js %}
+<script src="/scripts/article-state.js"></script>
+{% endblock %}
 {% block admin_sidebar %}
 <div id="sidebar" hx-boost="true" class="{{ sidebar_collapsed }}">
   <button
