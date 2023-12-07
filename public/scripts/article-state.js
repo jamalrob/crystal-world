@@ -48,35 +48,56 @@ const Article = class {
 
   states = {
     published:{
+      signalling:{
+        do:() => {
+          this.confAfterRequest.innerHTML = "✔ Published";
+          this.confAfterRequest.classList.add("autosaved");
+        }
+      },
       changes:{
         do:() => {
           this.isDraft = 0;
           this.alertUnpublishedChanges.innerText = 'There are unpublished changes';
           this.btRevert.classList.remove("hidden");
           this.btUnpublish.classList.remove("hidden");
+          this.btPublish.classList.remove("hidden");
           this.alertArticleStatus.innerHTML = "published";
+          this.confAfterRequest.innerHTML = "";
+          this.confAfterRequest.classList.remove("autosaved");
         }
       },
       no_changes: {
         do:() => {
           this.isDraft = 0;
           this.btUnpublish.classList.remove("hidden");
+          this.btPublish.classList.add("hidden");
           this.alertUnpublishedChanges.innerText = '';
           if(this.btRevert !== null) {
             this.btRevert.classList.add("hidden");
           }
           this.alertArticleStatus.innerHTML = "published";
+          this.confAfterRequest.innerHTML = "";
+          this.confAfterRequest.classList.remove("autosaved");
         }
       }
     },
     draft:{
+      signalling:{
+        do:() => {
+          this.confAfterRequest.innerHTML = "✔ Unpublished";
+          this.confAfterRequest.classList.add("autosaved");
+        }
+      },
       do:() => {
         this.isDraft = 1;
         this.btUnpublish.classList.add("hidden");
+        this.btPublish.classList.remove("hidden");
         if(this.btRevert !== null) {
           this.btRevert.classList.add("hidden");
         }
         this.alertArticleStatus.innerHTML = "draft";
+        this.confAfterRequest.innerHTML = "";
+        this.confAfterRequest.classList.remove("autosaved");
       }
     }
   }
@@ -99,8 +120,6 @@ const Article = class {
         this.currentState.do();
       },
       autosave:(inpEl) => {
-        var msAfterInputStops = 1500;
-        var msShowAlertFor = 2000;
         clearTimeout(inpEl._timer);
         inpEl._timer = setTimeout(()=>{
           localStorage.setItem(`article_${a.articleId}_${inpEl.name}`, inpEl.value)
@@ -108,7 +127,7 @@ const Article = class {
           signalEl.classList.remove("hidden");
           setTimeout(() => {
             signalEl.classList.add("hidden");
-          }, msShowAlertFor);
+          }, 2000);
 
           if (this.isDraft !== 1) {
             this.dataSource = "localStorage"
@@ -117,20 +136,9 @@ const Article = class {
             this.currentState = this.states.draft;
           }
           this.currentState.do();
-        }, msAfterInputStops);
+        }, 1500);
       },
       publish:() => {
-
-        /*
-          Briefly show the signal
-        */
-        this.confAfterRequest.innerHTML = "✔ Published";
-        this.confAfterRequest.classList.add("autosaved");
-        setTimeout(() => {
-          this.confAfterRequest.innerHTML = "";
-          this.confAfterRequest.classList.remove("autosaved");
-        }, 2500);
-
         /*
           Remove the localStorage items
           for the current article
@@ -142,20 +150,26 @@ const Article = class {
           localStorage.removeItem(storageKey);
         }
         this.dataSource = "db";
-        this.currentState = this.states.published.no_changes;
-        this.currentState.do();
+        /*
+          Set to signalling state for a couple
+          of seconds
+        */
+        this.states.published.signalling.do()
+        setTimeout(() => {
+          this.currentState = this.states.published.no_changes;
+          this.currentState.do();
+        }, 2500);
       },
       unpublish:() => {
-
-        this.confAfterRequest.innerHTML = "✔ Unpublished";
-        this.confAfterRequest.classList.add("autosaved");
+        /*
+          Set to signalling state for a couple
+          of seconds
+        */
+        this.states.draft.signalling.do()
         setTimeout(() => {
-          this.confAfterRequest.innerHTML = "";
-          this.confAfterRequest.classList.remove("autosaved");
+          this.currentState = this.states.draft;
+          this.currentState.do();
         }, 2500);
-
-        this.currentState = this.states.draft;
-        this.currentState.do();
       },
     }
   }
