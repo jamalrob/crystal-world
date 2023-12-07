@@ -19,21 +19,6 @@
       value="{{ article.title }}"
       autofocus
     >
-
-<!--
-      _=" on load call set_my_value(me)
-          on input call doAutosave(event.target)
-            if < #revert /> is not empty
-              remove .hidden from #revert
-            end
-            if #inpDraft.value === '1'
-              set #inpSlug.value to slugify(my value)
-              call doAutosave(#inpSlug)
-            end
-          end
-      "
--->
-
     <div hx-target="this" hx-swap="outerHTML">
       <label for="inpSlug">
         Slug
@@ -47,16 +32,6 @@
         id="inpSlug"
         value="{{ article.slug }}"
       >
-<!--
-        _=" on load call set_my_value(me)
-            on input
-              call doAutosave(event.target)
-              if < #revert /> is not empty
-                remove .hidden from #revert
-              end
-            end
-            "
--->
     </div>
 
     <div hx-target="this" hx-swap="outerHTML">
@@ -72,15 +47,6 @@
         id="inpDate"
         value="{{ article.date }}"
       >
-<!--
-        _=" on load call set_my_value(me)
-            on input call doAutosave(event.target)
-              if < #revert /> is not empty
-                remove .hidden from #revert
-              end
-            end
-            "
--->
     </div>
 
     <label for="inpTags">
@@ -93,15 +59,6 @@
       id="inpTags"
       value="{{ article.tags }}"
     >
-<!--
-      _=" on load call set_my_value(me)
-          on input call doAutosave(event.target)
-            if < #revert /> is not empty
-              remove .hidden from #revert
-            end
-          end
-      "
--->
     <label for="inpMainImage">Main image</label>
     <input type="file" name="main_image" id="inpMainImage" accept="image/png, image/jpeg">
 
@@ -113,15 +70,6 @@
       name="imageClass"
       id="selImageClass"
     >
-<!--
-        _=" on load call set_my_value(me)
-          on change call doAutosave(event.target)
-            if < #revert /> is not empty
-              remove .hidden from #revert
-            end
-          end
-          "
--->
     <option value="">--Choose--</option>
       <option value="small" {% if article.imageclass == "small" %}selected{% endif %}>Small</option>
       <option value="medium" {% if article.imageclass == "medium" %}selected{% endif %}>Medium</option>
@@ -139,14 +87,6 @@
         id="revert"
         class="fullwidth has-icon {% if article.draft %}hidden{% endif %}"
       >
-<!--
-        _=" on load
-              if are_saved_items()
-                remove .hidden from me
-              end
-            end
-          "
--->
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rotate-ccw"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
         Revert properties to published
       </button>

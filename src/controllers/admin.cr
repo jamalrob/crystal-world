@@ -332,6 +332,24 @@ module CrystalWorld::AdminControllers
           )
         ]
 
+        #
+        # Should return the value or an amended value from
+        # every validator, but not necessarily any errors.
+        # Only if there are errors should we return / prevent publication
+        #
+        # Should return this from validators instead of current:
+        # Example:
+
+        # hash = {
+        #   "name" => "slug",
+        #   "value" => "#{value}-#{Random.new.hex(8)}",
+        #   "error" => {
+        #     "error_message" => "Duplicate slug found and unique ID added",
+        #     "show_as_error" => false
+        #   }
+        # }
+        #
+
         validation_errors.each do |e|;
           if e.has_key?("error_message")
             ctx.response.print %({"errors": #{validation_errors.to_json}, "published": false})

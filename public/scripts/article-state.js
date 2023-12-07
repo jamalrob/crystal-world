@@ -1,27 +1,15 @@
 const Article = class {
 
-  dataSource = "db";
-
-  constructor({
-    articleId,
-    isDraft,
-    alertUnpublishedChanges,
-    alertArticleStatus,
-    confAfterRequest,
-    btRevert,
-    btPublish,
-    btUnpublish,
-    inps
-  }) {
-    this.articleId = articleId;
-    this.isDraft = isDraft;
-    this.alertUnpublishedChanges = alertUnpublishedChanges;
-    this.alertArticleStatus = alertArticleStatus;
-    this.confAfterRequest = confAfterRequest;
-    this.btRevert = btRevert;
-    this.btPublish = btPublish;
-    this.btUnpublish = btUnpublish;
-    this.inputs = inps;
+  constructor(params) {
+    this.articleId = params.articleId;
+    this.isDraft = params.isDraft;
+    this.alertUnpublishedChanges = params.alertUnpublishedChanges;
+    this.alertArticleStatus = params.alertArticleStatus;
+    this.confAfterRequest = params.confAfterRequest;
+    this.btRevert = params.btRevert;
+    this.btPublish = params.btPublish;
+    this.btUnpublish = params.btUnpublish;
+    this.inputs = params.inps;
     this.dataSource = this.getDataSource();
     this.events.mainLoad()
   }
