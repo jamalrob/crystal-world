@@ -167,9 +167,9 @@
             article_id: document.getElementById('unpublish').dataset.articleid
         }"
         hx-select=".status"
-        hx-on::after-request="afterRequest(event.detail)"
+        hx-on::after-request="afterRequest('unpublish')"
       >
-      <!-- hx-on::after-request="afterRequest('unpublish')" -->
+      <!-- hx-on::after-request="afterRequest(event.detail)" -->
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
         <span id="unpublishAction">Unpublish</span>
         <span class="spinner spinner--hidden" id="unpublishLoading"></span>
@@ -206,13 +206,25 @@
 
     dataSource = "db";
 
-    constructor({articleId, isDraft, alertUnpublishedChanges, alertArticleStatus, btRevert, btPublish, inps}) {
+    constructor({
+      articleId,
+      isDraft,
+      alertUnpublishedChanges,
+      alertArticleStatus,
+      confAfterRequest,
+      btRevert,
+      btPublish,
+      btUnpublish,
+      inps
+    }) {
       this.articleId = articleId;
       this.isDraft = isDraft;
       this.alertUnpublishedChanges = alertUnpublishedChanges;
       this.alertArticleStatus = alertArticleStatus;
+      this.confAfterRequest = confAfterRequest;
       this.btRevert = btRevert;
       this.btPublish = btPublish;
+      this.btUnpublish = btUnpublish;
       this.inputs = inps;
       this.dataSource = this.getDataSource();
       this.events.mainLoad()
@@ -231,8 +243,7 @@
           let storageKey = storageKeyPrefix + "_" + input.name
           if (localStorage.getItem(storageKey) !== null) {
             input.value = localStorage.getItem(storageKey);
-            console.log("this.initialDataSource = 'localStorage';")
-            return "localStorage";
+            return "localStorage"; // Got one, so return
           }
         }
       }
@@ -242,15 +253,18 @@
       published:{
         changes:{
           do:() => {
+            this.isDraft = 0;
             this.alertUnpublishedChanges.innerText = 'There are unpublished changes';
             this.btRevert.classList.remove("hidden");
+            this.btUnpublish.classList.remove("hidden");
             this.alertArticleStatus.innerHTML = "published";
           }
         },
         no_changes: {
           do:() => {
+            this.isDraft = 0;
+            this.btUnpublish.classList.remove("hidden");
             this.alertUnpublishedChanges.innerText = '';
-            console.log("h2")
             if(this.btRevert !== null) {
               this.btRevert.classList.add("hidden");
             }
@@ -260,6 +274,8 @@
       },
       draft:{
         do:() => {
+          this.isDraft = 1;
+          this.btUnpublish.classList.add("hidden");
           if(this.btRevert !== null) {
             this.btRevert.classList.add("hidden");
           }
@@ -296,25 +312,37 @@
             setTimeout(() => {
               signalEl.classList.add("hidden");
             }, msShowAlertFor);
-            this.dataSource = "localStorage"
-            this.currentState = this.states.published.changes;
+
+            if (this.isDraft !== 1) {
+              this.dataSource = "localStorage"
+              this.currentState = this.states.published.changes;
+            } else {
+              this.currentState = this.states.draft;
+            }
             this.currentState.do();
           }, msAfterInputStops);
         },
         publish:() => {
+
           /*
-            Remove items in localStorage
-            for this article
+            Briefly show the signal
+          */
+          this.confAfterRequest.innerHTML = "✔ Published";
+          this.confAfterRequest.classList.add("autosaved");
+          setTimeout(() => {
+            this.confAfterRequest.innerHTML = "";
+            this.confAfterRequest.classList.remove("autosaved");
+          }, 2500);
+
+          /*
+            Remove the localStorage items
+            for the current article
           */
           let storageKeyPrefix = 'article_' + this.articleId;
           localStorage.removeItem(storageKeyPrefix)
           for(const input of this.inputs){
             let storageKey = storageKeyPrefix + "_" + input.name
-            if (localStorage.getItem(storageKey) !== null) {
-              input.value = localStorage.removeItem(storageKey);
-              console.log("this.initialDataSource = 'localStorage';")
-              break;
-            }
+            localStorage.removeItem(storageKey);
           }
           this.dataSource = "db";
           this.currentState = this.states.published.no_changes;
@@ -322,9 +350,11 @@
         },
         unpublish:() => {
 
+          this.confAfterRequest.innerHTML = "✔ Unpublished";
+          this.confAfterRequest.classList.add("autosaved");
           setTimeout(() => {
-            document.getElementById("confirm-published").innerHTML = "✔ Unpublished";
-            document.getElementById("confirm-published").classList.add(".autosaved");
+            this.confAfterRequest.innerHTML = "";
+            this.confAfterRequest.classList.remove("autosaved");
           }, 2500);
 
           this.currentState = this.states.draft;
@@ -335,20 +365,15 @@
 
   } // Class
 
-  // Input els
-  //
-  //for(inp of inps) {
-  //  if(inp.type !== "hidden") {
-  //    inpArr.push(document.getElementById(inp.id))
-  //  }
-  //}
   const a = new Article({
     articleId: document.getElementById("inpArticleID").value,
     isDraft: document.getElementById("inpDraft").value,
     alertUnpublishedChanges: document.getElementById("unpublished-changes"),
     alertArticleStatus: document.getElementById("article-status"),
+    confAfterRequest: document.getElementById("confirm-published"),
     btRevert: document.getElementById("revert"),
     btPublish: document.getElementById("publish"),
+    btUnpublish: document.getElementById("unpublish"),
     inps: document.querySelectorAll("input, select")
   })
 
@@ -364,31 +389,16 @@
   }
 
   function afterRequest(whatHappened) {
+    console.log("whatHappened: " + whatHappened);
     switch(whatHappened) {
       case "publish":
         a.events.publish()
+        break;
+      case "unpublish":
+        a.events.unpublish()
+        break;
     }
   }
-
-
-    //get somethingInLocalStorage() {
-    //  let ar = [
-    //    'article_' + article_id,
-    //    'article_' + article_id + '_title',
-    //    'article_' + article_id + '_slug',
-    //    'article_' + article_id + '_date',
-    //    'article_' + article_id + '_tags',
-    //    'article_' + article_id + '_imageClass'
-    //  ]
-    //}
-
-
-  // EVENTS
-
-  //frm.addEventListener("load", function(){
-  //  console.log("pop")
-  //  a.events.mainLoad();
-  //})
 
   a.inputs.forEach((inp) => {
     if(inp.type !== "hidden") {
