@@ -41,32 +41,57 @@ module CrystalWorld::AdminControllers
 
   def admin_images(ctx)
     if u = self.authenticated_user ctx
-      res = Crest.get(
-        "https://api.imagekit.io/v1/files?path=blog",
-        user: IMAGEKIT_PRIVATE_KEY,
-        password: ""
-      )
-      #
-      # TODO: find out how to do this parsing and looping properly
-      # - `ims.each do |im|` doesn't work
-      #
-      ims = JSON.parse(res.body)
-      i = 0
-      img_h = [] of String
-      array_has_ended = false
-      while !array_has_ended
-        begin
-          img_h.push(ims[i]["url"].to_s)
-        rescue e
-          p! e
-          array_has_ended = true
+
+      img_arr = [] of String
+      if !LOCAL
+        res = Crest.get(
+          "https://api.imagekit.io/v1/files?path=blog",
+          user: IMAGEKIT_PRIVATE_KEY,
+          password: ""
+        )
+        #
+        # TODO: find out how to do this parsing and looping properly
+        # - `ims.each do |im|` doesn't work
+        #
+        ims = JSON.parse(res.body)
+        i = 0
+        array_has_ended = false
+        while !array_has_ended
+          begin
+            img_arr.push(ims[i]["url"].to_s)
+          rescue e
+            p! e
+            array_has_ended = true
+          end
+          i += 1
         end
-        i += 1
+      else
+        img_arr = [
+          "https://ik.imagekit.io/alistairrobinson/blog/crash-by-jg-ballard.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/mynah.png",
+          "https://ik.imagekit.io/alistairrobinson/blog/logicomix-an-epic-search.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/profile.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/_House-of-New-Life.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/great-moscow-state-circus.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/me-in-kazakhstan.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/metro-ulitsa-1905.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/post-war-soviet-modernist-architecture.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/jg-ballards-crash-is-it-science-fiction.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/nova-by-samuel-r-delany-1968.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/_Gorky-Art-Theatre-A-Savin-WikiCommons.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/profile2_J9se4LBCU.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/mynah3.png",
+          "https://ik.imagekit.io/alistairrobinson/blog/logomynah3_W9qR2Ve9Z.png",
+          "https://ik.imagekit.io/alistairrobinson/blog/duckrabbit_large.png",
+          "https://ik.imagekit.io/alistairrobinson/blog/perceptual-constancy_large.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/bird1.png",
+          "https://ik.imagekit.io/alistairrobinson/blog/trouble-on-triton-samuel-r-delany-1976.jpg",
+        ]
       end
 
       TemplateRenderer.render_page(ctx: ctx,
         data: {
-          "images"              => img_h,
+          "images"              => img_arr,
           "admin_section"       => "Admin: images",
           "user_authenticated"  => true,
           "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),

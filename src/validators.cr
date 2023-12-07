@@ -17,7 +17,7 @@ module CrystalWorld::Validators
       if !articles.empty?
         error.merge!({
           "error_message" => "Duplicate slug found and unique ID added",
-          "value" => "#{value}-#{Random.new.hex(3)}",
+          "value" => "#{value}-#{Random.new.hex(8)}",
           "show_as_error" => false
         })
       end

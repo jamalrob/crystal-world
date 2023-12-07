@@ -18,6 +18,9 @@
       id="inpTitle"
       value="{{ article.title }}"
       autofocus
+    >
+
+<!--
       _=" on load call set_my_value(me)
           on input call doAutosave(event.target)
             if < #revert /> is not empty
@@ -29,7 +32,7 @@
             end
           end
       "
-    >
+-->
 
     <div hx-target="this" hx-swap="outerHTML">
       <label for="inpSlug">
@@ -43,6 +46,8 @@
         name="slug"
         id="inpSlug"
         value="{{ article.slug }}"
+      >
+<!--
         _=" on load call set_my_value(me)
             on input
               call doAutosave(event.target)
@@ -51,7 +56,7 @@
               end
             end
             "
-      >
+-->
     </div>
 
     <div hx-target="this" hx-swap="outerHTML">
@@ -66,6 +71,8 @@
         name="date"
         id="inpDate"
         value="{{ article.date }}"
+      >
+<!--
         _=" on load call set_my_value(me)
             on input call doAutosave(event.target)
               if < #revert /> is not empty
@@ -73,7 +80,7 @@
               end
             end
             "
-      >
+-->
     </div>
 
     <label for="inpTags">
@@ -85,6 +92,8 @@
       name="tags"
       id="inpTags"
       value="{{ article.tags }}"
+    >
+<!--
       _=" on load call set_my_value(me)
           on input call doAutosave(event.target)
             if < #revert /> is not empty
@@ -92,8 +101,7 @@
             end
           end
       "
-    >
-
+-->
     <label for="inpMainImage">Main image</label>
     <input type="file" name="main_image" id="inpMainImage" accept="image/png, image/jpeg">
 
@@ -104,15 +112,17 @@
     <select
       name="imageClass"
       id="selImageClass"
-      _=" on load call set_my_value(me)
+    >
+<!--
+        _=" on load call set_my_value(me)
           on change call doAutosave(event.target)
             if < #revert /> is not empty
               remove .hidden from #revert
             end
           end
           "
-    >
-      <option value="">--Choose--</option>
+-->
+    <option value="">--Choose--</option>
       <option value="small" {% if article.imageclass == "small" %}selected{% endif %}>Small</option>
       <option value="medium" {% if article.imageclass == "medium" %}selected{% endif %}>Medium</option>
       <option value="large" {% if article.imageclass == "large" %}selected{% endif %}>Full column</option>
@@ -124,25 +134,22 @@
 
     <div class="button-group">
 
-      {% if not article.draft %}
-      <!--  TODO: HAVE TO CHECK IF THERE ARE ANY NEW SAVED UNPUBLISHED VALUES
-            COS WE CAN'T SHOW THIS BUTTON IF THERE AREN'T
-            : on load
-      -->
+
       <button
         id="revert"
-        class="fullwidth has-icon hidden"
+        class="fullwidth has-icon {% if article.draft %}hidden{% endif %}"
+      >
+<!--
         _=" on load
               if are_saved_items()
                 remove .hidden from me
               end
             end
           "
-      >
+-->
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rotate-ccw"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
         Revert properties to published
       </button>
-      {% endif %}
 
 
       <!--
@@ -160,7 +167,7 @@
             article_id: document.getElementById('unpublish').dataset.articleid
         }"
         hx-select=".status"
-        hx-on::after-request="after_request(event.detail)"
+        hx-on::after-request="afterRequest(event.detail)"
       >
       <!-- hx-on::after-request="afterRequest('unpublish')" -->
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
@@ -180,8 +187,9 @@
             article_id:   document.getElementById('publish').dataset.articleid
         }"
         hx-select=".status"
-        hx-on::after-request="after_request(event.detail)"
+        hx-on::after-request="afterRequest('publish')"
       >
+      <!--afterRequest(event.detail)-->
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         <span id="publishAction">Publish {% if not article.draft %}changes{% endif %}</span>
         <span class="spinner spinner--hidden" id="publishLoading"></span>
@@ -192,128 +200,205 @@
 
 </div>
 
-<script type="text/hyperscript">
-  on load
-    set article_id to #inpArticleID.value
-    set global articleprops_keys to [
-      'article_' + article_id,
-      'article_' + article_id + '_title',
-      'article_' + article_id + '_slug',
-      'article_' + article_id + '_date',
-      'article_' + article_id + '_tags',
-      'article_' + article_id + '_imageClass'
-    ]
-  end
+<script>
 
-  js
-    function slugify(str) {
-        return String(str)
-        .normalize('NFKD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9 -]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-');
+  const Article = class {
+
+    dataSource = "db";
+
+    constructor({articleId, isDraft, alertUnpublishedChanges, alertArticleStatus, btRevert, btPublish, inps}) {
+      this.articleId = articleId;
+      this.isDraft = isDraft;
+      this.alertUnpublishedChanges = alertUnpublishedChanges;
+      this.alertArticleStatus = alertArticleStatus;
+      this.btRevert = btRevert;
+      this.btPublish = btPublish;
+      this.inputs = inps;
+      this.dataSource = this.getDataSource();
+      this.events.mainLoad()
     }
-    return { slugify };
-  end
 
-  js
-    function doAutosave(inputElm) {
-      const article_id = document.getElementById("inpArticleID").value
-      const draft = document.getElementById("inpDraft").value
-      var duration = 1500;
-      clearTimeout(inputElm._timer);
-      inputElm._timer = setTimeout(()=>{
-        console.log("Saving")
-        localStorage.setItem(`article_${article_id}_${inputElm.name}`, inputElm.value)
-        if (draft == 0) {
-          document.getElementById("unpublished-changes").innerText = 'There are unpublished changes';
+    getDataSource() {
+      /*
+        Find out if there are any items in localStorage
+        for this article
+      */
+      let storageKeyPrefix = 'article_' + this.articleId;
+      if (localStorage.getItem(storageKeyPrefix) !== null){
+        return "localStorage";
+      } else {
+        for(const input of this.inputs){
+          let storageKey = storageKeyPrefix + "_" + input.name
+          if (localStorage.getItem(storageKey) !== null) {
+            input.value = localStorage.getItem(storageKey);
+            console.log("this.initialDataSource = 'localStorage';")
+            return "localStorage";
+          }
         }
-        let signalEl = inputElm.labels[0].querySelector(".autosaved")
-        signalEl.classList.remove("hidden");
-          setTimeout(function() {
-            signalEl.classList.add("hidden");
-        }, 2000);
-      }, duration);
+      }
     }
-    return { doAutosave }
-  end
 
-  def are_saved_items
-    repeat for key in articleprops_keys
-      if localStorage.getItem(key) is not empty
-        if #inpDraft.value === '0'
-          put "There are unpublished changes" into #unpublished-changes
-        end
-        return true
-      end
-    end
-  end
+    states = {
+      published:{
+        changes:{
+          do:() => {
+            this.alertUnpublishedChanges.innerText = 'There are unpublished changes';
+            this.btRevert.classList.remove("hidden");
+            this.alertArticleStatus.innerHTML = "published";
+          }
+        },
+        no_changes: {
+          do:() => {
+            this.alertUnpublishedChanges.innerText = '';
+            console.log("h2")
+            if(this.btRevert !== null) {
+              this.btRevert.classList.add("hidden");
+            }
+            this.alertArticleStatus.innerHTML = "published";
+          }
+        }
+      },
+      draft:{
+        do:() => {
+          if(this.btRevert !== null) {
+            this.btRevert.classList.add("hidden");
+          }
+          this.alertArticleStatus.innerHTML = "draft";
+        }
+      }
+    }
 
-  def set_my_value(el)
-    log "SET_MY_VALUE"
-    set article_id to #inpArticleID.value
-    set storage_key to 'article_' + article_id + '_' + el.name
-    if localStorage.getItem(storage_key) is not empty
-      set el.value to localStorage.getItem(storage_key)
-    end
-  end
+    get events() {
+      /*
+        These determine the current state
+      */
+      return {
+        mainLoad:() => {
+          if(parseInt(this.isDraft) == 0){
+            if(this.dataSource === "localStorage"){
+              this.currentState = this.states.published.changes;
+            } else {
+              this.currentState = this.states.published.no_changes;
+            }
+          } else {
+            this.currentState = this.states.draft;
+          }
+          this.currentState.do();
+        },
+        autosave:(inpEl) => {
+          var msAfterInputStops = 1500;
+          var msShowAlertFor = 2000;
+          clearTimeout(inpEl._timer);
+          inpEl._timer = setTimeout(()=>{
+            localStorage.setItem(`article_${a.articleId}_${inpEl.name}`, inpEl.value)
+            let signalEl = inpEl.labels[0].querySelector(".autosaved")
+            signalEl.classList.remove("hidden");
+            setTimeout(() => {
+              signalEl.classList.add("hidden");
+            }, msShowAlertFor);
+            this.dataSource = "localStorage"
+            this.currentState = this.states.published.changes;
+            this.currentState.do();
+          }, msAfterInputStops);
+        },
+        publish:() => {
+          /*
+            Remove items in localStorage
+            for this article
+          */
+          let storageKeyPrefix = 'article_' + this.articleId;
+          localStorage.removeItem(storageKeyPrefix)
+          for(const input of this.inputs){
+            let storageKey = storageKeyPrefix + "_" + input.name
+            if (localStorage.getItem(storageKey) !== null) {
+              input.value = localStorage.removeItem(storageKey);
+              console.log("this.initialDataSource = 'localStorage';")
+              break;
+            }
+          }
+          this.dataSource = "db";
+          this.currentState = this.states.published.no_changes;
+          this.currentState.do();
+        },
+        unpublish:() => {
 
-  def after_request(event_detail)
-    if event_detail.elt matches < button#publish />
-      --- USER CLICKED PUBLISH
-      set res to JSON.parse(event_detail.xhr.response)
-      if res.published
-        put "" into #error-message then remove .showing from #error-message
-        put "✔ Published" into #confirm-published then add .autosaved to #confirm-published
-        put "published" into #article-status
-        put "Publish changes" into #publishAction then remove .hidden from <button#unpublish/>
-        wait for 3s
-        if < #unpublished-changes /> is not empty
-          put "" into #unpublished-changes
-        end
-        if < #revert /> is not empty
-          add .hidden to #revert
-        end
-        remove .autosaved from #confirm-published then put "" into #confirm-published
-        repeat for key in articleprops_keys
-          localStorage.removeItem(key)
-        end
-      else
-        set msgs to ""
-        repeat for field in res.errors
-          if field.error_message is not really equal to undefined
-            if msgs is not equal to ""
-              append "<br>" to msgs
-            end
-            append `${field.name}: ${field.error_message}` to msgs
-          end
-        end
+          setTimeout(() => {
+            document.getElementById("confirm-published").innerHTML = "✔ Unpublished";
+            document.getElementById("confirm-published").classList.add(".autosaved");
+          }, 2500);
 
-        if msgs is not really equal to ""
-          put msgs into #error-message
-          add .showing to #error-message
-        end
-      end
-    else
-      --- USER CLICKED UNPUBLISH
-      localStorage.removeItem('article_' + #publish.dataset.articleid)
-      put "Publish" into #publishAction
-      add .hidden to <button#unpublish/>
-      put "draft" into #article-status
-      set #inpDraft.value to 1
-      put '✔ Unpublished' into #confirm-published then add .autosaved to #confirm-published
-      if < #revert /> is not empty
-        add .hidden to #revert
-      end
-      wait for 3s
-      remove .autosaved from #confirm-published then put "" into #confirm-published
-    end
+          this.currentState = this.states.draft;
+          this.currentState.do();
+        },
+      }
+    }
 
-  end
+  } // Class
+
+  // Input els
+  //
+  //for(inp of inps) {
+  //  if(inp.type !== "hidden") {
+  //    inpArr.push(document.getElementById(inp.id))
+  //  }
+  //}
+  const a = new Article({
+    articleId: document.getElementById("inpArticleID").value,
+    isDraft: document.getElementById("inpDraft").value,
+    alertUnpublishedChanges: document.getElementById("unpublished-changes"),
+    alertArticleStatus: document.getElementById("article-status"),
+    btRevert: document.getElementById("revert"),
+    btPublish: document.getElementById("publish"),
+    inps: document.querySelectorAll("input, select")
+  })
+
+  function slugify(str) {
+    return String(str)
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9 -]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+  }
+
+  function afterRequest(whatHappened) {
+    switch(whatHappened) {
+      case "publish":
+        a.events.publish()
+    }
+  }
+
+
+    //get somethingInLocalStorage() {
+    //  let ar = [
+    //    'article_' + article_id,
+    //    'article_' + article_id + '_title',
+    //    'article_' + article_id + '_slug',
+    //    'article_' + article_id + '_date',
+    //    'article_' + article_id + '_tags',
+    //    'article_' + article_id + '_imageClass'
+    //  ]
+    //}
+
+
+  // EVENTS
+
+  //frm.addEventListener("load", function(){
+  //  console.log("pop")
+  //  a.events.mainLoad();
+  //})
+
+  a.inputs.forEach((inp) => {
+    if(inp.type !== "hidden") {
+      inp.addEventListener("input", (ev) => {
+        a.events.autosave(ev.currentTarget);
+      })
+    }
+  })
 </script>
+
 <style>
   #unpublished-changes {
     display: block;

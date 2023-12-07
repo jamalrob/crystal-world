@@ -89,20 +89,21 @@ module CrystalWorld::Data
 
   def create_draft
     DB.open "sqlite3://./crw.db" do |db|
-      newid = db.query_one( "SELECT seq FROM sqlite_sequence " \
-                          "WHERE name = 'articles' LIMIT 1;",
-                          as: {Int32}
-          ) + 1
-      newslug = "new-draft-#{newid}"
-      insert = db.exec("INSERT INTO articles " \
-              "(slug, title, tags, date, date_created, main_image, image_class, draft, content) " \
-              " VALUES (?, ?, ?, ?, DATE('now'), ?, ?, ?, ?);",
-        "#{newslug}", "New Draft #{newid}", "", "", "", "", 1, ""
-      )
-      #return self.get_article(insert.last_insert_id)
-      return newid
-    rescue e
-      p! e
+      begin
+        newid = db.query_one( "SELECT seq FROM sqlite_sequence " \
+                            "WHERE name = 'articles' LIMIT 1;",
+                            as: {Int32}
+            ) + 1
+        newslug = "new-draft-#{newid}-#{Random.new.hex(8)}"
+        insert = db.exec("INSERT INTO articles " \
+                "(slug, title, tags, date, date_created, main_image, image_class, draft, content) " \
+                " VALUES (?, ?, ?, ?, DATE('now'), ?, ?, ?, ?);",
+          "#{newslug}", "New Draft #{newid}", "", "", "", "", 1, ""
+        )
+        return newid
+      rescue e
+        p! e
+      end
     end
   end
 
