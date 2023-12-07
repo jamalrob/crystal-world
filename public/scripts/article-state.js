@@ -31,18 +31,19 @@ const Article = class {
       Find out if there are any items in localStorage
       for this article
     */
+    let dSrc = "db";
     let storageKeyPrefix = 'article_' + this.articleId;
     if (localStorage.getItem(storageKeyPrefix) !== null){
-      return "localStorage";
-    } else {
-      for(const input of this.inputs){
-        let storageKey = storageKeyPrefix + "_" + input.name
-        if (localStorage.getItem(storageKey) !== null) {
-          input.value = localStorage.getItem(storageKey);
-          return "localStorage"; // Got one, so return
-        }
+      dSrc = "localStorage";
+    }
+    for(const input of this.inputs){
+      let storageKey = storageKeyPrefix + "_" + input.name
+      if (localStorage.getItem(storageKey) !== null) {
+        input.value = localStorage.getItem(storageKey);
+        dSrc = "localStorage";
       }
     }
+    return dSrc;
   }
 
   states = {
