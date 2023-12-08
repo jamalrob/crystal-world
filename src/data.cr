@@ -94,7 +94,7 @@ module CrystalWorld::Data
                             "WHERE name = 'articles' LIMIT 1;",
                             as: {Int32}
             ) + 1
-        newslug = "new-draft-#{newid}-#{Random.new.hex(8)}"
+        newslug = "new-draft-#{newid}-#{Random.new.hex(4)}"
         insert = db.exec("INSERT INTO articles " \
                 "(slug, title, tags, date, date_created, main_image, image_class, draft, content) " \
                 " VALUES (?, ?, ?, ?, DATE('now'), ?, ?, ?, ?);",
@@ -338,7 +338,6 @@ module CrystalWorld::Data
           slug, title, date, tags, main_image, image_class, 0, md, article_id
         )
       rescue ex
-        puts ex
         return nil
       end
     end

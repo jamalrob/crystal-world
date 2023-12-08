@@ -2,43 +2,63 @@ module CrystalWorld::Validators
   extend self
 
   def validate_slug(value, article_id)
-    error = {
+    hash = {
       "name" => "slug",
-      "value" => value
-    } of String => String | Bool
+      "value" => value,
+      "article_id" => article_id
+    } of String => String | Bool | Hash(String, String | Bool)
     if !value.match /^#{SLUG_PATTERN}$/
-      error_message = "Only lower case letters, numbers, and hyphens"
-      error.merge!({
-        "error_message" => "Only lower case letters, numbers, and hyphens",
+      hash["publish"] = false
+      error = {
+        "message" => "Only lower case letters, numbers, and hyphens",
         "show_as_error" => true
-      })
+      }
     else
+      hash["publish"] = true
       articles = Data.get_articles_by_slug(value, exclude_article_id: article_id.to_i)
       if !articles.empty?
-        error.merge!({
-          "error_message" => "Duplicate slug found and unique ID added",
-          "value" => "#{value}-#{Random.new.hex(8)}",
+        #
+        # DUPLICATE SLUG
+        #
+        # Update the value to send back
+        #
+        # Although we're calling this an error,
+        # if it's the controller's publish method
+        # that's calling, we don't want to stop
+        # publication in this instance, since
+        # we're making the slug unique by appending
+        # a random string.
+        #
+        # So we leave hash["publish"] = true
+        #
+        hash["value"] = "#{value}-#{Random.new.hex(4)}"
+        hash["error"] = {
+          "message" => "Duplicate slug found and unique ID added",
           "show_as_error" => false
-        })
+        }
       end
     end
-    return error
+    return hash
   end
 
-  def validate_date(value)
-    error = {
+  def validate_date(value, article_id)
+    hash = {
       "name" => "date",
-      "value" => value
-    } of String => String | Bool
+      "value" => value,
+      "article_id" => article_id
+    } of String => String | Bool | Hash(String, String | Bool)
     begin
-      Time.parse_utc(value, "%Y-%m-%d").to_s("%Y-%m-%d")
+      Time.parse_utc(value, "%Y-%m-%d")
     rescue Time::Format::Error
-      error.merge!({
-        "error_message" => "Please enter a valid date",
+      hash["publish"] = false
+      hash["error"] = {
+        "message" => "Please enter a valid date",
         "show_as_error" => true
-      })
+      }
+      return hash
     end
-    return error
+    hash["publish"] = true
+    return hash
   end
 
   def validate_tags(value)

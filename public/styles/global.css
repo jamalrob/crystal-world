@@ -282,6 +282,7 @@ form .error-message {
 form input + div.small {
   font-size: 0.7rem;
   text-align: right;
+  margin-top: -8px;
 }
 form .error input {
   background-color: pink;

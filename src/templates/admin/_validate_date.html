@@ -1,16 +1,31 @@
-<div hx-target="this" hx-swap="outerHTML" {% if show_as_error %}class="error"{% endif %}>
+<div hx-target="this" hx-swap="outerHTML" {% if error %}{% if error.show_as_error %}class="error"{% endif %}{% endif %}>
   <label for="inpDate">
     Publication date
     <span class="autosaved hidden">✔ Autosaved</span>
   </label>
   <input
     type="date"
+    data-articleid="{{ article_id }}"
     hx-post="/admin/validate_date"
     hx-trigger="changed, blur"
     name="date"
     id="inpDate"
     value="{{ value }}"
-    _="on input call doAutosave(event.target)"
   >
-  {% if error_message %}<div class='{% if show_as_error %}error-message{% endif %} small'>{{ error_message }}</div>{% endif %}
+  <!-- _="on input call doAutosave(event.target)" -->
+  {% if error %}<div class='{% if error.show_as_error %}error-message{% endif %} small'>{{ error.message }}</div>{% endif %}
 </div>
+<script>
+  var inp = document.getElementById('inpDate');
+  var articleId = inp.dataset.articleid;
+  var newValue = inp.value
+  var localDate = localStorage.getItem(`article_${articleId}_date`);
+
+  if (newValue !== localDate) {
+    a.events.autosave(inp);
+  }
+
+  inp.addEventListener("input, changed", function(){
+    a.events.autosave(inp);
+  })
+</script>

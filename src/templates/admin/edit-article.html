@@ -139,11 +139,6 @@
     else
       show <button.close/>
     end
-    if content is 'props'
-      add .narrow to .modal
-    else
-      remove .narrow from .modal
-    end
     add .visible to .modal-container
     if content is 'preview'
       call hljs.highlightAll()

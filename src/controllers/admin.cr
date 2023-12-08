@@ -303,7 +303,7 @@ module CrystalWorld::AdminControllers
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
       TemplateRenderer.render_partial(
         ctx: ctx,
-        data: Validators.validate_date(params["date"]),
+        data: Validators.validate_date(params["date"], params["article_id"]),
         template_path: "admin/_validate_date.html"
       )
     end
@@ -319,18 +319,28 @@ module CrystalWorld::AdminControllers
         #
         # FINAL VALIDATION
         #
-        validation_errors = [
+        validation_results = [
           Validators.validate_date(
-            value: params["date"]
+            value: params["date"],
+            article_id: params["article_id"]
           ),
           Validators.validate_slug(
             value: params["slug"],
             article_id: params["article_id"]
           ),
-          Validators.validate_tags(
-            value: params["tags"]
-          )
+          #Validators.validate_tags(
+          #  value: params["tags"]
+          #)
         ]
+
+        validation_results.each do |res|
+          if res["publish"] == false
+            ctx.response.print %({
+              "validation_results": #{validation_results.to_json}
+            })
+            return
+          end
+        end
 
         #
         # Should return the value or an amended value from
@@ -350,19 +360,12 @@ module CrystalWorld::AdminControllers
         # }
         #
 
-        validation_errors.each do |e|;
-          if e.has_key?("error_message")
-            ctx.response.print %({"errors": #{validation_errors.to_json}, "published": false})
-            return
-          end
-        end
-
         puts "NO ERRORS"
-        params.each do |pm|
-          if pm[0] != "md"
-            pp pm
-          end
-        end
+        #params.each do |pm|
+        #  if pm[0] != "md"
+        #    pp pm
+        #  end
+        #end
 
         publish = Data.publish_article(
           article_id: article_id,
@@ -376,8 +379,10 @@ module CrystalWorld::AdminControllers
           md: params["md"]
         )
         #ctx.response.print %({"result": "Published"})
-        pp validation_errors
-        ctx.response.print %({"errors": #{validation_errors.to_json}, "published": true})
+        ctx.response.print %({
+          "validation_results": #{validation_results.to_json},
+          "published": true
+        })
         return
       end
       PublicControllers.error_404 ctx
