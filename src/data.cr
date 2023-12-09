@@ -90,7 +90,7 @@ module CrystalWorld::Data
   def delete_article(id)
     DB.open "sqlite3://./crw.db" do |db|
       begin
-        return db.exec("UPDATE articles SET deleted = 1 WHERE id = ?", id)
+        return db.exec("UPDATE articles SET deleted = 1, date = '' WHERE id = ?", id)
       rescue e
         puts e.message
       end
@@ -162,7 +162,7 @@ module CrystalWorld::Data
     end
   end
 
-  def get_deleted_articles()
+  def get_deleted_articles(order_by="date DESC")
     DB.open "sqlite3://./crw.db" do |db|
       articles = [] of Hash(String, String | Array(String) | Int32 | Nil)
       results = (db.query_all "SELECT id, slug, title, date, date_created, tags, draft " \

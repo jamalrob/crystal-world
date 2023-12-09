@@ -39,6 +39,26 @@ module CrystalWorld::AdminControllers
     ctx.response.redirect "/"
   end
 
+  def admin_bin(ctx)
+    if u = self.authenticated_user ctx
+      articles = Data.get_deleted_articles(order_by: "date_created DESC")
+      TemplateRenderer.render_page(
+        ctx: ctx,
+        data: {
+          "title"               => "Admin: bin",
+          "admin_section"       => "Admin: bin",
+          "articles"            => articles,
+          "user_authenticated"  => true,
+          "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
+          "admin"               => true,
+        },
+        template_path: "admin/bin.html"
+      )
+      return
+    end
+    ctx.response.redirect "/"
+  end
+
   def admin_images(ctx)
     if u = self.authenticated_user ctx
 

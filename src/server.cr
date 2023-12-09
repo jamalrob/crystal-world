@@ -73,6 +73,9 @@ module CrystalWorld
     when "/admin/images"
       AdminControllers.admin_images(ctx)
 
+    when "/admin/bin"
+      AdminControllers.admin_bin(ctx)
+
     when "/admin/markdown-cheatsheet"
       AdminControllers.admin_markdown_cheatsheet(ctx)
 
