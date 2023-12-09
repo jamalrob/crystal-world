@@ -86,6 +86,10 @@ module CrystalWorld::AdminControllers
           i += 1
         end
       else
+
+        # Use a fixture so as to avoid calling the
+        # ImageKit API
+
         img_arr = [
           "https://ik.imagekit.io/alistairrobinson/blog/crash-by-jg-ballard.jpg",
           "https://ik.imagekit.io/alistairrobinson/blog/mynah.png",

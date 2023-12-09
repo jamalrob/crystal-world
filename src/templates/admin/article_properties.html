@@ -10,6 +10,7 @@
     <div class="col">
       <input type="hidden" name="article_id" id="inpArticleID" value="{{ article.id }}">
       <input type="hidden" name="draft" id="inpDraft" value="{{ article.draft }}">
+
       <label for="inpTitle">
         Title
         <span class="autosaved hidden">✔ Autosaved</span>
@@ -21,7 +22,8 @@
         value="{{ article.title }}"
         autofocus
       >
-      <div hx-target="this" hx-swap="outerHTML">
+
+      <div hx-target="this" hx-swap="outerHTML" class="inline-validated">
         <label for="inpSlug">
           Slug
           <span class="autosaved hidden">✔ Autosaved</span>
@@ -36,7 +38,7 @@
         >
       </div>
 
-      <div hx-target="this" hx-swap="outerHTML" id="date-container">
+      <div hx-target="this" hx-swap="outerHTML" class="inline-validated">
         <label for="inpDate">
           Publication date
           <span class="autosaved hidden">✔ Autosaved</span>
@@ -143,25 +145,59 @@
 <script>
 (function(window) {
   const a = new Article({
-    articleId: document.getElementById("inpArticleID").value,
-    isDraft: document.getElementById("inpDraft").value,
-    alertUnpublishedChanges: document.getElementById("unpublished-changes"),
-    alertArticleStatus: document.getElementById("article-status"),
-    confAfterRequest: document.getElementById("confirm-published"),
-    btRevert: document.getElementById("revert"),
-    btPublish: document.getElementById("publish"),
-    btUnpublish: document.getElementById("unpublish"),
-    inps: document.querySelectorAll("input, select"),
-    btPublishAction: document.getElementById("publishAction")
+    articleId:                document.getElementById("inpArticleID").value,
+    isDraft:                  document.getElementById("inpDraft").value,
+    alertUnpublishedChanges:  document.getElementById("unpublished-changes"),
+    alertArticleStatus:       document.getElementById("article-status"),
+    confAfterRequest:         document.getElementById("confirm-published"),
+    btRevert:                 document.getElementById("revert"),
+    btPublish:                document.getElementById("publish"),
+    btUnpublish:              document.getElementById("unpublish"),
+    alertPublishErrors:       document.getElementById("error-message"),
+    inps:                     document.querySelectorAll("input, select"),
+    btPublishAction:          document.getElementById("publishAction")
   })
 
-  a.inputs.forEach((inp) => {
-    if(inp.type !== "hidden") {
-      inp.addEventListener("input", (ev) => {
-        a.events.autosave(ev.currentTarget);
-      })
-    }
+  autosaveEvents = ["input", "changed"];
+  autoSaveElementIDs = [
+    "inpSlug",
+    "inpDate",
+    "inpTitle",
+    "inpDate",
+    "inpTags",
+    "inpMainImage",
+    "selImageClass"
+  ]
+
+  autosaveEvents.forEach((eventType) => {
+    document.body.addEventListener(eventType, (ev) => {
+      if (autoSaveElementIDs.includes(ev.target.id)) {
+        a.events.autosave(ev.target)
+      }
+    })
   })
+
+  document.body.addEventListener('htmx:afterRequest', (evt) => {
+    const myTarget = evt.detail.target;
+    switch (myTarget.id) {
+      case "publish":
+        let res = JSON.parse(evt.detail.xhr.response);
+        errors = false;
+        for(const inp of res.validation_results) {
+          if (inp.hasOwnProperty("error")) {
+            errors = true;
+            a.events.receivePublishError(inp.error)
+          }
+        }
+        if(!errors) {
+          a.events.publish()
+        }
+        break;
+      case "unpublish":
+        a.events.unpublish()
+        break;
+    }
+  });
 
   function slugify(str) {
     return String(str)
@@ -174,133 +210,75 @@
     .replace(/-+/g, '-');
   }
 
-  document.body.addEventListener('htmx:afterRequest', function(evt) {
-    const myTarget = evt.detail.target;
-    if (myTarget === document.getElementById("publish")) {
-
-      // Deal with the response to the attempt to publish
-      let res = JSON.parse(evt.detail.xhr.response);
-      errors = false;
-      for(const inp of res.validation_results) {
-        if (inp.hasOwnProperty("error")) {
-          errors = true;
-          document.getElementById("error-message").innerHTML = inp.error.message;
-          document.getElementById("error-message").classList.remove("hidden");
-        }
-      }
-      if(!errors) {
-        document.getElementById("error-message").innerHTML = "";
-        document.getElementById("error-message").classList.add("hidden");
-        a.events.publish()
-      }
-
-
-    } else if (myTarget === document.getElementById("unpublish")) {
-      document.getElementById("error-message").innerHTML = "";
-      document.getElementById("error-message").classList.add("hidden");
-      a.events.unpublish()
-    }
-    //evt.detail.parameters['auth_token'] = getAuthToken(); // add a new parameter into the mix
-    //alert("ja")
-  });
-
-  function afterRequest(whatHappened, eventDetail) {
-
-    if (whatHappened === "publish") {
-      let res = JSON.parse(eventDetail.xhr.response);
-      errors = false;
-      for(const inp of res.validation_results) {
-        if (inp.hasOwnProperty("error")) {
-          errors = true;
-          document.getElementById("error-message").innerHTML = inp.error.message;
-          document.getElementById("error-message").classList.remove("hidden");
-        }
-      }
-
-      if(!errors) {
-        document.getElementById("error-message").innerHTML = "";
-        document.getElementById("error-message").classList.add("hidden");
-        a.events.publish()
-      }
-    } else if (whatHappened === "unpublish") {
-      document.getElementById("error-message").innerHTML = "";
-      document.getElementById("error-message").classList.add("hidden");
-      a.events.unpublish()
-    }
-  }
-
 }(window))
 </script>
 <style>
-  #unpublished-changes {
-    display: block;
-    text-align: center;
-    background: #bc6632;
-    width: 240px;
-    margin: 0 auto;
-    border-radius: 2px;
-    margin-top: 17px;
-    color: #fff;
-    float: right;
+#unpublished-changes {
+  display: block;
+  text-align: center;
+  background: #bc6632;
+  width: 240px;
+  margin: 0 auto;
+  border-radius: 2px;
+  margin-top: 17px;
+  color: #fff;
+  float: right;
+}
+label .autosaved {
+  float: right;
+  padding: 0 5px;
+  border-radius: 2px;
+  line-height: 0.98rem;
+  font-size: 0.7rem;
+}
+#confirm-published {
+  padding: 0 4px;
+  border-radius: 2px;
+  display: inline-block;
+  margin-left: 15px;
+}
+#error-message {
+  color: white;
+  background-color: rgb(198, 57, 57);
+  padding: 5px 10px;
+  border-radius: 3px;
+  line-height: 0.9rem;
+  font-size: 16px;
+  min-height: 30px;
+}
+.error {
+  position: relative;
+}
+#error-message.showing {
+  opacity: 1;
+}
+.spinner {
+  position: absolute;
+  top: calc(50% - 0.55rem);
+  width: 1rem;
+  height: 1rem;
+  border: 0.15rem solid #ffc000;
+  border-bottom-width: 0.15rem;
+  border-bottom-style: solid;
+  border-bottom-color: rgb(255, 192, 0);
+  border-bottom: 0.25rem solid rgba(0,0,0,0);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 9999;
+  margin: 0 0 10px 10px;
+  margin-left: 8px;
+}
+.spinner--hidden {
+  display: none;
+}
+.htmx-request {
+  display: unset;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
-  label .autosaved {
-    float: right;
-    padding: 0 5px;
-    border-radius: 2px;
-    line-height: 0.98rem;
-    font-size: 0.7rem;
-  }
-  #confirm-published {
-    padding: 0 4px;
-    border-radius: 2px;
-    display: inline-block;
-    margin-left: 15px;
-  }
-  #error-message {
-    color: white;
-    background-color: rgb(198, 57, 57);
-    padding: 5px 10px;
-    border-radius: 3px;
-    line-height: 0.9rem;
-    font-size: 16px;
-    min-height: 30px;
-  }
-  .error {
-    position: relative;
-  }
-  #error-message.showing {
-    opacity: 1;
-  }
-  .spinner {
-    position: absolute;
-    top: calc(50% - 0.55rem);
-    width: 1rem;
-    height: 1rem;
-    border: 0.15rem solid #ffc000;
-    border-bottom-width: 0.15rem;
-    border-bottom-style: solid;
-    border-bottom-color: rgb(255, 192, 0);
-    border-bottom: 0.25rem solid rgba(0,0,0,0);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    z-index: 9999;
-    margin: 0 0 10px 10px;
-    margin-left: 8px;
-  }
-
-  .spinner--hidden {
-    display: none;
-  }
-
-  .htmx-request {
-    display: unset;
-  }
-
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
+}
 .button-group {
   margin: 20px 0 20px;
 }

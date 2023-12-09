@@ -1,4 +1,9 @@
-<div hx-target="this" hx-swap="outerHTML" {% if error %}{% if error.show_as_error %}class="error"{% endif %}{% endif %}>
+<div
+  class="inline-validated"
+  hx-target="this"
+  hx-swap="outerHTML"
+  {% if error %}{% if error.show_as_error %}class="error"{% endif %}{% endif %}
+>
   <label for="inpDate">
     Publication date
     <span class="autosaved hidden">✔ Autosaved</span>

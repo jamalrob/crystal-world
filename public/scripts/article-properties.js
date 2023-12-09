@@ -11,6 +11,7 @@ const Article = class {
     this.btUnpublish = params.btUnpublish;
     this.inputs = params.inps;
     this.btPublishAction = params.btPublishAction;
+    this.alertPublishErrors = params.alertPublishErrors
     this.dataSource = this.getDataSource();
     this.events.mainLoad()
   }
@@ -91,6 +92,12 @@ const Article = class {
         this.confAfterRequest.classList.remove("autosaved");
         this.btPublishAction.innerHTML = "Publish"
       }
+    },
+    publishError:{
+      UIState:(error) => {
+        this.alertPublishErrors.innerHTML = error.message;
+        this.alertPublishErrors.classList.remove("hidden");
+      }
     }
   }
 
@@ -150,6 +157,11 @@ const Article = class {
         this.currentState = this.states.published.noChanges;
         this.currentState.UIState();
       }, 2500);
+      /*
+        Remove error messages
+      */
+      this.alertPublishErrors.innerHTML = "";
+      this.alertPublishErrors.classList.add("hidden");
     },
     unpublish:() => {
       /*
@@ -161,7 +173,16 @@ const Article = class {
         this.currentState = this.states.draft;
         this.currentState.UIState();
       }, 2500);
+      /*
+        Remove error messages
+      */
+      this.alertPublishErrors.innerHTML = "";
+      this.alertPublishErrors.classList.add("hidden");
     },
+    receivePublishError:(error) => {
+      this.currentState = this.states.publishError;
+      this.currentState.UIState(error);
+    }
   }
 
 }
