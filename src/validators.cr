@@ -49,7 +49,7 @@ module CrystalWorld::Validators
     } of String => String | Bool | Hash(String, String | Bool)
     begin
       Time.parse_utc(value, "%Y-%m-%d")
-    rescue Time::Format::Error
+    rescue ex : Time::Format::Error | ArgumentError
       hash["publish"] = false
       hash["error"] = {
         "message" => "Please enter a valid date",

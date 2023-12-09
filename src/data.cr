@@ -77,10 +77,20 @@ module CrystalWorld::Data
     end
   end
 
+  def purge_article(id)
+    DB.open "sqlite3://./crw.db" do |db|
+      begin
+        return db.exec("DELETE FROM articles WHERE id = ?", id)
+      rescue e
+        puts e.message
+      end
+    end
+  end
+
   def delete_article(id)
     DB.open "sqlite3://./crw.db" do |db|
       begin
-        return db.exec("DELETE FROM articles where id = ?", id)
+        return db.exec("UPDATE articles SET deleted = 1 WHERE id = ?", id)
       rescue e
         puts e.message
       end
@@ -134,17 +144,55 @@ module CrystalWorld::Data
       if exclude_article_id > 0
         articles = (db.query_all  "SELECT id " \
                                   "FROM articles " \
-                                  "WHERE slug = ? AND id != ?;",
+                                  "WHERE slug = ? AND id != ? " \
+                                  "AND deleted = 0;",
                                   slug, exclude_article_id,
                                   as: {Int32}
         )
       else
         articles = (db.query_all  "SELECT id " \
                                   "FROM articles " \
-                                  "WHERE slug = ?;",
+                                  "WHERE slug = ? " \
+                                  "AND deleted = 0;",
                                   slug,
                                   as: {Int32}
         )
+      end
+      return articles
+    end
+  end
+
+  def get_deleted_articles()
+    DB.open "sqlite3://./crw.db" do |db|
+      articles = [] of Hash(String, String | Array(String) | Int32 | Nil)
+      results = (db.query_all "SELECT id, slug, title, date, date_created, tags, draft " \
+                                  "FROM articles WHERE deleted = 1 ORDER BY #{order_by};",
+                                  as: {Int32, String, String, String?, String, String?, Int32}
+            )
+      results.each do |result|
+        begin
+          pub_date = Time.parse_utc(result[3].to_s, "%Y-%m-%d").to_s("%Y-%m-%d")
+          pub_date_friendly = Time.parse_utc(result[3].to_s, "%Y-%m-%d").to_s("%d %B %Y")
+        rescue e
+          puts "Currently not published or bad pub date format"
+        end
+
+        tags = result[5]
+        if tags
+          tags = tags.delete(' ').split(",")
+        end
+        this_row = {
+          "id"                    => result[0],
+          "slug"                  => result[1],
+          "title"                 => result[2],
+          "date"                  => pub_date,
+          "friendly_date"         => pub_date_friendly,
+          "date_created"          => Time.parse_utc(result[4], "%Y-%m-%d").to_s("%Y-%m-%d"),
+          "friendly_date_created" => Time.parse_utc(result[4], "%Y-%m-%d").to_s("%d %B %Y"),
+          "draft"                 => result[6],
+          "tags"                  => tags,
+        }
+        articles.push(this_row)
       end
       return articles
     end
@@ -154,21 +202,17 @@ module CrystalWorld::Data
     DB.open "sqlite3://./crw.db" do |db|
       articles = [] of Hash(String, String | Array(String) | Int32 | Nil)
       begin
-        # 0 id
-        # 1 slug
-        # 2 title
-        # 3 date
-        # 4 date_created
-        # 5 tags
-        # 6 draft
         if include_drafts
           results = (db.query_all "SELECT id, slug, title, date, date_created, tags, draft " \
-                                  "FROM articles ORDER BY #{order_by};",
+                                  "FROM articles WHERE deleted = 0 ORDER BY #{order_by};",
                                   as: {Int32, String, String, String?, String, String?, Int32}
             )
         else
           results = (db.query_all "SELECT id, slug, title, date, date_created, tags, draft " \
-                                  "FROM articles WHERE draft = 0 ORDER BY #{order_by};",
+                                  "FROM articles WHERE deleted = 0 " \
+                                  "AND draft = 0 " \
+                                  "AND date < DATETIME('now') " \
+                                  "ORDER BY #{order_by};",
                                   as: {Int32, String, String, String?, String, String?, Int32}
             )
         end
@@ -210,7 +254,8 @@ module CrystalWorld::Data
       articles = [] of Hash(String, String | Int32)
       begin
         results = db.query_all("SELECT id, slug, title, date, tags FROM articles " \
-                               "WHERE draft = 0 AND tags LIKE '%' || ? || '%' " \
+                               "WHERE deleted = 0 AND draft = 0 " \
+                               "AND tags LIKE '%' || ? || '%' " \
                                "ORDER BY date DESC;",
           tag,
           as: {Int32, String, String, String, String}

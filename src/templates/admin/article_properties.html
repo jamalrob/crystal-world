@@ -36,7 +36,7 @@
         >
       </div>
 
-      <div hx-target="this" hx-swap="outerHTML">
+      <div hx-target="this" hx-swap="outerHTML" id="date-container">
         <label for="inpDate">
           Publication date
           <span class="autosaved hidden">✔ Autosaved</span>
@@ -107,9 +107,8 @@
               article_id: document.getElementById('unpublish').dataset.articleid
           }"
           hx-select=".status"
-          hx-on::after-request="afterRequest('unpublish', event.detail)"
         >
-        <!-- hx-on::after-request="afterRequest(event.detail)" -->
+        <!-- hx-on::after-request="afterRequest('unpublish', event.detail)" -->
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
           <span id="unpublishAction">Unpublish</span>
           <span class="spinner spinner--hidden" id="unpublishLoading"></span>
@@ -127,9 +126,8 @@
               article_id:   document.getElementById('publish').dataset.articleid
           }"
           hx-select=".status"
-          hx-on::after-request="afterRequest('publish', event.detail)"
         >
-        <!--afterRequest(event.detail)-->
+        <!-- hx-on::after-request="afterRequest('publish', event.detail)" -->
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
           <span id="publishAction">Publish</span>
           <span class="spinner spinner--hidden" id="publishLoading"></span>
@@ -141,179 +139,10 @@
     </div><!-- col -->
 
   </form>
-
-
-
 </div>
 <script>
-  var Article = class {
-
-    constructor(params) {
-      this.articleId = params.articleId;
-      this.isDraft = params.isDraft;
-      this.alertUnpublishedChanges = params.alertUnpublishedChanges;
-      this.alertArticleStatus = params.alertArticleStatus;
-      this.confAfterRequest = params.confAfterRequest;
-      this.btRevert = params.btRevert;
-      this.btPublish = params.btPublish;
-      this.btUnpublish = params.btUnpublish;
-      this.inputs = params.inps;
-      this.btPublishAction = params.btPublishAction;
-      this.dataSource = this.getDataSource();
-      this.events.mainLoad()
-    }
-
-    getDataSource() {
-      /*
-        Find out if there are any items in localStorage
-        for this article
-      */
-      let dSrc = "db";
-      let storageKeyPrefix = 'article_' + this.articleId;
-      if (localStorage.getItem(storageKeyPrefix) !== null){
-        dSrc = "localStorage";
-      }
-      for(const input of this.inputs){
-        let storageKey = storageKeyPrefix + "_" + input.name
-        if (localStorage.getItem(storageKey) !== null) {
-          input.value = localStorage.getItem(storageKey);
-          dSrc = "localStorage";
-        }
-      }
-      return dSrc;
-    }
-
-    states = {
-      published:{
-        signalling:{
-          do:() => {
-            this.confAfterRequest.innerHTML = "✔ Published";
-            this.confAfterRequest.classList.add("autosaved");
-          }
-        },
-        changes:{
-          do:() => {
-            this.isDraft = 0;
-            this.alertUnpublishedChanges.innerText = 'There are unpublished changes';
-            this.btRevert.classList.remove("hidden");
-            this.btUnpublish.classList.remove("hidden");
-            this.btPublish.classList.remove("hidden");
-            this.alertArticleStatus.innerHTML = "published";
-            this.confAfterRequest.innerHTML = "";
-            this.confAfterRequest.classList.remove("autosaved");
-            this.btPublishAction.innerHTML = "Publish changes"
-          }
-        },
-        no_changes: {
-          do:() => {
-            this.isDraft = 0;
-            this.btUnpublish.classList.remove("hidden");
-            this.btPublish.classList.add("hidden");
-            this.alertUnpublishedChanges.innerText = '';
-            if(this.btRevert !== null) {
-              this.btRevert.classList.add("hidden");
-            }
-            this.alertArticleStatus.innerHTML = "published";
-            this.confAfterRequest.innerHTML = "";
-            this.confAfterRequest.classList.remove("autosaved");
-          }
-        }
-      },
-      draft:{
-        signalling:{
-          do:() => {
-            this.confAfterRequest.innerHTML = "✔ Unpublished";
-            this.confAfterRequest.classList.add("autosaved");
-          }
-        },
-        do:() => {
-          this.isDraft = 1;
-          this.btUnpublish.classList.add("hidden");
-          this.btPublish.classList.remove("hidden");
-          if(this.btRevert !== null) {
-            this.btRevert.classList.add("hidden");
-          }
-          this.alertArticleStatus.innerHTML = "draft";
-          this.confAfterRequest.innerHTML = "";
-          this.confAfterRequest.classList.remove("autosaved");
-          this.btPublishAction.innerHTML = "Publish"
-        }
-      }
-    }
-
-    events = {
-      /*
-        These determine the current state
-      */
-      mainLoad:() => {
-        if(parseInt(this.isDraft) == 0){
-          if(this.dataSource === "localStorage"){
-            this.currentState = this.states.published.changes;
-          } else {
-            this.currentState = this.states.published.no_changes;
-          }
-        } else {
-          this.currentState = this.states.draft;
-        }
-        this.currentState.do();
-      },
-      autosave:(inpEl) => {
-        clearTimeout(inpEl._timer);
-        inpEl._timer = setTimeout(()=>{
-          localStorage.setItem(`article_${a.articleId}_${inpEl.name}`, inpEl.value)
-          let signalEl = inpEl.labels[0].querySelector(".autosaved")
-          signalEl.classList.remove("hidden");
-          setTimeout(() => {
-            signalEl.classList.add("hidden");
-          }, 2000);
-
-          if (this.isDraft !== 1) {
-            this.dataSource = "localStorage"
-            this.currentState = this.states.published.changes;
-          } else {
-            this.currentState = this.states.draft;
-          }
-          this.currentState.do();
-        }, 1500);
-      },
-      publish:() => {
-        /*
-          Remove the localStorage items
-          for the current article
-        */
-        let storageKeyPrefix = 'article_' + this.articleId;
-        localStorage.removeItem(storageKeyPrefix)
-        for(const input of this.inputs){
-          let storageKey = storageKeyPrefix + "_" + input.name
-          localStorage.removeItem(storageKey);
-        }
-        this.dataSource = "db";
-        /*
-          Set to signalling state for a couple
-          of seconds
-        */
-        this.states.published.signalling.do()
-        setTimeout(() => {
-          this.currentState = this.states.published.no_changes;
-          this.currentState.do();
-        }, 2500);
-      },
-      unpublish:() => {
-        /*
-          Set to signalling state for a couple
-          of seconds
-        */
-        this.states.draft.signalling.do()
-        setTimeout(() => {
-          this.currentState = this.states.draft;
-          this.currentState.do();
-        }, 2500);
-      },
-    }
-
-  } // Class
-
-  var a = new Article({
+(function(window) {
+  const a = new Article({
     articleId: document.getElementById("inpArticleID").value,
     isDraft: document.getElementById("inpDraft").value,
     alertUnpublishedChanges: document.getElementById("unpublished-changes"),
@@ -326,6 +155,14 @@
     btPublishAction: document.getElementById("publishAction")
   })
 
+  a.inputs.forEach((inp) => {
+    if(inp.type !== "hidden") {
+      inp.addEventListener("input", (ev) => {
+        a.events.autosave(ev.currentTarget);
+      })
+    }
+  })
+
   function slugify(str) {
     return String(str)
     .normalize('NFKD')
@@ -336,6 +173,36 @@
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-');
   }
+
+  document.body.addEventListener('htmx:afterRequest', function(evt) {
+    const myTarget = evt.detail.target;
+    if (myTarget === document.getElementById("publish")) {
+
+      // Deal with the response to the attempt to publish
+      let res = JSON.parse(evt.detail.xhr.response);
+      errors = false;
+      for(const inp of res.validation_results) {
+        if (inp.hasOwnProperty("error")) {
+          errors = true;
+          document.getElementById("error-message").innerHTML = inp.error.message;
+          document.getElementById("error-message").classList.remove("hidden");
+        }
+      }
+      if(!errors) {
+        document.getElementById("error-message").innerHTML = "";
+        document.getElementById("error-message").classList.add("hidden");
+        a.events.publish()
+      }
+
+
+    } else if (myTarget === document.getElementById("unpublish")) {
+      document.getElementById("error-message").innerHTML = "";
+      document.getElementById("error-message").classList.add("hidden");
+      a.events.unpublish()
+    }
+    //evt.detail.parameters['auth_token'] = getAuthToken(); // add a new parameter into the mix
+    //alert("ja")
+  });
 
   function afterRequest(whatHappened, eventDetail) {
 
@@ -360,18 +227,10 @@
       document.getElementById("error-message").classList.add("hidden");
       a.events.unpublish()
     }
-
   }
 
-  a.inputs.forEach((inp) => {
-    if(inp.type !== "hidden") {
-      inp.addEventListener("input", (ev) => {
-        a.events.autosave(ev.currentTarget);
-      })
-    }
-  })
+}(window))
 </script>
-
 <style>
   #unpublished-changes {
     display: block;
@@ -448,11 +307,7 @@
 #article-props-container {
   padding: 30px;
   font-size: 0.8rem;
-  /*display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;*/
-  /*display: grid;
-  grid: auto-flow / 50%;*/
+  padding-bottom: 55px;
 }
 #frm-article-properties {
   display: flex;

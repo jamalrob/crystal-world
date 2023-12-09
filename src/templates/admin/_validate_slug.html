@@ -15,17 +15,3 @@
   <!-- _="on input call doAutosave(event.target)" -->
   {% if error %}<div class='{% if error.show_as_error %}error-message{% endif %} small'>{{ error.message }}</div>{% endif %}
 </div>
-<script>
-  var inp = document.getElementById("inpSlug")
-  var articleId = inp.dataset.articleid
-  var newValue = inp.value
-  var localSlug = localStorage.getItem(`article_${articleId}_slug`)
-
-  if (newValue !== localSlug) {
-    a.events.autosave(inp);
-  }
-
-  inp.addEventListener("input, changed", function(){
-    a.events.autosave(inp);
-  })
-</script>
