@@ -143,75 +143,11 @@
   </form>
 </div>
 <script>
-(function(window) {
-  const a = new Article({
-    articleId:                document.getElementById("inpArticleID").value,
-    isDraft:                  document.getElementById("inpDraft").value,
-    alertUnpublishedChanges:  document.getElementById("unpublished-changes"),
-    alertArticleStatus:       document.getElementById("article-status"),
-    confAfterRequest:         document.getElementById("confirm-published"),
-    btRevert:                 document.getElementById("revert"),
-    btPublish:                document.getElementById("publish"),
-    btUnpublish:              document.getElementById("unpublish"),
-    alertPublishErrors:       document.getElementById("error-message"),
-    inps:                     document.querySelectorAll("input, select"),
-    btPublishAction:          document.getElementById("publishAction")
-  })
-
-  autosaveEvents = ["input", "changed"];
-  autoSaveElementIDs = [
-    "inpSlug",
-    "inpDate",
-    "inpTitle",
-    "inpDate",
-    "inpTags",
-    "inpMainImage",
-    "selImageClass"
-  ]
-
-  autosaveEvents.forEach((eventType) => {
-    document.body.addEventListener(eventType, (ev) => {
-      if (autoSaveElementIDs.includes(ev.target.id)) {
-        a.events.autosave(ev.target)
-      }
-    })
-  })
-
-  document.body.addEventListener('htmx:afterRequest', (evt) => {
-    const myTarget = evt.detail.target;
-    switch (myTarget.id) {
-      case "publish":
-        let res = JSON.parse(evt.detail.xhr.response);
-        errors = false;
-        for(const inp of res.validation_results) {
-          if (inp.hasOwnProperty("error")) {
-            errors = true;
-            a.events.receivePublishError(inp.error)
-          }
-        }
-        if(!errors) {
-          a.events.publish()
-        }
-        break;
-      case "unpublish":
-        a.events.unpublish()
-        break;
-    }
-  });
-
-  function slugify(str) {
-    return String(str)
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9 -]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-');
-  }
-
-}(window))
+  (function(window) {
+    setupArticle();
+  }(window))
 </script>
+
 <style>
 #unpublished-changes {
   display: block;

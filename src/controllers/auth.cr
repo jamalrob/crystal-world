@@ -43,11 +43,12 @@ module CrystalWorld::AuthControllers
         # ctx.response.redirect "/admin/articles"
 
         # BASIC REDIRECT FOR HTMX REQUEST
-        # ctx.response.headers["HX-Redirect"] = "/admin/articles"
+        # Use this because we want admin-specific js files to load in the head
+        ctx.response.headers["HX-Redirect"] = "/admin/articles"
 
         # REDIRECT FOR HTMX REQUEST, REPLACING ONLY A PART OF THE PAGE
         # (new url pushed to the history automatically)
-        ctx.response.headers["HX-Location"] = %({"path": "/admin/articles", "target": "body"})
+        #ctx.response.headers["HX-Location"] = %({"path": "/admin/articles", "target": "body"})
         return
       end
     end
