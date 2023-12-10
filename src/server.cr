@@ -35,19 +35,19 @@ module CrystalWorld
 
     case ctx.request.path
     when "/"
-      PublicControllers.home_page(ctx)
+      PublicControllers.home(ctx)
 
     when "/tags"
-      PublicControllers.tags_page(ctx)
+      PublicControllers.tags(ctx)
 
     when .match /\/tag\/#{SLUG_PATTERN}$/
-      PublicControllers.tag_page(ctx)
+      PublicControllers.tag(ctx)
 
     when "/about"
-      PublicControllers.about_page(ctx)
+      PublicControllers.about(ctx)
 
     when "/admin/login"
-      PublicControllers.login_page(ctx)
+      PublicControllers.login(ctx)
 
     when "/admin/logout"
       AuthControllers.do_logout(ctx)
@@ -56,28 +56,28 @@ module CrystalWorld
       AuthControllers.do_login(ctx)
 
     when "/admin", "/admin/articles"
-      AdminControllers.admin_articles(ctx)
+      AdminControllers.articles(ctx)
 
     when "/admin/pages"
-      AdminControllers.admin_pages(ctx)
+      AdminControllers.pages(ctx)
 
     when "/admin/customize"
-      AdminControllers.admin_customize(ctx)
+      AdminControllers.customize(ctx)
 
     when "/admin/authors"
-      AdminControllers.admin_authors(ctx)
+      AdminControllers.authors(ctx)
 
     when "/admin/settings"
-      AdminControllers.admin_settings(ctx)
+      AdminControllers.settings(ctx)
 
     when "/admin/images"
-      AdminControllers.admin_images(ctx)
+      AdminControllers.images(ctx)
 
     when "/admin/bin"
-      AdminControllers.admin_bin(ctx)
+      AdminControllers.bin(ctx)
 
     when "/admin/markdown-cheatsheet"
-      AdminControllers.admin_markdown_cheatsheet(ctx)
+      AdminControllers.markdown_cheatsheet(ctx)
 
     when .match /^\/api\/save_sidebar_state\/[a-z]*$/
       AdminControllers.save_sidebar_state(ctx)
@@ -110,7 +110,7 @@ module CrystalWorld
       AdminControllers.edit_article_page(ctx)
 
     when .match /^\/#{SLUG_PATTERN}$/
-      PublicControllers.article_page(ctx)
+      PublicControllers.article(ctx)
 
     else
       PublicControllers.error_404(ctx)

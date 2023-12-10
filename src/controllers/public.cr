@@ -1,7 +1,7 @@
 module CrystalWorld::PublicControllers
   extend self
 
-  def home_page(ctx)
+  def home(ctx)
     articles = Data.get_articles
     TemplateRenderer.render_page(
       ctx: ctx,
@@ -13,7 +13,7 @@ module CrystalWorld::PublicControllers
     )
   end
 
-  def about_page(ctx)
+  def about(ctx)
     TemplateRenderer.render_page(
       ctx: ctx,
       data: {
@@ -23,7 +23,7 @@ module CrystalWorld::PublicControllers
     )
   end
 
-  def article_page(ctx)
+  def article(ctx)
     urlbits = ctx.request.path.split('/', remove_empty: true)
     slug = urlbits[0]
     if article = Data.get_article(slug: slug, return_draft: false)
@@ -43,7 +43,7 @@ module CrystalWorld::PublicControllers
     PublicControllers.error_404 ctx
   end
 
-  def tags_page(ctx)
+  def tags(ctx)
     tags = Data.get_tags
     TemplateRenderer.render_page(ctx: ctx,
       data: {
@@ -54,7 +54,7 @@ module CrystalWorld::PublicControllers
     )
   end
 
-  def tag_page(ctx)
+  def tag(ctx)
     urlbits = ctx.request.path.split('/', remove_empty: true)
     tag = urlbits[1]?
     articles = Data.get_articles_for_tag(tag)
@@ -72,7 +72,7 @@ module CrystalWorld::PublicControllers
     PublicControllers.error_404 ctx
   end
 
-  def login_page(ctx)
+  def login(ctx)
     TemplateRenderer.render_page(ctx: ctx,
       data: {
         "title" => "Sign in to admin",

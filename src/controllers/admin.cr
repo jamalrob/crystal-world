@@ -16,7 +16,7 @@ module CrystalWorld::AdminControllers
     end
   end
 
-  def admin_articles(ctx)
+  def articles(ctx)
     if u = self.authenticated_user ctx
       articles = Data.get_articles(
         include_drafts: true,
@@ -39,7 +39,7 @@ module CrystalWorld::AdminControllers
     ctx.response.redirect "/"
   end
 
-  def admin_bin(ctx)
+  def bin(ctx)
     if u = self.authenticated_user ctx
       articles = Data.get_deleted_articles(order_by: "date_created DESC")
       TemplateRenderer.render_page(
@@ -59,7 +59,7 @@ module CrystalWorld::AdminControllers
     ctx.response.redirect "/"
   end
 
-  def admin_images(ctx)
+  def images(ctx)
     if u = self.authenticated_user ctx
 
       img_arr = [] of String
@@ -71,7 +71,7 @@ module CrystalWorld::AdminControllers
         )
         #
         # TODO: find out how to do this parsing and looping properly
-        # - `ims.each do |im|` doesn't work
+        # --- cos `ims.each do |im|` doesn't work
         #
         ims = JSON.parse(res.body)
         i = 0
@@ -89,27 +89,27 @@ module CrystalWorld::AdminControllers
 
         # Use a fixture so as to avoid calling the
         # ImageKit API
-
+        # https://ik.imagekit.io/alistairrobinson/blog
         img_arr = [
-          "https://ik.imagekit.io/alistairrobinson/blog/crash-by-jg-ballard.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/mynah.png",
-          "https://ik.imagekit.io/alistairrobinson/blog/logicomix-an-epic-search.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/profile.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/_House-of-New-Life.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/great-moscow-state-circus.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/me-in-kazakhstan.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/metro-ulitsa-1905.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/post-war-soviet-modernist-architecture.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/jg-ballards-crash-is-it-science-fiction.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/nova-by-samuel-r-delany-1968.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/_Gorky-Art-Theatre-A-Savin-WikiCommons.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/profile2_J9se4LBCU.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/mynah3.png",
-          "https://ik.imagekit.io/alistairrobinson/blog/logomynah3_W9qR2Ve9Z.png",
-          "https://ik.imagekit.io/alistairrobinson/blog/duckrabbit_large.png",
-          "https://ik.imagekit.io/alistairrobinson/blog/perceptual-constancy_large.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/bird1.png",
-          "https://ik.imagekit.io/alistairrobinson/blog/trouble-on-triton-samuel-r-delany-1976.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/crash-by-jg-ballard.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/mynah.png",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/logicomix-an-epic-search.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/profile.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/_House-of-New-Life.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/great-moscow-state-circus.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/me-in-kazakhstan.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/metro-ulitsa-1905.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/post-war-soviet-modernist-architecture.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/jg-ballards-crash-is-it-science-fiction.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/nova-by-samuel-r-delany-1968.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/_Gorky-Art-Theatre-A-Savin-WikiCommons.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/profile2_J9se4LBCU.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/mynah3.png",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/logomynah3_W9qR2Ve9Z.png",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/duckrabbit_large.png",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/perceptual-constancy_large.jpg",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/bird1.png",
+          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/trouble-on-triton-samuel-r-delany-1976.jpg",
         ]
       end
 
@@ -128,7 +128,7 @@ module CrystalWorld::AdminControllers
     ctx.response.redirect "/"
   end
 
-  def admin_settings(ctx)
+  def settings(ctx)
     if u = self.authenticated_user ctx
       TemplateRenderer.render_page(ctx: ctx,
         data: {
@@ -145,7 +145,7 @@ module CrystalWorld::AdminControllers
     ctx.response.redirect "/"
   end
 
-  def admin_authors(ctx)
+  def authors(ctx)
     if u = self.authenticated_user ctx
       TemplateRenderer.render_page(ctx: ctx,
         data: {
@@ -163,7 +163,7 @@ module CrystalWorld::AdminControllers
     ctx.response.redirect "/"
   end
 
-  def admin_customize(ctx)
+  def customize(ctx)
     if u = self.authenticated_user ctx
       TemplateRenderer.render_page(
         ctx: ctx,
@@ -181,7 +181,7 @@ module CrystalWorld::AdminControllers
     ctx.response.redirect "/"
   end
 
-  def admin_pages(ctx)
+  def pages(ctx)
     if u = self.authenticated_user ctx
       TemplateRenderer.render_page(ctx: ctx,
         data: {
@@ -205,7 +205,7 @@ module CrystalWorld::AdminControllers
       id = urlbits[2]?
       begin
         Data.delete_article(id)
-        self.admin_articles(ctx)
+        self.articles(ctx)
       rescue e
         p! e
         return e.message
@@ -259,7 +259,7 @@ module CrystalWorld::AdminControllers
     end
   end
 
-  def admin_markdown_cheatsheet(ctx)
+  def markdown_cheatsheet(ctx)
     if u = self.authenticated_user ctx
       TemplateRenderer.render_basic(
         ctx: ctx,
