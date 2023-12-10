@@ -188,33 +188,6 @@ label .autosaved {
 #error-message.showing {
   opacity: 1;
 }
-.spinner {
-  position: absolute;
-  top: calc(50% - 0.55rem);
-  width: 1rem;
-  height: 1rem;
-  border: 0.15rem solid #ffc000;
-  border-bottom-width: 0.15rem;
-  border-bottom-style: solid;
-  border-bottom-color: rgb(255, 192, 0);
-  border-bottom: 0.25rem solid rgba(0,0,0,0);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  z-index: 9999;
-  margin: 0 0 10px 10px;
-  margin-left: 8px;
-}
-.spinner--hidden {
-  display: none;
-}
-.htmx-request {
-  display: unset;
-}
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
 .button-group {
   margin: 20px 0 20px;
 }

@@ -50,4 +50,5 @@ module CrystalWorld::TemplateRenderer
     final_html = template.render
     ctx.response.print final_html
   end
+
 end

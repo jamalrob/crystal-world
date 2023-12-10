@@ -290,3 +290,64 @@ form .error input {
 .hidden {
   display: none;
 }
+.spinner {
+  position: absolute;
+  top: calc(50% - 0.55rem);
+  width: 1rem;
+  height: 1rem;
+  border: 0.15rem solid #ffc000;
+  border-bottom-width: 0.15rem;
+  border-bottom-style: solid;
+  border-bottom-color: rgb(255, 192, 0);
+  border-bottom: 0.25rem solid rgba(0,0,0,0);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 9999;
+  margin: 0 0 10px 10px;
+  margin-left: 8px;
+}
+.spinner--hidden {
+  display: none;
+}
+.htmx-request {
+  display: unset;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #433;
+  background-color:rgba(0,0,0,0.5);
+  display: none;
+}
+.modal-container.visible {
+  display: block !important;
+}
+.modal {
+  margin: 2.4rem auto;
+  width: 80vw;
+  max-width: 1100px;
+  max-height: 90vh;
+  /*background: #fffdf8;*/
+  background-color: #0a4775;
+  overflow-y: auto;
+  z-index: 1000;
+  border-radius: 2px;
+  padding: 0;
+  position: relative;
+}
+.modal-inner h1 {
+  margin-top: 0;
+}
+button.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}

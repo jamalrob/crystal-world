@@ -25,6 +25,7 @@ module CrystalWorld
   TEMPLATE_FOLDER       = "src/templates/"
   SLUG_PATTERN          = "[a-z0-9-]+"
   ID_PATTERN            = "[0-9]+"
+  FILENAME_PATTERN      = "[\w\-. ]+"
 
   server = HTTP::Server.new([
     HTTP::StaticFileHandler.new(public_dir = "./public", fallthrough = true, directory_listing = false),
@@ -108,6 +109,12 @@ module CrystalWorld
 
     when .match /^\/admin\/articles\/#{ID_PATTERN}\/edit$/
       AdminControllers.edit_article_page(ctx)
+
+    #when .match /^\/admin\/get_image\/#{FILENAME_PATTERN}$/
+    #  AdminControllers.get_image(ctx)
+
+    when .starts_with? "/admin/get_image/"
+      AdminControllers.get_image(ctx)
 
     when .match /^\/#{SLUG_PATTERN}$/
       PublicControllers.article(ctx)

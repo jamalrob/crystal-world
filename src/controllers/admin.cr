@@ -1,6 +1,14 @@
 module CrystalWorld::AdminControllers
   extend self
 
+  def get_image(ctx)
+    urlbits = ctx.request.path.split('/', remove_empty: true)
+    file = urlbits[-1]?
+    html = "<img src=\"https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/#{file}\">"
+    ctx.response.print html
+    #ctx.response.print "pop"
+  end
+
   def sidebar_collapsed_classname(ctx)
     if ctx.request.cookies.has_key?("sidebar_collapsed")
       return ctx.request.cookies["sidebar_collapsed"].value
@@ -90,26 +98,27 @@ module CrystalWorld::AdminControllers
         # Use a fixture so as to avoid calling the
         # ImageKit API
         # https://ik.imagekit.io/alistairrobinson/blog
+        # https://ik.imagekit.io/alistairrobinson/blog/tr:w-150
         img_arr = [
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/crash-by-jg-ballard.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/mynah.png",
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/logicomix-an-epic-search.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/profile.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/_House-of-New-Life.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/great-moscow-state-circus.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/me-in-kazakhstan.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/metro-ulitsa-1905.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/post-war-soviet-modernist-architecture.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/jg-ballards-crash-is-it-science-fiction.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/nova-by-samuel-r-delany-1968.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/_Gorky-Art-Theatre-A-Savin-WikiCommons.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/profile2_J9se4LBCU.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/mynah3.png",
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/logomynah3_W9qR2Ve9Z.png",
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/duckrabbit_large.png",
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/perceptual-constancy_large.jpg",
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/bird1.png",
-          "https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/trouble-on-triton-samuel-r-delany-1976.jpg",
+          "crash-by-jg-ballard.jpg",
+          "mynah.png",
+          "logicomix-an-epic-search.jpg",
+          "profile.jpg",
+          "_House-of-New-Life.jpg",
+          "great-moscow-state-circus.jpg",
+          "me-in-kazakhstan.jpg",
+          "metro-ulitsa-1905.jpg",
+          "post-war-soviet-modernist-architecture.jpg",
+          "jg-ballards-crash-is-it-science-fiction.jpg",
+          "nova-by-samuel-r-delany-1968.jpg",
+          "_Gorky-Art-Theatre-A-Savin-WikiCommons.jpg",
+          "profile2_J9se4LBCU.jpg",
+          "mynah3.png",
+          "logomynah3_W9qR2Ve9Z.png",
+          "duckrabbit_large.png",
+          "perceptual-constancy_large.jpg",
+          "bird1.png",
+          "trouble-on-triton-samuel-r-delany-1976.jpg",
         ]
       end
 
