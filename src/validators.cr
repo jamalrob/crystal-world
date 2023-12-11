@@ -9,7 +9,7 @@ module CrystalWorld::Validators
     } of String => String | Bool | Hash(String, String | Bool)
     if !value.match /^#{SLUG_PATTERN}$/
       hash["publish"] = false
-      error = {
+      hash["error"] = {
         "message" => "Only lower case letters, numbers, and hyphens",
         "show_as_error" => true
       }

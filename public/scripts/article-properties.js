@@ -94,8 +94,14 @@ const Article = class {
       }
     },
     publishError:{
-      UIState:(error) => {
-        this.alertPublishErrors.innerHTML = error.message;
+      UIState:(validation_results) => {
+        let errorMsg = "";
+        for(const inp of validation_results) {
+          if (inp.error !== undefined) {
+            errorMsg += `${inp.name}: ${inp.error.message}<br>`
+          }
+        }
+        this.alertPublishErrors.innerHTML = errorMsg;
         this.alertPublishErrors.classList.remove("hidden");
       }
     }
@@ -179,9 +185,9 @@ const Article = class {
       this.alertPublishErrors.innerHTML = "";
       this.alertPublishErrors.classList.add("hidden");
     },
-    receivePublishError:(error) => {
+    receivePublishError:(validation_results) => {
       this.currentState = this.states.publishError;
-      this.currentState.UIState(error);
+      this.currentState.UIState(validation_results);
     }
   }
 
@@ -231,10 +237,11 @@ function setupArticle() {
         for(const inp of res.validation_results) {
           if (inp.hasOwnProperty("error")) {
             errors = true;
-            a.events.receivePublishError(inp.error)
           }
         }
-        if(!errors) {
+        if(errors) {
+          a.events.receivePublishError(res.validation_results)
+        } else {
           a.events.publish()
         }
         break;

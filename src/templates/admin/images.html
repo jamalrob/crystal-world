@@ -10,8 +10,9 @@
     id="frm-upload"
     hx-encoding="multipart/form-data"
     hx-post="/admin/images/upload"
-    _="on htmx:xhr:progress(loaded, total) set #progress.value to (loaded/total)*100"
+    hx-target="#imagelist"
   >
+  <!--_="on htmx:xhr:progress(loaded, total) set #progress.value to (loaded/total)*100"-->
     <button
       class="green has-icon new"
     >
@@ -21,7 +22,7 @@
       </label>
       <input type="file" id="imageUpload" name="imageUpload" accept=".png, .jpg, .jpeg" />
     </button>
-    <progress id='progress' value='0' max='100'></progress>
+    <!--<progress id='progress' value='0' max='100'></progress>-->
   </form>
 </div>
 
@@ -61,9 +62,9 @@ _="on click
     })
   })
 
-  document.body.addEventListener("uploadComplete", function (ev) {
-    console.log("Uploaded")
-  })
+  //document.body.addEventListener("uploadComplete", function (ev) {
+  //  console.log("Uploaded")
+  //})
 </script>
 <script type="text/hyperscript">
   on keyup[key is 'Escape']

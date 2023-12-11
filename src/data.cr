@@ -4,21 +4,22 @@ module CrystalWorld::Data
   def get_user(username = nil, sessionid = nil)
     DB.open "sqlite3://./crw.db" do |db|
       begin
-        if username
-          userid, password, first_name, last_name, sessionid, csrftoken =
-            db.query_one("SELECT id, password, first_name, last_name, sessionid, csrftoken " \
-                         "FROM users WHERE username = ? LIMIT 1;",
-              username,
-              as: {Int32, String, String?, String?, String?, String?}
-            )
-        elsif sessionid
-          userid, password, first_name, last_name, sessionid, csrftoken =
-            db.query_one("SELECT id, password, first_name, last_name, sessionid, csrftoken " \
-                         "FROM users WHERE sessionid = ? LIMIT 1;",
-              sessionid,
-              as: {Int32, String, String?, String?, String?, String?}
-            )
+        if sessionid
+          where = "WHERE sessionid = ? LIMIT 1"
+          by = sessionid
+        elsif username
+          where = "WHERE username = ? LIMIT 1"
+          by = username
         end
+
+        query = "SELECT id, password, first_name, last_name, sessionid, csrftoken " \
+                "FROM users #{where};"
+
+        userid, password, first_name, last_name, sessionid, csrftoken = db.query_one(
+          query,
+          by,
+          as: {Int32, String, String?, String?, String?, String?}
+        )
       rescue DB::NoResultsError
         puts "No results"
         return nil
@@ -308,23 +309,18 @@ module CrystalWorld::Data
   def get_article(slug : String, return_draft : Bool = false)
     DB.open "sqlite3://./crw.db" do |db|
       begin
+        anddrafts = ""
         if return_draft
-          id, slug, title, tags, date, image, imageclass, draft, md =
-            db.query_one("SELECT id, slug, title, tags, date, main_image, " \
-                         "image_class, draft, content " \
-                         "FROM articles WHERE slug = ? LIMIT 1;",
-              slug,
-              as: {Int32, String, String, String?, String, String?, String?, Int32, String}
-            )
-        else
-          id, slug, title, tags, date, image, imageclass, draft, md =
-            db.query_one("SELECT id, slug, title, tags, date, main_image, " \
-                         "image_class, draft, content " \
-                         "FROM articles WHERE slug = ? AND draft = 0 LIMIT 1;",
-              slug,
-              as: {Int32, String, String, String?, String, String?, String?, Int32, String}
-            )
+          anddrafts = "AND draft = 0 "
         end
+
+        id, slug, title, tags, date, image, imageclass, draft, md =
+          db.query_one("SELECT id, slug, title, tags, date, main_image, " \
+                        "image_class, draft, content " \
+                        "FROM articles WHERE slug = ? #{anddrafts}LIMIT 1;",
+            slug,
+            as: {Int32, String, String, String?, String, String?, String?, Int32, String}
+          )
 
         pub_date = !date || date == "" ? nil : date
         if pub_date
