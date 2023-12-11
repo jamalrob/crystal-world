@@ -1,22 +1,32 @@
 {% extends "admin/layouts/base.html" %}
 {% block content %}
-<ul id="imagelist">
-{% for im in images %}
-  <li data-url="{{ im }}">
-    <a
-      href="#"
-      class="imglink"
-      hx-get="/admin/get_image/{{ im }}"
-      hx-trigger="load"
-      _="on click call showModal('{{ im }}')"
+<div class="super-row">
+  <!--
+  hx-post="/admin/articles/new"
+  hx-target="body"
+  hx-push-url="true"
+  -->
+  <form
+    id="frm-upload"
+    hx-encoding="multipart/form-data"
+    hx-post="/admin/images/upload"
+    _="on htmx:xhr:progress(loaded, total) set #progress.value to (loaded/total)*100"
+  >
+    <button
+      class="green has-icon new"
     >
-      <span class="spinner" class="imgLoading"></span>
-    </a>
-    <button class="copymd icon" title="Copy markdown link" data-url="{{ im }}">
-      <svg data-url="{{ im }}" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+    <label for="imageUpload">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        New image
+      </label>
+      <input type="file" id="imageUpload" name="imageUpload" accept=".png, .jpg, .jpeg" />
     </button>
-  </li>
-{% endfor %}
+    <progress id='progress' value='0' max='100'></progress>
+  </form>
+</div>
+
+<ul id="imagelist" hx-trigger="load, uploadComplete from:body" hx-get="/admin/images/get">
+  <!-- _images.html -->
 </ul>
 
 <div class="modal-container"
@@ -50,6 +60,10 @@ _="on click
       console.log('Copied');
     })
   })
+
+  document.body.addEventListener("uploadComplete", function (ev) {
+    console.log("Uploaded")
+  })
 </script>
 <script type="text/hyperscript">
   on keyup[key is 'Escape']
@@ -71,10 +85,32 @@ _="on click
   end
 </script>
 <style>
+  .super-row {
+    overflow: auto;
+  }
+  button.new {
+    float: right;
+    padding: 0;
+  }
+  input[type='file'] {
+    display: none;
+  }
+  label[for='imageUpload'] {
+    display: inline-block;
+    padding: 5px 20px 7px;
+    cursor: pointer;
+    line-height: 1rem;
+  }
   #imagelist {
+    clear: both;
+    margin-top: 10px;
     display: flex;
     flex-wrap: wrap;
     list-style: none;
+    background-color: #165a8f34;
+    box-shadow: 0 0 1px #0b2a42;
+    padding: 10px;
+    justify-content: center;
   }
   #imagelist li {
     margin: 5px 5px 35px;

@@ -26,6 +26,7 @@ module CrystalWorld
   SLUG_PATTERN          = "[a-z0-9-]+"
   ID_PATTERN            = "[0-9]+"
   FILENAME_PATTERN      = "[\w\-. ]+"
+  TEMP_IMAGES_FOLDER    = @@env["TEMP_IMAGES_FOLDER"]
 
   server = HTTP::Server.new([
     HTTP::StaticFileHandler.new(public_dir = "./public", fallthrough = true, directory_listing = false),
@@ -115,6 +116,12 @@ module CrystalWorld
 
     when .starts_with? "/admin/get_image/"
       AdminControllers.get_image(ctx)
+
+    when "/admin/images/get"
+      AdminControllers.get_images(ctx)
+
+    when "/admin/images/upload"
+      AdminControllers.upload_image(ctx)
 
     when .match /^\/#{SLUG_PATTERN}$/
       PublicControllers.article(ctx)

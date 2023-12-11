@@ -38,7 +38,7 @@ module CrystalWorld::Data
       begin
         userid, password, first_name, last_name, sessionid, csrftoken =
           db.query_one("SELECT id, password, first_name, last_name, sessionid, csrftoken " \
-                       "FROM users WHERE sessionid = ? AND csrftoken = ? LIMIT 1;",
+                        "FROM users WHERE sessionid = ? AND csrftoken = ? LIMIT 1;",
             sessionid, csrftoken,
             as: {Int32, String, String?, String?, String?, String?}
           )
@@ -201,51 +201,44 @@ module CrystalWorld::Data
   def get_articles(include_drafts=false, order_by="date DESC")
     DB.open "sqlite3://./crw.db" do |db|
       articles = [] of Hash(String, String | Array(String) | Int32 | Nil)
-      begin
-        if include_drafts
-          results = (db.query_all "SELECT id, slug, title, date, date_created, tags, draft " \
-                                  "FROM articles WHERE deleted = 0 ORDER BY #{order_by};",
-                                  as: {Int32, String, String, String?, String, String?, Int32}
-            )
-        else
-          results = (db.query_all "SELECT id, slug, title, date, date_created, tags, draft " \
-                                  "FROM articles WHERE deleted = 0 " \
-                                  "AND draft = 0 " \
-                                  "AND date < DATETIME('now') " \
-                                  "ORDER BY #{order_by};",
-                                  as: {Int32, String, String, String?, String, String?, Int32}
-            )
-        end
-        results.each do |result|
-          begin
-            pub_date = Time.parse_utc(result[3].to_s, "%Y-%m-%d").to_s("%Y-%m-%d")
-            pub_date_friendly = Time.parse_utc(result[3].to_s, "%Y-%m-%d").to_s("%d %B %Y")
-          rescue e
-            puts "Currently not published or bad pub date format"
-          end
-
-          tags = result[5]
-          if tags
-            tags = tags.delete(' ').split(",")
-          end
-          this_row = {
-            "id"                    => result[0],
-            "slug"                  => result[1],
-            "title"                 => result[2],
-            "date"                  => pub_date,
-            "friendly_date"         => pub_date_friendly,
-            "date_created"          => Time.parse_utc(result[4], "%Y-%m-%d").to_s("%Y-%m-%d"),
-            "friendly_date_created" => Time.parse_utc(result[4], "%Y-%m-%d").to_s("%d %B %Y"),
-            "draft"                 => result[6],
-            "tags"                  => tags,
-          }
-          articles.push(this_row)
-        end
-        return articles
-      rescue DB::NoResultsError
-        puts "No results"
-        return nil
+      where = "WHERE deleted = 0 "
+      if !include_drafts
+        where += "AND draft = 0 AND date <= DATETIME('now') "
       end
+      query = "SELECT id, slug, title, date, date_created, tags, draft FROM articles " \
+              "#{where} ORDER BY #{order_by};"
+
+      results = db.query_all(
+        query,
+        as: {Int32, String, String, String?, String, String?, Int32}
+      )
+
+      results.each do |result|
+        begin
+          pub_date = Time.parse_utc(result[3].to_s, "%Y-%m-%d").to_s("%Y-%m-%d")
+          pub_date_friendly = Time.parse_utc(result[3].to_s, "%Y-%m-%d").to_s("%d %B %Y")
+        rescue e
+          puts "Currently not published or bad pub date format"
+        end
+
+        tags = result[5]
+        if tags
+          tags = tags.delete(' ').split(",")
+        end
+        this_row = {
+          "id"                    => result[0],
+          "slug"                  => result[1],
+          "title"                 => result[2],
+          "date"                  => pub_date,
+          "friendly_date"         => pub_date_friendly,
+          "date_created"          => Time.parse_utc(result[4], "%Y-%m-%d").to_s("%Y-%m-%d"),
+          "friendly_date_created" => Time.parse_utc(result[4], "%Y-%m-%d").to_s("%d %B %Y"),
+          "draft"                 => result[6],
+          "tags"                  => tags,
+        }
+        articles.push(this_row)
+      end
+      return articles
     end
   end
 

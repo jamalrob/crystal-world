@@ -6,7 +6,44 @@ module CrystalWorld::AdminControllers
     file = urlbits[-1]?
     html = "<img src=\"https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/#{file}\">"
     ctx.response.print html
-    #ctx.response.print "pop"
+  end
+
+  def upload_image(ctx)
+    p! ctx.request
+    HTTP::FormData.parse(ctx.request) do |part|
+      p! part.name
+      case part.name
+      when "imageUpload"
+        fname = part.filename.to_s
+        p! fname
+
+        File.write("#{TEMP_IMAGES_FOLDER}/#{fname}", part.body)
+        #tempfile = File.tempfile(fname) do |file|
+        file = File.open("/home/user/Pictures/#{fname}") do |f|
+          req = Crest::Request.new(
+            :post,
+            url: "https://upload.imagekit.io/api/v1/files/upload",
+            user: IMAGEKIT_PRIVATE_KEY,
+            password: "",
+            form: {
+              "file" => f,
+              #"type" => "image/png",
+              "fileName" => fname,
+              "folder" => "blog"
+            },
+          )
+          res = req.execute
+          ctx.response.headers["HX-Trigger"] = "uploadComplete"
+          #ctx.response.headers["HX-Trigger-After-Swap"] = "uploadComplete"
+          ctx.response.print res.status
+        end
+        file.delete if file
+        #tempfile.delete
+        #content = File.open("/home/user/websites/crystal-world/#{fname}") do |f|
+        #end
+      end
+    end
+    #ctx.response.headers["HX-Trigger-After-Swap"] = "uploadComplete"
   end
 
   def sidebar_collapsed_classname(ctx)
@@ -67,64 +104,72 @@ module CrystalWorld::AdminControllers
     ctx.response.redirect "/"
   end
 
+  def get_images(ctx)
+    img_arr = [] of String
+    if LOCAL
+      res = Crest.get(
+        "https://api.imagekit.io/v1/files?path=blog",
+        user: IMAGEKIT_PRIVATE_KEY,
+        password: ""
+      )
+      #
+      # TODO: find out how to do this parsing and looping properly
+      # --- cos `ims.each do |im|` doesn't work
+      #
+      ims = JSON.parse(res.body)
+      i = 0
+      array_has_ended = false
+      while !array_has_ended
+        begin
+          img_arr.push(ims[i]["name"].to_s)
+        rescue e
+          p! e
+          array_has_ended = true
+        end
+        i += 1
+      end
+    else
+
+      # Use a fixture so as to avoid calling the
+      # ImageKit API
+      # https://ik.imagekit.io/alistairrobinson/blog
+      # https://ik.imagekit.io/alistairrobinson/blog/tr:w-150
+      img_arr = [
+        "crash-by-jg-ballard.jpg",
+        "mynah.png",
+        "logicomix-an-epic-search.jpg",
+        "profile.jpg",
+        "_House-of-New-Life.jpg",
+        "great-moscow-state-circus.jpg",
+        "me-in-kazakhstan.jpg",
+        "metro-ulitsa-1905.jpg",
+        "post-war-soviet-modernist-architecture.jpg",
+        "jg-ballards-crash-is-it-science-fiction.jpg",
+        "nova-by-samuel-r-delany-1968.jpg",
+        "_Gorky-Art-Theatre-A-Savin-WikiCommons.jpg",
+        "profile2_J9se4LBCU.jpg",
+        "mynah3.png",
+        "logomynah3_W9qR2Ve9Z.png",
+        "duckrabbit_large.png",
+        "perceptual-constancy_large.jpg",
+        "bird1.png",
+        "trouble-on-triton-samuel-r-delany-1976.jpg",
+      ]
+    end
+
+    TemplateRenderer.render_partial(ctx: ctx,
+      data: {
+        "images" => img_arr,
+      },
+      template_path: "admin/_images.html"
+    )
+  end
+
   def images(ctx)
     if u = self.authenticated_user ctx
-
-      img_arr = [] of String
-      if !LOCAL
-        res = Crest.get(
-          "https://api.imagekit.io/v1/files?path=blog",
-          user: IMAGEKIT_PRIVATE_KEY,
-          password: ""
-        )
-        #
-        # TODO: find out how to do this parsing and looping properly
-        # --- cos `ims.each do |im|` doesn't work
-        #
-        ims = JSON.parse(res.body)
-        i = 0
-        array_has_ended = false
-        while !array_has_ended
-          begin
-            img_arr.push(ims[i]["url"].to_s)
-          rescue e
-            p! e
-            array_has_ended = true
-          end
-          i += 1
-        end
-      else
-
-        # Use a fixture so as to avoid calling the
-        # ImageKit API
-        # https://ik.imagekit.io/alistairrobinson/blog
-        # https://ik.imagekit.io/alistairrobinson/blog/tr:w-150
-        img_arr = [
-          "crash-by-jg-ballard.jpg",
-          "mynah.png",
-          "logicomix-an-epic-search.jpg",
-          "profile.jpg",
-          "_House-of-New-Life.jpg",
-          "great-moscow-state-circus.jpg",
-          "me-in-kazakhstan.jpg",
-          "metro-ulitsa-1905.jpg",
-          "post-war-soviet-modernist-architecture.jpg",
-          "jg-ballards-crash-is-it-science-fiction.jpg",
-          "nova-by-samuel-r-delany-1968.jpg",
-          "_Gorky-Art-Theatre-A-Savin-WikiCommons.jpg",
-          "profile2_J9se4LBCU.jpg",
-          "mynah3.png",
-          "logomynah3_W9qR2Ve9Z.png",
-          "duckrabbit_large.png",
-          "perceptual-constancy_large.jpg",
-          "bird1.png",
-          "trouble-on-triton-samuel-r-delany-1976.jpg",
-        ]
-      end
-
       TemplateRenderer.render_page(ctx: ctx,
         data: {
-          "images"              => img_arr,
+          #"images"              => img_arr,
           "admin_section"       => "Admin: images",
           "user_authenticated"  => true,
           "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
@@ -265,6 +310,7 @@ module CrystalWorld::AdminControllers
         },
         template_path: "admin/article_properties.html"
       )
+      ctx.response.headers["HX-Trigger"] = "setupArticle"
     end
   end
 

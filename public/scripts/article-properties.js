@@ -185,9 +185,10 @@ const Article = class {
     }
   }
 
-}
+} // Class Article
 
 function setupArticle() {
+
   const a = new Article({
     articleId:                document.getElementById("inpArticleID").value,
     isDraft:                  document.getElementById("inpDraft").value,
@@ -253,4 +254,4 @@ function setupArticle() {
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-');
   }
-}
+} // setupArticle()
