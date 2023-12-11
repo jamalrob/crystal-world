@@ -1,7 +1,6 @@
 {% for im in images %}
   <li data-url="{{ im }}">
     <a
-      href="#"
       class="imglink"
       _="on click call showModal('{{ im }}')"
     >
@@ -23,4 +22,9 @@
       log 'Copied'
     end
   </script>
+  <style>
+    a.imglink {
+      cursor: pointer;
+    }
+  </style>
 {% endfor %}

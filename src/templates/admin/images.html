@@ -27,7 +27,7 @@
 </div>
 
 <ul id="imagelist" hx-trigger="load, uploadComplete from:body" hx-get="/admin/images/get">
-  <!-- _images.html -->
+  <div class="spinner imgLoading nonabsolute"></div>
 </ul>
 
 <div class="modal-container"
@@ -86,6 +86,11 @@ _="on click
   end
 </script>
 <style>
+  #imagelist .spinner {
+    margin-top: 7px;
+    width: 1.6rem;
+    height: 1.6rem;
+  }
   .super-row {
     overflow: auto;
   }

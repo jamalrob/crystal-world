@@ -9,6 +9,10 @@ module CrystalWorld::AdminControllers
   end
 
   def upload_image(ctx)
+
+
+    p! ctx.request.body
+
     HTTP::FormData.parse(ctx.request) do |part|
       p! part.name
       case part.name
