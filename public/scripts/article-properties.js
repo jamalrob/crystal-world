@@ -24,11 +24,11 @@ function createArticle(params) {
       for this article
     */
     let dSrc = "db";
-    let storageKeyPrefix = 'article_' + this.articleId;
+    let storageKeyPrefix = 'article_' + articleId;
     if (localStorage.getItem(storageKeyPrefix) !== null){
       dSrc = "localStorage";
     }
-    for(const input of this.inputs){
+    for(const input of inputs){
       let storageKey = storageKeyPrefix + "_" + input.name
       if (localStorage.getItem(storageKey) !== null) {
         /*
@@ -258,16 +258,6 @@ function setupArticle() {
     }
   });
 
-  function slugify(str) {
-    return String(str)
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9 -]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-');
-  }
 } // setupArticle()
 
 window.addEventListener("doSetupArticle", ()=>{
@@ -278,3 +268,14 @@ window.addEventListener("doSetupArticle", ()=>{
   */
   setupArticle();
 })
+
+function slugify(str) {
+  return String(str)
+  .normalize('NFKD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .trim()
+  .toLowerCase()
+  .replace(/[^a-z0-9 -]/g, '')
+  .replace(/\s+/g, '-')
+  .replace(/-+/g, '-');
+}

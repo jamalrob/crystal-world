@@ -20,6 +20,9 @@
         name="title"
         id="inpTitle"
         value="{{ article.title }}"
+        _=" on input
+              set #inpSlug.value to slugify(my value)
+          "
         autofocus
       >
 
