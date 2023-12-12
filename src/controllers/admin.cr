@@ -21,26 +21,27 @@ module CrystalWorld::AdminControllers
         p! fname
 
         File.write("#{TEMP_IMAGES_FOLDER}/#{fname}", part.body)
-        #tempfile = File.tempfile(fname) do |file|
-        file = File.open("/home/user/Pictures/#{fname}") do |f|
-          req = Crest::Request.new(
-            :post,
-            url: "https://upload.imagekit.io/api/v1/files/upload",
-            user: IMAGEKIT_PRIVATE_KEY,
-            password: "",
-            form: {
-              "file" => f,
-              #"type" => "image/png",
-              "fileName" => fname,
-              "folder" => "blog"
-            },
-          )
-          res = req.execute
-          ctx.response.headers["HX-Trigger"] = "uploadComplete"
-          #ctx.response.headers["HX-Trigger-After-Swap"] = "uploadComplete"
-          #ctx.response.print res.status
-        end
+        #tempfile = File.tempfile(fname, dir: TEMP_IMAGES_FOLDER)
+
+        file = File.open("/home/user/Pictures/#{fname}")
+        req = Crest::Request.new(
+          :post,
+          url: "https://upload.imagekit.io/api/v1/files/upload",
+          user: IMAGEKIT_PRIVATE_KEY,
+          password: "",
+          form: {
+            "file" => file,
+            #"type" => "image/png",
+            "fileName" => fname,
+            "folder" => "blog"
+          },
+        )
+        res = req.execute
+        ctx.response.headers["HX-Trigger"] = "uploadComplete"
+        #ctx.response.headers["HX-Trigger-After-Swap"] = "uploadComplete"
+        #ctx.response.print res.status
         deleted = File.delete?("#{TEMP_IMAGES_FOLDER}/#{fname}")
+        #tempfile.delete
         #tempfile.delete
         #content = File.open("/home/user/websites/crystal-world/#{fname}") do |f|
         #end
@@ -308,6 +309,7 @@ module CrystalWorld::AdminControllers
     id = urlbits[2]
     article = Data.get_article(id: id.to_i)
     if article
+      ctx.response.headers["HX-Trigger-After-Settle"] = "doSetupArticle"
       TemplateRenderer.render_page(ctx: ctx,
         data: {
           "article"         => article,

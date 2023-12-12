@@ -29,6 +29,9 @@ const Article = class {
     for(const input of this.inputs){
       let storageKey = storageKeyPrefix + "_" + input.name
       if (localStorage.getItem(storageKey) !== null) {
+        /*
+          Replace input values with localStorage values
+        */
         input.value = localStorage.getItem(storageKey);
         dSrc = "localStorage";
       }
@@ -262,3 +265,7 @@ function setupArticle() {
     .replace(/-+/g, '-');
   }
 } // setupArticle()
+
+window.addEventListener("doSetupArticle", ()=>{
+  setupArticle();
+})

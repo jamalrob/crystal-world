@@ -1,16 +1,12 @@
 {% extends "admin/layouts/base.html" %}
 {% block content %}
 <div class="super-row">
-  <!--
-  hx-post="/admin/articles/new"
-  hx-target="body"
-  hx-push-url="true"
-  -->
   <form
     id="frm-upload"
     hx-encoding="multipart/form-data"
     hx-post="/admin/images/upload"
     hx-target="#imagelist"
+    hx-indicator="#uploadSpinner"
   >
   <!--_="on htmx:xhr:progress(loaded, total) set #progress.value to (loaded/total)*100"-->
     <button
@@ -50,41 +46,9 @@ _="on click
       <div class="modal-inner">
       </div>
   </div>
+
 </div>
 
-<script>
-  document.querySelectorAll(".copymd").forEach(el => {
-    el.addEventListener("click", function(ev) {
-      const url = ev.target.dataset.url;
-      const md = `![alt text](${url})`;
-      navigator.clipboard.writeText(md);
-      console.log('Copied');
-    })
-  })
-
-  //document.body.addEventListener("uploadComplete", function (ev) {
-  //  console.log("Uploaded")
-  //})
-</script>
-<script type="text/hyperscript">
-  on keyup[key is 'Escape']
-    remove .visible from .modal-container
-  end
-
-  def do_html(md)
-    make a showdown.Converter called converter
-    set html to converter.makeHtml(md.replaceAll('/bucket/', '{{ imagekit_bucket }}/'))
-    put html into #pre-preview
-    call hljs.highlightAll()
-  end
-
-  def showModal(imgurl)
-    ---show <button.close/>
-    add .visible to .modal-container
-    set img_html to "<img src=\"https://ik.imagekit.io/alistairrobinson/blog/tr:w-800/" + imgurl + "\">"
-    put img_html into .modal-inner
-  end
-</script>
 <style>
   #imagelist .spinner {
     margin-top: 7px;
@@ -136,7 +100,7 @@ _="on click
     height: 100%;
     justify-content: center;
   }
-  #imagelist li a:hover {
+    #imagelist li a:hover {
     background-color: rgb(8, 32, 50);
   }
   #imagelist button {
@@ -149,6 +113,9 @@ _="on click
     display: flex;
     align-content: center;
     justify-content: center;
+  }
+  .modal.image img {
+    max-height: 85vh;
   }
 </style>
 {% endblock %}

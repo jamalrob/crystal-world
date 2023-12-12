@@ -32,15 +32,6 @@
   <section class="edit">
     <div class="editable" contenteditable="true" id="edit-box" placeholder="Start writing here! NOTE: don't put the article title here; just define it in 'Article properties'."
     _="
-        --- ################################################################################
-        --- #
-        --- # MAY HAVE TO ADD ERROR HANDLING WHEN LOCASTORAGE IS FULL
-        --- # See here for exceptions in hyperscript: https://hyperscript.org/features/def/
-        --- # See here for distinguishing localStorage exceptions:
-        --- #  https://mmazzarolo.com/blog/2022-06-25-local-storage-status/
-        --- #
-        --- ################################################################################
-
         on load
           if localStorage.article_{{ article.id }} is not empty
             set my innerText to localStorage.article_{{ article.id }}
@@ -73,12 +64,6 @@
   <section class="preview">
     <!--  FULL PREVIEW: get the markdown conversion from the server,
           because showdown.js doesn't do proper typography
-
-          ALSO, IF USING THE NEW TAB METHOD INSTEAD OF MODAL, WE NEED TO
-          SET LOCAL STORAGE THEN OPEN THE NEW TAB NORMALLY:
-          <a href="/admin/articles/{{ article.slug }}/preview"
-            _="on click set localStorage.previewHtml to innerHTML of #pre-preview">
-          OR SOMETHING LIKE THAT
     -->
     <a  href="/admin/articles/{{ article.id }}/preview"
         title="Full preview"
@@ -121,10 +106,6 @@
 
 </div>
 <script type="text/hyperscript">
-  on keyup[key is 'Escape']
-    remove .visible from .modal-container
-  end
-
   def do_html(md)
     make a showdown.Converter called converter
     set html to converter.makeHtml(md.replaceAll('/bucket/', '{{ imagekit_bucket }}/'))

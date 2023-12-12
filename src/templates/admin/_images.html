@@ -1,12 +1,14 @@
 {% for im in images %}
-  <li data-url="{{ im }}">
+  <li>
     <a
       class="imglink"
-      _="on click call showModal('{{ im }}')"
+      data-url="{{ im }}"
+      _=" on click
+            add .visible to .modal-container
+            set img_html to `<img src='https://ik.imagekit.io/alistairrobinson/blog/tr:w-960/${me.dataset.url}'>`
+            put img_html into .modal-inner
+        "
     >
-    <!--hx-get="/admin/get_image/{{ im }}"
-    hx-trigger="load"-->
-      <!--<span class="spinner imgLoading"></span>-->
       <img src="https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/{{ im }}">
     </a>
     <button class="copymd icon" title="Copy markdown link" data-url="https://ik.imagekit.io/alistairrobinson/blog/{{ im }}" _="on click call copymd(me)">
@@ -16,7 +18,6 @@
   <script type="text/hyperscript">
     def copymd(el)
       set url to el.dataset.url
-      ---set md to "![alt text](" + url + ")"
       set md to `![alt text](${url})`
       navigator.clipboard.writeText(md)
       log 'Copied'
