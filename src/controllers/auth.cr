@@ -3,8 +3,8 @@ module CrystalWorld::AuthControllers
 
   def do_login(ctx)
     params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
-    username = params["username"] || ""
-    password = params["password"] || ""
+    username = params["username"]
+    password = params["password"]
     if u = Data.get_user(username)
       begin
         res = Argon2::Password.verify_password(password, u["password"].to_s)

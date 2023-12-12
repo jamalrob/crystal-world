@@ -23,13 +23,14 @@ main.admin.extended.collapsed {
   margin: 0 10px 0 50px !important;
 }
 button svg {
-  height: 1.3rem;
-  vertical-align: bottom;
+  /*height: 1.3rem;
+  vertical-align: bottom;*/
+  vertical-align: sub;
   margin-right: 0;
 }
 button.has-icon {
-  padding-top: 5px;
-  padding-left: 22px;
+  /*padding-top: 5px;
+  padding-left: 22px;*/
 }
 button.green {
   background-color: #2f71bc;

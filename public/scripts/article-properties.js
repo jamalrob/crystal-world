@@ -1,22 +1,24 @@
-const Article = class {
+function createArticle(params) {
 
-  constructor(params) {
-    this.articleId = params.articleId;
-    this.isDraft = params.isDraft;
-    this.alertUnpublishedChanges = params.alertUnpublishedChanges;
-    this.alertArticleStatus = params.alertArticleStatus;
-    this.confAfterRequest = params.confAfterRequest;
-    this.btRevert = params.btRevert;
-    this.btPublish = params.btPublish;
-    this.btUnpublish = params.btUnpublish;
-    this.inputs = params.inps;
-    this.btPublishAction = params.btPublishAction;
-    this.alertPublishErrors = params.alertPublishErrors
-    this.dataSource = this.getDataSource();
-    this.events.mainLoad()
-  }
+  /*
+    Factory function for state management in article
+    properties form: templates/admin/article_properties.html
+  */
 
-  getDataSource() {
+  let articleId = params.articleId;
+  let isDraft = params.isDraft;
+  let alertUnpublishedChanges = params.alertUnpublishedChanges;
+  let alertArticleStatus = params.alertArticleStatus;
+  let confAfterRequest = params.confAfterRequest;
+  let btRevert = params.btRevert;
+  let btPublish = params.btPublish;
+  let btUnpublish = params.btUnpublish;
+  let inputs = params.inps;
+  let btPublishAction = params.btPublishAction;
+  let alertPublishErrors = params.alertPublishErrors
+  let dataSource = getDataSource();
+
+  function getDataSource() {
     /*
       Find out if there are any items in localStorage
       for this article
@@ -43,57 +45,57 @@ const Article = class {
     published:{
       signalling:{
         UIState:() => {
-          this.confAfterRequest.innerHTML = "✔ Published";
-          this.confAfterRequest.classList.add("autosaved");
+          confAfterRequest.innerHTML = "✔ Published";
+          confAfterRequest.classList.add("autosaved");
         }
       },
       changes:{
         UIState:() => {
-          this.isDraft = 0;
-          this.alertUnpublishedChanges.innerText = 'There are unpublished changes';
-          this.btRevert.classList.remove("hidden");
-          this.btUnpublish.classList.remove("hidden");
-          this.btPublish.classList.remove("hidden");
-          this.alertArticleStatus.innerHTML = "published";
-          this.confAfterRequest.innerHTML = "";
-          this.confAfterRequest.classList.remove("autosaved");
-          this.btPublishAction.innerHTML = "Publish changes"
+          isDraft = 0;
+          alertUnpublishedChanges.innerText = 'There are unpublished changes';
+          btRevert.classList.remove("hidden");
+          btUnpublish.classList.remove("hidden");
+          btPublish.classList.remove("hidden");
+          alertArticleStatus.innerHTML = "published";
+          confAfterRequest.innerHTML = "";
+          confAfterRequest.classList.remove("autosaved");
+          btPublishAction.innerHTML = "Publish changes"
         }
       },
       noChanges: {
         UIState:() => {
-          this.isDraft = 0;
-          this.btUnpublish.classList.remove("hidden");
-          this.btPublish.classList.add("hidden");
-          this.alertUnpublishedChanges.innerText = '';
-          if(this.btRevert !== null) {
-            this.btRevert.classList.add("hidden");
+          isDraft = 0;
+          btUnpublish.classList.remove("hidden");
+          btPublish.classList.add("hidden");
+          alertUnpublishedChanges.innerText = '';
+          if(btRevert !== null) {
+            btRevert.classList.add("hidden");
           }
-          this.alertArticleStatus.innerHTML = "published";
-          this.confAfterRequest.innerHTML = "";
-          this.confAfterRequest.classList.remove("autosaved");
+          alertArticleStatus.innerHTML = "published";
+          confAfterRequest.innerHTML = "";
+          confAfterRequest.classList.remove("autosaved");
         }
       }
     },
     draft:{
       signalling:{
         UIState:() => {
-          this.confAfterRequest.innerHTML = "✔ Unpublished";
-          this.confAfterRequest.classList.add("autosaved");
+          confAfterRequest.innerHTML = "✔ Unpublished";
+          confAfterRequest.classList.add("autosaved");
         }
       },
       UIState:() => {
-        this.isDraft = 1;
-        this.alertUnpublishedChanges.innerText = '';
-        this.btUnpublish.classList.add("hidden");
-        this.btPublish.classList.remove("hidden");
-        if(this.btRevert !== null) {
-          this.btRevert.classList.add("hidden");
+        isDraft = 1;
+        alertUnpublishedChanges.innerText = '';
+        btUnpublish.classList.add("hidden");
+        btPublish.classList.remove("hidden");
+        if(btRevert !== null) {
+          btRevert.classList.add("hidden");
         }
-        this.alertArticleStatus.innerHTML = "draft";
-        this.confAfterRequest.innerHTML = "";
-        this.confAfterRequest.classList.remove("autosaved");
-        this.btPublishAction.innerHTML = "Publish"
+        alertArticleStatus.innerHTML = "draft";
+        confAfterRequest.innerHTML = "";
+        confAfterRequest.classList.remove("autosaved");
+        btPublishAction.innerHTML = "Publish"
       }
     },
     publishError:{
@@ -104,8 +106,8 @@ const Article = class {
             errorMsg += `${inp.name}: ${inp.error.message}<br>`
           }
         }
-        this.alertPublishErrors.innerHTML = errorMsg;
-        this.alertPublishErrors.classList.remove("hidden");
+        alertPublishErrors.innerHTML = errorMsg;
+        alertPublishErrors.classList.remove("hidden");
       }
     }
   }
@@ -115,34 +117,34 @@ const Article = class {
       These determine the current state
     */
     mainLoad:() => {
-      if(parseInt(this.isDraft) == 0){
-        if(this.dataSource === "localStorage"){
-          this.currentState = this.states.published.changes;
+      if(parseInt(isDraft) == 0){
+        if(dataSource === "localStorage"){
+          currentState = states.published.changes;
         } else {
-          this.currentState = this.states.published.noChanges;
+          currentState = states.published.noChanges;
         }
       } else {
-        this.currentState = this.states.draft;
+        currentState = states.draft;
       }
-      this.currentState.UIState();
+      currentState.UIState();
     },
     autosave:(inpEl) => {
       clearTimeout(inpEl._timer);
       inpEl._timer = setTimeout(()=>{
-        localStorage.setItem(`article_${this.articleId}_${inpEl.name}`, inpEl.value)
+        localStorage.setItem(`article_${articleId}_${inpEl.name}`, inpEl.value)
         let signalEl = inpEl.labels[0].querySelector(".autosaved")
         signalEl.classList.remove("hidden");
         setTimeout(() => {
           signalEl.classList.add("hidden");
         }, 2000);
 
-        if (this.isDraft !== 1) {
-          this.dataSource = "localStorage"
-          this.currentState = this.states.published.changes;
+        if (isDraft !== 1) {
+          dataSource = "localStorage"
+          currentState = states.published.changes;
         } else {
-          this.currentState = this.states.draft;
+          currentState = states.draft;
         }
-        this.currentState.UIState();
+        currentState.UIState();
       }, 1500);
     },
     publish:() => {
@@ -150,55 +152,55 @@ const Article = class {
         Remove the localStorage items
         for the current article
       */
-      let storageKeyPrefix = 'article_' + this.articleId;
+      let storageKeyPrefix = 'article_' + articleId;
       localStorage.removeItem(storageKeyPrefix)
-      for(const input of this.inputs){
+      for(const input of inputs){
         let storageKey = storageKeyPrefix + "_" + input.name
         localStorage.removeItem(storageKey);
       }
-      this.dataSource = "db";
+      dataSource = "db";
       /*
         Set to signalling state for a couple
         of seconds
       */
-      this.states.published.signalling.UIState()
+      states.published.signalling.UIState()
       setTimeout(() => {
-        this.currentState = this.states.published.noChanges;
-        this.currentState.UIState();
+        currentState = states.published.noChanges;
+        currentState.UIState();
       }, 2500);
       /*
         Remove error messages
       */
-      this.alertPublishErrors.innerHTML = "";
-      this.alertPublishErrors.classList.add("hidden");
+      alertPublishErrors.innerHTML = "";
+      alertPublishErrors.classList.add("hidden");
     },
     unpublish:() => {
       /*
         Set to signalling state for a couple
         of seconds
       */
-      this.states.draft.signalling.UIState()
+      states.draft.signalling.UIState()
       setTimeout(() => {
-        this.currentState = this.states.draft;
-        this.currentState.UIState();
+        currentState = states.draft;
+        currentState.UIState();
       }, 2500);
       /*
         Remove error messages
       */
-      this.alertPublishErrors.innerHTML = "";
-      this.alertPublishErrors.classList.add("hidden");
+      alertPublishErrors.innerHTML = "";
+      alertPublishErrors.classList.add("hidden");
     },
     receivePublishError:(validation_results) => {
-      this.currentState = this.states.publishError;
-      this.currentState.UIState(validation_results);
+      currentState = states.publishError;
+      currentState.UIState(validation_results);
     }
   }
-
-} // Class Article
+  return { events }
+}
 
 function setupArticle() {
 
-  const a = new Article({
+  const a = createArticle({
     articleId:                document.getElementById("inpArticleID").value,
     isDraft:                  document.getElementById("inpDraft").value,
     alertUnpublishedChanges:  document.getElementById("unpublished-changes"),
@@ -212,7 +214,9 @@ function setupArticle() {
     btPublishAction:          document.getElementById("publishAction")
   })
 
-  const autosaveEvents = ["input", "changed"];
+  a.events.mainLoad();
+
+  const autosaveEvents = ["input", "change", "blur"];
   const autoSaveElementIDs = [
     "inpSlug",
     "inpDate",
@@ -267,5 +271,10 @@ function setupArticle() {
 } // setupArticle()
 
 window.addEventListener("doSetupArticle", ()=>{
+  /*
+    Triggered by HTMX:
+    Header "HX-Trigger-After-Settle" = "doSetupArticle"
+    sent from article_properties response only
+  */
   setupArticle();
 })

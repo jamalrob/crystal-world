@@ -10,7 +10,6 @@ module CrystalWorld::AdminControllers
 
   def upload_image(ctx)
 
-
     p! ctx.request.body
 
     HTTP::FormData.parse(ctx.request) do |part|
@@ -37,7 +36,8 @@ module CrystalWorld::AdminControllers
           },
         )
         res = req.execute
-        ctx.response.headers["HX-Trigger"] = "uploadComplete"
+        #ctx.response.headers["HX-Trigger"] = "uploadComplete"
+        ctx.response.headers["HX-Trigger-After-Settle"] = "uploadComplete"
         #ctx.response.headers["HX-Trigger-After-Swap"] = "uploadComplete"
         #ctx.response.print res.status
         deleted = File.delete?("#{TEMP_IMAGES_FOLDER}/#{fname}")
