@@ -117,7 +117,7 @@ function createArticle(params) {
       These determine the current state
     */
     mainLoad:() => {
-      if(parseInt(isDraft) == 0){
+      if(parseInt(isDraft) === 0){
         if(dataSource === "localStorage"){
           currentState = states.published.changes;
         } else {
@@ -216,7 +216,12 @@ function setupArticle() {
 
   a.events.mainLoad();
 
-  const autosaveEvents = ["input", "change", "blur"];
+
+  /*
+    AUTOSAVE
+  */
+
+  const autosaveEvents = ["input", "change"];
   const autoSaveElementIDs = [
     "inpSlug",
     "inpDate",
@@ -231,9 +236,22 @@ function setupArticle() {
     document.body.addEventListener(eventType, (ev) => {
       if (autoSaveElementIDs.includes(ev.target.id)) {
         a.events.autosave(ev.target)
+
+        /*
+          Special rule to ensure auto-slugified value
+          for slug is autosaved
+        */
+        if (ev.target.id === 'inpTitle'){
+          a.events.autosave(document.getElementById("inpSlug"))
+        }
       }
     })
   })
+
+
+  /*
+    FORM SUBMISSION
+  */
 
   document.body.addEventListener('htmx:afterRequest', (evt) => {
     const myTarget = evt.detail.target;
@@ -262,9 +280,9 @@ function setupArticle() {
 
 window.addEventListener("doSetupArticle", ()=>{
   /*
-    Triggered by HTMX:
+    Triggered by HTMX via header from server:
     Header "HX-Trigger-After-Settle" = "doSetupArticle"
-    sent from article_properties response only
+    sent from article_properties response (only)
   */
   setupArticle();
 })

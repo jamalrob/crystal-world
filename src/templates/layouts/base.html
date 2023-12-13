@@ -24,7 +24,8 @@
 </head>
 <body
   hx-headers='{"X-CSRFToken": "{{ csrftoken }}"}'
-  _="on keyup[key is 'Escape'] remove .visible from .modal-container">
+  _="on keyup[key is 'Escape'] remove .visible from .modal-container"
+>
     {% if admin_preview is not defined %}
       <header hx-boost="true">
           <a href="/" class="logo" title="Home">
