@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 {% block extra_head %}
-<script src="/scripts/article-properties.js?v={{ cachebust }}"></script>
+<script src="/scripts/admin-main.js?v={{ cachebust }}" type="module"></script>
 {% endblock %}
 {% block admin_sidebar %}
 <div id="sidebar" hx-boost="true" class="{{ sidebar_collapsed }}">
