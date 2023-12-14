@@ -1,5 +1,5 @@
 {% extends "layouts/base.html" %}
-{% block extra_head %}
+{% block extra_body %}
 <script src="/scripts/modules/admin-main.js?v={{ cachebust }}" type="module"></script>
 {% endblock %}
 {% block admin_sidebar %}
@@ -54,7 +54,6 @@
     </a>
   </nav>
 </div>
-
 <style>
 button#toggle-sidebar {
   position: absolute;
