@@ -2,7 +2,7 @@ export const Article = function(params) {
 
   /*
     Factory function for state management in article
-    properties form: templates/admin/article_properties.html
+    properties form
   */
 
   const articleId = params.articleId;

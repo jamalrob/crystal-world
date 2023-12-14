@@ -1,4 +1,4 @@
-import { Article } from "./article-properties.js"
+import { Article } from "./article.js"
 
 /*
   Entry point for the article properties form
@@ -90,11 +90,11 @@ function setupArticle() {
         if(errors) {
           a.events.receivePublishError(res.validation_results)
         } else {
-          a.events.publish()
+          a.events.publish();
         }
         break;
       case "unpublish":
-        a.events.unpublish()
+        a.events.unpublish();
         break;
     }
   });
