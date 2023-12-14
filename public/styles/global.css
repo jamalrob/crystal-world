@@ -67,7 +67,7 @@ h3 {
     }
 }
 .button-row {
-    margin-top: 1rem;
+    margin-top: 1.4rem;
     display: flex;
     justify-content: right;
 }
@@ -95,6 +95,10 @@ button.delete:hover {
 }
 button.fullwidth {
   width: 100%;
+  margin: 10px 0 0;
+}
+button.halfwidth {
+  width: 50%;
   margin: 10px 0 0;
 }
 button.small {

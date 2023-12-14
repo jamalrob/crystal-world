@@ -5,14 +5,17 @@
   id="frm-login"
   class="login"
   hx-post="/admin/login/auth"
-  hx-indicator=".error-message"
+  hx-indicator="#loginSpinner"
 >
   <label>Username</label>
   <input type="text" name="username">
   <label>Password</label>
   <input type="password" name="password">
   <div class="button-row">
-    <button>Sign in</button>
+    <button class="halfwidth">
+      Sign in
+      <span class="spinner spinner--hidden" id="loginSpinner"></span>
+    </button>
   </div>
   <div class="error-message"></div>
 </form>
