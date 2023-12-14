@@ -129,14 +129,18 @@ function createArticle(params) {
       currentState.UIState();
     },
     autosave:(inpEl) => {
+      const SHOW_SIGNAL_FOR = 2000;
+      const DO_AUTOSAVE_AFTER = 1500; // Following last input/change event
+
       clearTimeout(inpEl._timer);
       inpEl._timer = setTimeout(()=>{
+
         localStorage.setItem(`article_${articleId}_${inpEl.name}`, inpEl.value)
         let signalEl = inpEl.labels[0].querySelector(".autosaved")
         signalEl.classList.remove("hidden");
         setTimeout(() => {
           signalEl.classList.add("hidden");
-        }, 2000);
+        }, SHOW_SIGNAL_FOR);
 
         if (isDraft !== 1) {
           dataSource = "localStorage"
@@ -144,8 +148,10 @@ function createArticle(params) {
         } else {
           currentState = states.draft;
         }
+
         currentState.UIState();
-      }, 1500);
+
+      }, DO_AUTOSAVE_AFTER);
     },
     publish:() => {
       /*
@@ -229,34 +235,35 @@ function setupArticle() {
     "inpDate",
     "inpTags",
     "selImageClass"
-  ]
+  ];
+  const syncedPairs = {inpTitle: "inpSlug"};
 
-  autosaveEvents.forEach((eventType) => {
-    document.body.addEventListener(eventType, (ev) => {
+  autosaveEvents.forEach(eventType => {
+    document.body.addEventListener(eventType, ev => {
       if (autoSaveElementIDs.includes(ev.target.id)) {
         a.events.autosave(ev.target)
-
         /*
-          Special rule to ensure auto-slugified value
-          for slug is autosaved
+          When key (property name) of syncedPairs is saved,
+          value gets saved too (not vice versa)
         */
-        if (ev.target.id === 'inpTitle'){
-          a.events.autosave(document.getElementById("inpSlug"))
+        if (syncedPairs.hasOwnProperty(ev.target.id)) {
+          a.events.autosave(document.getElementById(syncedPairs[ev.target.id]))
         }
+
       }
     })
   })
 
 
   /*
-    FORM SUBMISSION
+    FORM SUBMISSION RESPONSE
   */
 
-  document.body.addEventListener('htmx:afterRequest', (evt) => {
-    const myTarget = evt.detail.target;
+  document.body.addEventListener('htmx:afterRequest', ev => {
+    const myTarget = ev.detail.target;
     switch (myTarget.id) {
       case "publish":
-        let res = JSON.parse(evt.detail.xhr.response);
+        let res = JSON.parse(ev.detail.xhr.response);
         errors = false;
         for(const inp of res.validation_results) {
           if (inp.hasOwnProperty("error")) {
