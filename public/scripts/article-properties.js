@@ -228,7 +228,6 @@ function setupArticle() {
     "inpTitle",
     "inpDate",
     "inpTags",
-    "inpMainImage",
     "selImageClass"
   ]
 
@@ -275,6 +274,12 @@ function setupArticle() {
         break;
     }
   });
+
+  //const filepicker = document.getElementById("inpMainImage");
+  //filepicker.addEventListener("change", (event) => {
+  //  const files = event.target.files;
+  //  filepicker.value = files[0].name;
+  //});
 
 } // setupArticle()
 

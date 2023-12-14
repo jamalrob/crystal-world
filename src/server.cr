@@ -111,10 +111,8 @@ module CrystalWorld
     when .match /^\/admin\/articles\/#{ID_PATTERN}\/edit$/
       AdminControllers.edit_article_page(ctx)
 
-    #when .match /^\/admin\/get_image\/#{FILENAME_PATTERN}$/
-    #  AdminControllers.get_image(ctx)
-
-    when .starts_with? "/admin/get_image/"
+    when .starts_with? "/admin/get_image"
+      # Currently not used
       AdminControllers.get_image(ctx)
 
     when "/admin/images/get"

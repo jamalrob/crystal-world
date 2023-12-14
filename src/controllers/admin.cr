@@ -2,26 +2,36 @@ module CrystalWorld::AdminControllers
   extend self
 
   def get_image(ctx)
+    # Currently not used
     urlbits = ctx.request.path.split('/', remove_empty: true)
     file = urlbits[-1]?
     html = "<img src=\"https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/#{file}\">"
     ctx.response.print html
   end
 
+
+  # KEMAL:
+  #
+  # @tempfile = File.tempfile
+  # ::File.open(@tempfile.path, "w") do |file|
+  #   IO.copy(upload.body, file)
+  # end
+  # @filename = upload.filename
+  # @headers = upload.headers
+  # @creation_time = upload.creation_time
+  # @modification_time = upload.modification_time
+  # @read_time = upload.read_time
+  # @size = upload.size
+
+
   def upload_image(ctx)
-
-    p! ctx.request.body
-
+    #p! ctx.request.body
     HTTP::FormData.parse(ctx.request) do |part|
-      p! part.name
       case part.name
       when "imageUpload"
         fname = part.filename.to_s
         p! fname
-
         File.write("#{TEMP_IMAGES_FOLDER}/#{fname}", part.body)
-        #tempfile = File.tempfile(fname, dir: TEMP_IMAGES_FOLDER)
-
         file = File.open("/home/user/Pictures/#{fname}")
         req = Crest::Request.new(
           :post,
@@ -36,16 +46,10 @@ module CrystalWorld::AdminControllers
           },
         )
         res = req.execute
-        #ctx.response.headers["HX-Trigger"] = "uploadComplete"
-        ctx.response.headers["HX-Trigger-After-Settle"] = "uploadComplete"
-        #ctx.response.headers["HX-Trigger-After-Swap"] = "uploadComplete"
-        #ctx.response.print res.status
         deleted = File.delete?("#{TEMP_IMAGES_FOLDER}/#{fname}")
-        #tempfile.delete
-        #tempfile.delete
-        #content = File.open("/home/user/websites/crystal-world/#{fname}") do |f|
-        #end
+        ctx.response.headers["HX-Trigger-After-Settle"] = "uploadComplete"
       end
+      #p! res
     end
     self.get_images(ctx)
     #ctx.response.headers["HX-Trigger-After-Swap"] = "uploadComplete"
