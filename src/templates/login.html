@@ -1,9 +1,11 @@
 {% extends "layouts/base.html" %}
 {% block content %}
 <h1>{{ title }}</h1>
-<form   class="login"
-        hx-post="/admin/login/auth"
-        hx-target=".error-message" hx-swap="innerHTML"
+<form
+  id="frm-login"
+  class="login"
+  hx-post="/admin/login/auth"
+  hx-indicator=".error-message"
 >
   <label>Username</label>
   <input type="text" name="username">
@@ -14,4 +16,9 @@
   </div>
   <div class="error-message"></div>
 </form>
+<style>
+  .error-message {
+    margin-top: 20px;
+  }
+</style>
 {% endblock %}

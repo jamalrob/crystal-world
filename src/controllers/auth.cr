@@ -52,10 +52,7 @@ module CrystalWorld::AuthControllers
         return
       end
     end
-
-    # Adding an error status to the response here trips up
-    # the HTMX replacement, so we don't do it
-    ctx.response.print "Your credentials were not recognized."
+    ctx.response.respond_with_status(401)
   end
 
   def do_logout(ctx)

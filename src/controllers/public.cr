@@ -77,7 +77,7 @@ module CrystalWorld::PublicControllers
       data: {
         "title" => "Sign in to admin",
       },
-      template_path: "admin/login.html"
+      template_path: "login.html"
     )
   end
 
