@@ -161,14 +161,18 @@ export const Article = function(params) {
         Remove the localStorage items
         for the current article
       */
+      const SHOW_SIGNAL_FOR = 2500;
       let currentState = {};
       let storageKeyPrefix = 'article_' + articleId;
+
       localStorage.removeItem(storageKeyPrefix);
+
       for(const input of inputs){
         let storageKey = storageKeyPrefix + "_" + input.name;
         localStorage.removeItem(storageKey);
       }
       dataSource = "db";
+
       /*
         Set to signalling state for a couple
         of seconds
@@ -177,7 +181,7 @@ export const Article = function(params) {
       setTimeout(() => {
         currentState = states.published.noChanges;
         currentState.UIState();
-      }, 2500);
+      }, SHOW_SIGNAL_FOR);
       /*
         Remove error messages
       */
@@ -192,7 +196,6 @@ export const Article = function(params) {
       let currentState = states.draft;
       currentState.signalling.UIState();
       setTimeout(() => {
-        currentState = states.draft;
         currentState.UIState();
       }, 2500);
       /*
