@@ -22,17 +22,25 @@ export const newArticle = function(params) {
   function getDataSource() {
     /*
       Find out if there are any items in localStorage
-      for this article
+      for this article.
+
+      LOCAL STORAGE USAGE SCHEME:
+
+      E.g., for article with ID=42, we'll have the following localStorage keys:
+      - "article_42", which holds the markdown for the article body
+      - "article_42_title", "article_42_slug", etc. for the article properties,
+      - where "title", "slug", etc. are the values of the `name` attributes for each
+      - of `me.inputs` (note that select elements etc. can be in `me.inputs` too)
     */
     let dSrc = "db";
-    let storageKeyPrefix = 'article_' + me.articleId;
+    let storageKeyPrefix = `article_${me.articleId}`;
 
     if (localStorage.getItem(storageKeyPrefix) !== null){
       dSrc = "localStorage";
     }
 
     for(const input of me.inputs){
-      let storageKey = storageKeyPrefix + "_" + input.name;
+      let storageKey = `${storageKeyPrefix}_${input.name}`;
       if (localStorage.getItem(storageKey) !== null) {
         /*
           Replace input values with localStorage values
@@ -41,7 +49,7 @@ export const newArticle = function(params) {
         dSrc = "localStorage";
       }
     }
-    
+
     return dSrc;
   }
 
@@ -167,12 +175,12 @@ export const newArticle = function(params) {
       */
       const SHOW_SIGNAL_FOR = 2500;
       let currentState = {};
-      let storageKeyPrefix = 'article_' + me.articleId;
+      let storageKeyPrefix = `article_${me.articleId}`;
 
       localStorage.removeItem(storageKeyPrefix);
 
       for(const input of me.inputs){
-        let storageKey = storageKeyPrefix + "_" + input.name;
+        let storageKey = `${storageKeyPrefix}_${input.name}`;
         localStorage.removeItem(storageKey);
       }
       me.dataSource = "db";
