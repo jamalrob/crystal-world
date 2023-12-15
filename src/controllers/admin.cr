@@ -57,7 +57,7 @@ module CrystalWorld::AdminControllers
 
   def get_images(ctx)
     img_arr = [] of String
-    if LOCAL
+    if !LOCAL
       res = Crest.get(
         "https://api.imagekit.io/v1/files?path=blog",
         user: IMAGEKIT_PRIVATE_KEY,

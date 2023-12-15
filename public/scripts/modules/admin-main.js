@@ -1,4 +1,4 @@
-import { Article } from "./article.js"
+import { newArticle } from "./article.js"
 
 /*
   Entry point for the article properties form
@@ -16,7 +16,7 @@ window.addEventListener("doSetupArticle", ()=>{
 
 function setupArticle() {
 
-  const a = Article({
+  const a = newArticle({
     articleId:                document.getElementById("inpArticleID").value,
     isDraft:                  document.getElementById("inpDraft").value,
     alertUnpublishedChanges:  document.getElementById("unpublished-changes"),

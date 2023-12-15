@@ -1,22 +1,23 @@
-export const Article = function(params) {
+export const newArticle = function(params) {
 
   /*
     Factory function for state management in article
     properties form
   */
 
-  const articleId = params.articleId;
-  const alertUnpublishedChanges = params.alertUnpublishedChanges;
-  const alertArticleStatus = params.alertArticleStatus;
-  const confAfterRequest = params.confAfterRequest;
-  const btRevert = params.btRevert;
-  const btPublish = params.btPublish;
-  const btUnpublish = params.btUnpublish;
-  const inputs = params.inps;
-  const btPublishAction = params.btPublishAction;
-  const alertPublishErrors = params.alertPublishErrors
-  let isDraft = params.isDraft;
-  let dataSource = getDataSource();
+  const me = {};
+  me.articleId = params.articleId;
+  me.alertUnpublishedChanges = params.alertUnpublishedChanges;
+  me.alertArticleStatus = params.alertArticleStatus;
+  me.confAfterRequest = params.confAfterRequest;
+  me.btRevert = params.btRevert;
+  me.btPublish = params.btPublish;
+  me.btUnpublish = params.btUnpublish;
+  me.inputs = params.inps;
+  me.btPublishAction = params.btPublishAction;
+  me.alertPublishErrors = params.alertPublishErrors
+  me.isDraft = params.isDraft;
+  me.dataSource = getDataSource();
 
   function getDataSource() {
     /*
@@ -24,12 +25,14 @@ export const Article = function(params) {
       for this article
     */
     let dSrc = "db";
-    let storageKeyPrefix = 'article_' + articleId;
+    let storageKeyPrefix = 'article_' + me.articleId;
+
     if (localStorage.getItem(storageKeyPrefix) !== null){
       dSrc = "localStorage";
     }
-    for(const input of inputs){
-      let storageKey = storageKeyPrefix + "_" + input.name
+
+    for(const input of me.inputs){
+      let storageKey = storageKeyPrefix + "_" + input.name;
       if (localStorage.getItem(storageKey) !== null) {
         /*
           Replace input values with localStorage values
@@ -38,64 +41,65 @@ export const Article = function(params) {
         dSrc = "localStorage";
       }
     }
+    
     return dSrc;
   }
 
-  const states = {
+  me.states = {
     published:{
       signalling:{
         UIState:() => {
-          confAfterRequest.innerHTML = "✔ Published";
-          confAfterRequest.classList.add("autosaved");
+          me.confAfterRequest.classList.add("autosaved");
+          me.confAfterRequest.innerHTML = "✔ Published";
         }
       },
       changes:{
         UIState:() => {
-          isDraft = 0;
-          alertUnpublishedChanges.innerText = 'There are unpublished changes';
-          btRevert.classList.remove("hidden");
-          btUnpublish.classList.remove("hidden");
-          btPublish.classList.remove("hidden");
-          alertArticleStatus.innerHTML = "published";
-          confAfterRequest.innerHTML = "";
-          confAfterRequest.classList.remove("autosaved");
-          btPublishAction.innerHTML = "Publish changes"
+          me.alertUnpublishedChanges.innerText = 'There are unpublished changes';
+          me.isDraft = 0;
+          me.btRevert.classList.remove("hidden");
+          me.btUnpublish.classList.remove("hidden");
+          me.btPublish.classList.remove("hidden");
+          me.alertArticleStatus.innerHTML = "published";
+          me.confAfterRequest.innerHTML = "";
+          me.confAfterRequest.classList.remove("autosaved");
+          me.btPublishAction.innerHTML = "Publish changes"
         }
       },
       noChanges: {
         UIState:() => {
-          isDraft = 0;
-          btUnpublish.classList.remove("hidden");
-          btPublish.classList.add("hidden");
-          alertUnpublishedChanges.innerText = '';
-          if(btRevert !== null) {
-            btRevert.classList.add("hidden");
+          me.isDraft = 0;
+          me.btUnpublish.classList.remove("hidden");
+          me.btPublish.classList.add("hidden");
+          me.alertUnpublishedChanges.innerText = '';
+          if(me.btRevert !== null) {
+            me.btRevert.classList.add("hidden");
           }
-          alertArticleStatus.innerHTML = "published";
-          confAfterRequest.innerHTML = "";
-          confAfterRequest.classList.remove("autosaved");
+          me.alertArticleStatus.innerHTML = "published";
+          me.confAfterRequest.innerHTML = "";
+          me.confAfterRequest.classList.remove("autosaved");
         }
       }
     },
     draft:{
       signalling:{
         UIState:() => {
-          confAfterRequest.innerHTML = "✔ Unpublished";
-          confAfterRequest.classList.add("autosaved");
+          me.confAfterRequest.innerHTML = "✔ Unpublished";
+          me.confAfterRequest.classList.add("autosaved");
         }
       },
       UIState:() => {
-        isDraft = 1;
-        alertUnpublishedChanges.innerText = '';
-        btUnpublish.classList.add("hidden");
-        btPublish.classList.remove("hidden");
-        if(btRevert !== null) {
-          btRevert.classList.add("hidden");
+        me.isDraft = 1;
+        me.alertUnpublishedChanges.innerText = '';
+        me.btUnpublish.classList.add("hidden");
+        me.btPublish.classList.remove("hidden");
+        if(me.btRevert !== null) {
+          me.btRevert.classList.add("hidden");
         }
-        alertArticleStatus.innerHTML = "draft";
-        confAfterRequest.innerHTML = "";
-        confAfterRequest.classList.remove("autosaved");
-        btPublishAction.innerHTML = "Publish"
+        me.alertArticleStatus.innerHTML = "draft";
+        me.confAfterRequest.innerHTML = "";
+        me.confAfterRequest.classList.remove("autosaved");
+        me.btPublishAction.innerHTML = "Publish"
       }
     },
     publishError:{
@@ -106,26 +110,26 @@ export const Article = function(params) {
             errorMsg += `${inp.name}: ${inp.error.message}<br>`
           }
         }
-        alertPublishErrors.innerHTML = errorMsg;
-        alertPublishErrors.classList.remove("hidden");
+        me.alertPublishErrors.innerHTML = errorMsg;
+        me.alertPublishErrors.classList.remove("hidden");
       }
     }
   }
 
-  const events = {
+  me.events = {
     /*
       These determine the current state
     */
     mainLoad:() => {
       let currentState = {};
-      if(parseInt(isDraft) === 0){
-        if(dataSource === "localStorage"){
-          currentState = states.published.changes;
+      if(parseInt(me.isDraft) === 0){
+        if(me.dataSource === "localStorage"){
+          currentState = me.states.published.changes;
         } else {
-          currentState = states.published.noChanges;
+          currentState = me.states.published.noChanges;
         }
       } else {
-        currentState = states.draft;
+        currentState = me.states.draft;
       }
       currentState.UIState();
     },
@@ -138,18 +142,18 @@ export const Article = function(params) {
       clearTimeout(inpEl._timer);
       inpEl._timer = setTimeout(()=>{
 
-        localStorage.setItem(`article_${articleId}_${inpEl.name}`, inpEl.value)
+        localStorage.setItem(`article_${me.articleId}_${inpEl.name}`, inpEl.value)
         let signalEl = inpEl.labels[0].querySelector(".autosaved")
         signalEl.classList.remove("hidden");
         setTimeout(() => {
           signalEl.classList.add("hidden");
         }, SHOW_SIGNAL_FOR);
 
-        if (isDraft !== 1) {
-          dataSource = "localStorage"
-          currentState = states.published.changes;
+        if (me.isDraft !== 1) {
+          me.dataSource = "localStorage"
+          currentState = me.states.published.changes;
         } else {
-          currentState = states.draft;
+          currentState = me.states.draft;
         }
 
         currentState.UIState();
@@ -163,37 +167,37 @@ export const Article = function(params) {
       */
       const SHOW_SIGNAL_FOR = 2500;
       let currentState = {};
-      let storageKeyPrefix = 'article_' + articleId;
+      let storageKeyPrefix = 'article_' + me.articleId;
 
       localStorage.removeItem(storageKeyPrefix);
 
-      for(const input of inputs){
+      for(const input of me.inputs){
         let storageKey = storageKeyPrefix + "_" + input.name;
         localStorage.removeItem(storageKey);
       }
-      dataSource = "db";
+      me.dataSource = "db";
 
       /*
         Set to signalling state for a couple
         of seconds
       */
-      states.published.signalling.UIState()
+      me.states.published.signalling.UIState()
       setTimeout(() => {
-        currentState = states.published.noChanges;
+        currentState = me.states.published.noChanges;
         currentState.UIState();
       }, SHOW_SIGNAL_FOR);
       /*
         Remove error messages
       */
-      alertPublishErrors.innerHTML = "";
-      alertPublishErrors.classList.add("hidden");
+      me.alertPublishErrors.innerHTML = "";
+      me.alertPublishErrors.classList.add("hidden");
     },
     unpublish:() => {
       /*
         Set to signalling state for a couple
         of seconds
       */
-      let currentState = states.draft;
+      let currentState = me.states.draft;
       currentState.signalling.UIState();
       setTimeout(() => {
         currentState.UIState();
@@ -201,13 +205,13 @@ export const Article = function(params) {
       /*
         Remove error messages
       */
-      alertPublishErrors.innerHTML = "";
-      alertPublishErrors.classList.add("hidden");
+      me.alertPublishErrors.innerHTML = "";
+      me.alertPublishErrors.classList.add("hidden");
     },
     receivePublishError:(validation_results) => {
-      let currentState = states.publishError;
+      let currentState = me.states.publishError;
       currentState.UIState(validation_results);
     }
   }
-  return { events };
+  return me;
 }
