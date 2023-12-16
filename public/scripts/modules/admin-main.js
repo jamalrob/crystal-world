@@ -1,4 +1,4 @@
-import { newArticle } from "./article.js"
+import { makeArticle } from "./article.js"
 
 /*
   Entry point for the article properties form
@@ -16,7 +16,7 @@ window.addEventListener("doSetupArticle", ()=>{
 
 function setupArticle() {
 
-  const a = newArticle({
+  const article = makeArticle({
     articleId:                document.getElementById("inpArticleID").value,
     isDraft:                  document.getElementById("inpDraft").value,
     alertUnpublishedChanges:  document.getElementById("unpublished-changes"),
@@ -26,11 +26,11 @@ function setupArticle() {
     btPublish:                document.getElementById("publish"),
     btUnpublish:              document.getElementById("unpublish"),
     alertPublishErrors:       document.getElementById("error-message"),
-    inps:                     document.querySelectorAll("input, select"),
+    inputs:                   document.querySelectorAll("input, select"),
     btPublishAction:          document.getElementById("publishAction")
   })
 
-  a.events.mainLoad();
+  article.events.mainLoad();
 
 
   /*
@@ -58,13 +58,13 @@ function setupArticle() {
 
       // On to the autosave
       if (autoSaveElementIDs.includes(ev.target.id)) {
-        a.events.autosave(ev.target)
+        article.events.autosave(ev.target)
         /*
           When key (property name) of syncedPairs is saved,
           value gets saved too (not vice versa)
         */
         if (syncedPairs.hasOwnProperty(ev.target.id)) {
-          a.events.autosave(document.getElementById(syncedPairs[ev.target.id]))
+          article.events.autosave(document.getElementById(syncedPairs[ev.target.id]))
         }
 
       }
@@ -88,13 +88,13 @@ function setupArticle() {
           }
         }
         if(errors) {
-          a.events.receivePublishError(res.validation_results)
+          article.events.receivePublishError(res.validation_results)
         } else {
-          a.events.publish();
+          article.events.publish();
         }
         break;
       case "unpublish":
-        a.events.unpublish();
+        article.events.unpublish();
         break;
     }
   });

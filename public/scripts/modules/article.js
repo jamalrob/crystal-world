@@ -1,22 +1,24 @@
-export const newArticle = function(params) {
+export const makeArticle = function(params = {
+  articleId,
+  alertUnpublishedChanges,
+  alertArticleStatus,
+  confAfterRequest,
+  btRevert,
+  btPublish,
+  btUnpublish,
+  inputs,
+  btPublishAction,
+  alertPublishErrors,
+  isDraft
+}) {
 
   /*
     Factory function for state management in article
     properties form
   */
 
-  const me = {};
-  me.articleId = params.articleId;
-  me.alertUnpublishedChanges = params.alertUnpublishedChanges;
-  me.alertArticleStatus = params.alertArticleStatus;
-  me.confAfterRequest = params.confAfterRequest;
-  me.btRevert = params.btRevert;
-  me.btPublish = params.btPublish;
-  me.btUnpublish = params.btUnpublish;
-  me.inputs = params.inps;
-  me.btPublishAction = params.btPublishAction;
-  me.alertPublishErrors = params.alertPublishErrors
-  me.isDraft = params.isDraft;
+  const me = params;
+
   me.dataSource = getDataSource();
 
   function getDataSource() {
