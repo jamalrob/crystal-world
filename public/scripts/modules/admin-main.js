@@ -1,10 +1,68 @@
 import { makeArticle } from "./article.js"
 
 /*
-  Entry point for the article properties form
-  state management
+  TABLE SORTING
 */
-window.addEventListener("doSetupArticle", ()=>{
+
+document.querySelectorAll('[data-colnum]').forEach(el => {
+  el.addEventListener("click", () => {
+    sortTable(el.dataset.colnum, el)
+  })
+})
+
+function sortTable(colnum, me) {
+  const table = document.querySelector(".admin-table");
+  let rows = Array.from(table.querySelectorAll("tr"));
+  rows = rows.slice(1);
+  let qs = `td:nth-child(${colnum})`;
+
+  rows.sort( (r1,r2) => {
+    let t1 = r1.querySelector(qs);
+    let t2 = r2.querySelector(qs);
+
+    if(me.dataset.sortdirection=='asc' || me.dataset.sortdirection=='unsorted'){
+      return t2.textContent.localeCompare(t1.textContent);
+    }
+    else{
+      return t1.textContent.localeCompare(t2.textContent);
+    }
+  });
+
+  if(me.dataset.sortdirection=='asc' || me.dataset.sortdirection=='unsorted'){
+    me.dataset.sortdirection = 'desc';
+    if(me.innerHTML.indexOf('▴▾') > -1){
+      me.innerHTML = me.innerHTML.replace('▴▾', '▾');
+    }
+    else{
+      me.innerHTML = me.innerHTML.replace('▴', '▾');
+    }
+  } else {
+    me.dataset.sortdirection = 'asc';
+    if(me.innerHTML.indexOf('▴▾') > -1){
+      me.innerHTML = me.innerHTML.replace('▴▾', '▴');
+    }
+    else{
+      me.innerHTML = me.innerHTML.replace('▾', '▴');
+    }
+  }
+
+  const otherElId = me.id == 'btSortByCreated' ? 'btSortByPublished' : 'btSortByCreated'
+  const otherEl = document.getElementById(otherElId);
+
+  if(otherEl.innerHTML.indexOf('▴▾') < 0){
+    console.log(otherEl.innerHTML);
+    otherEl.innerHTML = otherEl.innerHTML.replace(/▴|▾/, '▴▾');
+  }
+
+  rows.forEach(row => table.appendChild(row));
+} // sortTable()
+
+
+/*
+  ARTICLE PROPERTIES STATE MANAGEMENT
+*/
+
+window.addEventListener("doSetupArticle", () => {
   /*
     Triggered by HTMX via header from server:
     Header "HX-Trigger-After-Settle" = "doSetupArticle"
@@ -12,7 +70,6 @@ window.addEventListener("doSetupArticle", ()=>{
   */
   setupArticle();
 })
-
 
 function setupArticle() {
 
@@ -34,7 +91,7 @@ function setupArticle() {
 
 
   /*
-    AUTOSAVE
+    Autosave
   */
 
   const autosaveEvents = ["input", "change"];
@@ -73,7 +130,7 @@ function setupArticle() {
 
 
   /*
-    FORM SUBMISSION RESPONSE
+    Form submission response
   */
 
   document.body.addEventListener('htmx:afterRequest', ev => {
@@ -109,7 +166,16 @@ function setupArticle() {
 
 
 /*
-  Helper function
+  FORMAT DATES ACCORDING TO LOCALE
+*/
+document.querySelectorAll('[data-js-formatdate]').forEach(el => {
+  let thisDate = new Date(el.innerHTML);
+  el.innerHTML = new Intl.DateTimeFormat(navigator.language).format(thisDate);
+})
+
+
+/*
+  HELPERS
 */
 export function slugify(str) {
   return String(str)

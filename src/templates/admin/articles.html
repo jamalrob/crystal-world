@@ -15,10 +15,6 @@
 </button>
 <table
   class="admin-table"
-  _=" on load
-        ---hide #txtSearch
-        call colourTheRows()
-    "
   hx-boost="true"
 >
   <caption>Articles</caption>
@@ -37,9 +33,7 @@
             id="btSortByPublished"
             data-sortdirection="unsorted"
             data-sortby="published"
-            _=" on click
-                  call sortTable(2, me) then call colourTheRows()
-              "
+            data-colnum="2"
           >Published&nbsp; ▴▾
           </button>
       </th>
@@ -48,9 +42,7 @@
           id="btSortByCreated"
           data-sortdirection="desc"
           data-sortby="created"
-          _=" on click
-                call sortTable(3, me)  then call colourTheRows()
-            "
+          data-colnum="3"
         >Created&nbsp; ▾
         </button>
       </th>
@@ -63,8 +55,8 @@
       <td class="td-title">
         <a href="/admin/articles/{{ a.id }}/edit">{{ a.title }}</a>
       </td>
-      <td>{% if a.draft %}<span class="tag">Draft</span>{% else %}{{ a.date }}{% endif %}</td>
-      <td>{{ a.date_created }}</td>
+      <td>{% if a.draft %}<span class="tag">Draft</span>{% else %}<span data-js-formatdate>{{ a.date }}</span>{% endif %}</td>
+      <td data-js-formatdate>{{ a.date_created }}</td>
       <td>
         <button hx-get="/admin/articles/{{ a.id }}/edit" hx-target="body" hx-push-url="true">Edit</button>
         <button hx-delete="/admin/articles/{{ a.id }}/delete" hx-target="body" class="delete" >Delete</button>
@@ -72,57 +64,11 @@
     </tr>
     {% endfor %}
   </tbody>
-  <tfoot></tfoot> <!-- tfoot optional -->
+  <tfoot></tfoot>
 </table>
-<script>
-  function sortTable(colnum, me) {
-    const table = document.querySelector(".admin-table");
-    let rows = Array.from(table.querySelectorAll("tr"));
-    rows = rows.slice(1);
-    let qs = `td:nth-child(${colnum})`;
-
-    rows.sort( (r1,r2) => {
-      let t1 = r1.querySelector(qs);
-      let t2 = r2.querySelector(qs);
-
-      if(me.dataset.sortdirection=='asc' || me.dataset.sortdirection=='unsorted'){
-        return t2.textContent.localeCompare(t1.textContent);
-      }
-      else{
-        return t1.textContent.localeCompare(t2.textContent);
-      }
-    });
-
-    if(me.dataset.sortdirection=='asc' || me.dataset.sortdirection=='unsorted'){
-      me.dataset.sortdirection = 'desc';
-      if(me.innerHTML.indexOf('▴▾') > -1){
-        me.innerHTML = me.innerHTML.replace('▴▾', '▾');
-      }
-      else{
-        me.innerHTML = me.innerHTML.replace('▴', '▾');
-      }
-    } else {
-      me.dataset.sortdirection = 'asc';
-      if(me.innerHTML.indexOf('▴▾') > -1){
-        me.innerHTML = me.innerHTML.replace('▴▾', '▴');
-      }
-      else{
-        me.innerHTML = me.innerHTML.replace('▾', '▴');
-      }
-    }
-
-    const otherElId = me.id == 'btSortByCreated' ? 'btSortByPublished' : 'btSortByCreated'
-    const otherEl = document.getElementById(otherElId);
-    if(otherEl.innerHTML.indexOf('▴▾') < 0){
-      console.log(otherEl.innerHTML);
-      otherEl.innerHTML = otherEl.innerHTML.replace(/▴|▾/, '▴▾');
-    }
-
-    rows.forEach(row => table.appendChild(row));
-  }
-</script>
 <script type="text/hyperscript">
   def colourTheRows()
+    --- Use this if active search is implemented
     repeat for tr in <table.admin-table tr.row-showing/> index i
         if i mod 2 == 0
             add .oddrow to it
@@ -150,6 +96,9 @@
   }
   thead > tr > th {
     text-align: left;
+  }
+  table.admin-table tr.row-showing:nth-child(odd) {
+    background-color: #08416d;
   }
   .oddrow {
     background-color: #08416d;

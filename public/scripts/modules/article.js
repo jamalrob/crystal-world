@@ -29,10 +29,10 @@ export const makeArticle = function(params = {
       LOCAL STORAGE USAGE SCHEME:
 
       E.g., for article with ID=42, we'll have the following localStorage keys:
-      - "article_42", which holds the markdown for the article body
-      - "article_42_title", "article_42_slug", etc. for the article properties,
-      - where "title", "slug", etc. are the values of the `name` attributes for each
-      - of `me.inputs` (note that select elements etc. can be in `me.inputs` too)
+        - "article_42", which holds the markdown for the article body
+        - "article_42_title", "article_42_slug", etc. for the article properties,
+          where "title", "slug", etc. are the values of the `name` attributes for each
+          of `me.inputs` (note that select elements etc. can be in `me.inputs` too)
     */
     let dSrc = "db";
     let storageKeyPrefix = `article_${me.articleId}`;
@@ -82,9 +82,7 @@ export const makeArticle = function(params = {
           me.btUnpublish.classList.remove("hidden");
           me.btPublish.classList.add("hidden");
           me.alertUnpublishedChanges.innerText = '';
-          if(me.btRevert !== null) {
-            me.btRevert.classList.add("hidden");
-          }
+          me.btRevert.classList.add("hidden");
           me.alertArticleStatus.innerHTML = "published";
           me.confAfterRequest.innerHTML = "";
           me.confAfterRequest.classList.remove("autosaved");
@@ -103,9 +101,7 @@ export const makeArticle = function(params = {
         me.alertUnpublishedChanges.innerText = '';
         me.btUnpublish.classList.add("hidden");
         me.btPublish.classList.remove("hidden");
-        if(me.btRevert !== null) {
-          me.btRevert.classList.add("hidden");
-        }
+        me.btRevert.classList.add("hidden");
         me.alertArticleStatus.innerHTML = "draft";
         me.confAfterRequest.innerHTML = "";
         me.confAfterRequest.classList.remove("autosaved");

@@ -22,15 +22,6 @@ module CrystalWorld::TemplateRenderer
     tengine = Crinja.new
     tengine.loader = Crinja::Loader::FileSystemLoader.new(TEMPLATE_FOLDER)
     template = tengine.get_template(template_path)
-
-    # A CUSTOM TEMPLATE FILTER
-    # USE FOR DATES AND REMOVE DATE CONVERSION FROM Data MODULE
-    # myfilter = Crinja.filter({ attribute: nil }) do
-    #  "#{target} is #{arguments["attribute"]}!"
-    # end
-    # tengine.filters["customfilter"] = myfilter
-    # IN THE TEMPLATE: {{ "Hello World" | customfilter(attribute="super") }}
-
     final_html = template.render(data)
     ctx.response.print final_html
   end
