@@ -15,6 +15,10 @@
     <script src="/scripts/showdown.min.js" defer></script>
     {% block extra_head %}{% endblock %}
 
+    {% if local is defined %}
+    <!--<meta http-equiv="refresh" content="3">-->
+    {% endif %}
+
     <link rel="stylesheet" href="/scripts/highlight/styles/github-dark.min.css">
     <script src="/scripts/highlight/highlight.min.js"></script>
 

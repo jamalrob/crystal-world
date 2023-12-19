@@ -26,13 +26,13 @@ export const makeArticle = function(params = {
       Find out if there are any items in localStorage
       for this article.
 
-      LOCAL STORAGE USAGE SCHEME:
-
+      Local storage usage scheme:
+      ---------------------------
       E.g., for article with ID=42, we'll have the following localStorage keys:
-        - "article_42", which holds the markdown for the article body
-        - "article_42_title", "article_42_slug", etc. for the article properties,
-          where "title", "slug", etc. are the values of the `name` attributes for each
-          of `me.inputs` (note that select elements etc. can be in `me.inputs` too)
+      - "article_42", which holds the markdown for the article body
+      - "article_42_title", "article_42_slug", etc. for the article properties,
+        where "title", "slug", etc. are the values of the `name` attributes for each
+        of `me.inputs` (note that select elements etc. can be in `me.inputs` too)
     */
     let dSrc = "db";
     let storageKeyPrefix = `article_${me.articleId}`;
@@ -65,6 +65,17 @@ export const makeArticle = function(params = {
       },
       changes:{
         UIState:() => {
+
+          /*
+          NOTE: Alternative technique using data attributes:
+
+          <button id="revert" data-show-for-state="{ states.published.changes }" class="...">
+
+          document.querySelectorAll('[data-show-for-state="{ states.published.changes }"]').forEach(el => {
+            el.classList.remove("hidden")
+          })
+          */
+
           me.alertUnpublishedChanges.innerText = 'There are unpublished changes';
           me.isDraft = 0;
           me.btRevert.classList.remove("hidden");

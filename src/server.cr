@@ -51,11 +51,17 @@ module CrystalWorld
     when "/admin/login"
       PublicControllers.login(ctx)
 
+    when "/admin/register"
+      PublicControllers.register(ctx)
+
     when "/admin/logout"
       AuthControllers.do_logout(ctx)
 
     when "/admin/login/auth"
       AuthControllers.do_login(ctx)
+
+    when "/admin/register/auth"
+      AuthControllers.do_register(ctx)
 
     when "/admin", "/admin/articles"
       AdminControllers.articles(ctx)

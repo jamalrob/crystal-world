@@ -1,0 +1,27 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+<h1>{{ title }}</h1>
+<form
+  id="frm-register"
+  class="login"
+  hx-post="/admin/register/auth"
+  hx-indicator="#regSpinner"
+>
+  <label>Email</label>
+  <input type="text" name="username" placeholder="Email address">
+  <label>Password</label>
+  <input type="password" name="password" placeholder="Create a password">
+  <div class="button-row">
+    <button class="halfwidth">
+      Register
+      <span class="spinner spinner--hidden" id="regSpinner"></span>
+    </button>
+  </div>
+  <div class="error-message"></div>
+</form>
+<style>
+.error-message {
+  margin-top: 20px;
+}
+</style>
+{% endblock %}

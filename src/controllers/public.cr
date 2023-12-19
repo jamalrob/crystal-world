@@ -3,11 +3,13 @@ module CrystalWorld::PublicControllers
 
   def home(ctx)
     articles = Data.get_articles
+    #header_pages = Data.get_header_pages
     TemplateRenderer.render_page(
       ctx: ctx,
       data: {
-        "articles" => articles,
-        "title"    => "My Crystal World",
+        "articles"      => articles,
+        #"header_pages"  => header_pages,
+        "title"         => "My Crystal World",
       },
       template_path: "home.html"
     )
@@ -78,6 +80,15 @@ module CrystalWorld::PublicControllers
         "title" => "Sign in to admin",
       },
       template_path: "login.html"
+    )
+  end
+
+  def register(ctx)
+    TemplateRenderer.render_page(ctx: ctx,
+      data: {
+        "title" => "Sign up",
+      },
+      template_path: "register.html"
     )
   end
 

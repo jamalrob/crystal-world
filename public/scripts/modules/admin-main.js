@@ -50,7 +50,6 @@ function sortTable(colnum, me) {
   const otherEl = document.getElementById(otherElId);
 
   if(otherEl.innerHTML.indexOf('▴▾') < 0){
-    console.log(otherEl.innerHTML);
     otherEl.innerHTML = otherEl.innerHTML.replace(/▴|▾/, '▴▾');
   }
 

@@ -1,11 +1,34 @@
 module CrystalWorld::AuthControllers
   extend self
 
+  def create_user(ctx)
+    params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
+    username = params["username"]
+    first_name = params["first_name"]
+    last_name = params["last_name"]
+    Data.create_user(
+      username: username,
+      first_name: first_name,
+      last_name: last_name
+    )
+  end
+
+  def do_register(ctx)
+    params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
+    invite_key = params["invite_key"]
+    username = params["username"]
+    password = params["password"]
+    if u = Data.get_user(username, invite_key)
+      Data.update_password u["id"].as(Int32), Argon2::Password.create(password)
+      self.do_login(ctx)
+    end
+  end
+
   def do_login(ctx)
     params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
     username = params["username"]
     password = params["password"]
-    if u = Data.get_user(username)
+    if u = Data.get_user(username: username)
       begin
         res = Argon2::Password.verify_password(password, u["password"].to_s)
       rescue ex

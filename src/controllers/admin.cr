@@ -57,7 +57,7 @@ module CrystalWorld::AdminControllers
 
   def get_images(ctx)
     img_arr = [] of String
-    if !LOCAL
+    if LOCAL
       res = Crest.get(
         "https://api.imagekit.io/v1/files?path=blog",
         user: IMAGEKIT_PRIVATE_KEY,
@@ -402,13 +402,12 @@ module CrystalWorld::AdminControllers
   def publish_article(ctx)
     if u = self.authenticated_user ctx
 
+      # TODO:
       # WE HAVE THE ID IN THE url NOW SO THERES NO NEED TO GET IT FROM PARAMS
       # OR SEND IT IN PARAMS
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
       if article_id = params["article_id"].to_i?
-        #
-        # FINAL VALIDATION
-        #
+
         validation_results = [
           Validators.validate_date(
             value: params["date"],
@@ -432,31 +431,6 @@ module CrystalWorld::AdminControllers
           end
         end
 
-        #
-        # Should return the value or an amended value from
-        # every validator, but not necessarily any errors.
-        # Only if there are errors should we return / prevent publication
-        #
-        # Should return this from validators instead of current:
-        # Example:
-
-        # hash = {
-        #   "name" => "slug",
-        #   "value" => "#{value}-#{Random.new.hex(8)}",
-        #   "error" => {
-        #     "error_message" => "Duplicate slug found and unique ID added",
-        #     "show_as_error" => false
-        #   }
-        # }
-        #
-
-        puts "NO ERRORS"
-        #params.each do |pm|
-        #  if pm[0] != "md"
-        #    pp pm
-        #  end
-        #end
-
         publish = Data.publish_article(
           article_id: article_id,
           slug: params["slug"],
@@ -468,7 +442,6 @@ module CrystalWorld::AdminControllers
           image_class: params["imageClass"],
           md: params["md"]
         )
-        #ctx.response.print %({"result": "Published"})
         ctx.response.print %({
           "validation_results": #{validation_results.to_json},
           "published": true
