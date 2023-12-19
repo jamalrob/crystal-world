@@ -125,8 +125,8 @@ module CrystalWorld::Data::Users
     DB.open "sqlite3://./crw.db" do |db|
       users = [] of Hash(String, String | Bool | Int32 | Nil)
       results = db.query_all(
-        "SELECT id, username, password, first_name, last_name FROM users;",
-        as: { Int32, String, String?, String?, String? }
+        "SELECT id, username, password, first_name, last_name, admin FROM users;",
+        as: { Int32, String, String?, String?, String?, Int32 }
       )
 
       results.each do |result|
@@ -139,6 +139,7 @@ module CrystalWorld::Data::Users
           "has_password"  => has_password,
           "first_name"    => result[3],
           "last_name"     => result[4],
+          "admin"         => result[5]
         }
         #articles[result[0]] = this_row
         users.push(this_row)

@@ -19,19 +19,20 @@
       <th>Username</th>
       <th>First name</th>
       <th>Last name</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
     {% for a in authors %}
     <tr class="row-showing">
       <td class="td-title">
-        {{ a.username }}
+        {{ a.username }} &nbsp;{% if a.admin == 1 %}<span class="tag">Admin</span>{% endif %}
       </td>
       <td>{{ a.first_name }}</td>
       <td>{{ a.last_name }}</td>
       <td>
-        <button hx-get="/admin/articles/{{ a.id }}/edit" hx-target="body" hx-push-url="true">Restore</button>
-        <button hx-delete="/admin/articles/{{ a.id }}/delete" hx-target="body" class="delete" >Purge</button>
+        <button hx-get="/admin/articles/{{ a.id }}/edit" hx-target="body" hx-push-url="true">Edit</button>
+        <button hx-delete="/admin/articles/{{ a.id }}/delete" hx-target="body" class="delete" >Delete</button>
       </td>
     </tr>
     {% endfor %}
@@ -102,7 +103,6 @@
   }
     table.admin-table tr > td:last-child {
     padding-right: 5px;
-    padding-top: 5px;
     text-align: right;
   }
   table.admin-table tr > td {

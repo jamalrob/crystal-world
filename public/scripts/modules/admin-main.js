@@ -176,7 +176,7 @@ document.querySelectorAll('[data-js-formatdate]').forEach(el => {
 /*
   HELPERS
 */
-export function slugify(str) {
+function slugify(str) {
   return String(str)
   .normalize('NFKD')
   .replace(/[\u0300-\u036f]/g, '')
