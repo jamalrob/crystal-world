@@ -15,7 +15,7 @@ module CrystalWorld::Validators
       }
     else
       hash["publish"] = true
-      articles = Data.get_articles_by_slug(value, exclude_article_id: article_id.to_i)
+      articles = Data::Articles.get_articles_by_slug(value, exclude_article_id: article_id.to_i)
       if !articles.empty?
         #
         # DUPLICATE SLUG

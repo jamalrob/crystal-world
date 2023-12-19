@@ -1,0 +1,131 @@
+{% extends "admin/layouts/base.html" %}
+{% block content %}
+<button
+  class="green has-icon push-right"
+  hx-put="/admin/authors/new"
+  hx-target="body"
+  hx-push-url="true"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+  New author
+</button>
+<table
+  class="admin-table bin"
+  hx-boost="true"
+>
+  <caption>Authors</caption>
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>First name</th>
+      <th>Last name</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for a in authors %}
+    <tr class="row-showing">
+      <td class="td-title">
+        {{ a.username }}
+      </td>
+      <td>{{ a.first_name }}</td>
+      <td>{{ a.last_name }}</td>
+      <td>
+        <button hx-get="/admin/articles/{{ a.id }}/edit" hx-target="body" hx-push-url="true">Restore</button>
+        <button hx-delete="/admin/articles/{{ a.id }}/delete" hx-target="body" class="delete" >Purge</button>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot></tfoot> <!-- tfoot optional -->
+</table>
+<style>
+  table.admin-table {
+    font-size: 0.8rem;
+    width: 100%;
+    min-width: 980px;
+    /*border: 1px solid rgba(84, 143, 211, 0.3);*/
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #165a8f34;
+    overflow: hidden;
+    border-radius: 2px;
+    box-shadow: 0 0 3px #0b2a42;
+    /*background-color: #f1f1e6;*/
+    /*color: #222;*/
+  }
+  thead > tr > th {
+    text-align: left;
+  }
+  table.admin-table tr.row-showing:nth-child(odd) {
+    background-color: #08416d;
+  }
+  .oddrow {
+    background-color: #08416d;
+    /*background-color: #f3faff;*/
+  }
+  table.admin-table caption {
+    color: #e3dfd4;
+    text-align: left;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    font-family: 'Roboto Condensed', Ubuntu, Helvetica, Arial, sans-serif;
+  }
+  table.admin-table tr > th > button {
+    padding: 0;
+    background-color: unset;
+  }
+  table.admin-table tr > th:nth-child(1) {
+    width: 35%;
+    padding: 5px 0 10px 10px;
+  }
+  table.admin-table tr > th:nth-child(1) svg {
+    vertical-align: bottom;
+  }
+  table.admin-table tr > th:nth-child(1) input {
+    padding: 3px 8px;
+    height: 30px;
+    margin-left: 5px;
+  }
+  table.admin-table tr > th:nth-child(2) {
+    width: 25%;
+  }
+  table.admin-table tr > th:nth-child(3) {
+    width: 25%;
+  }
+  table.admin-table tr > th:last-child {
+    width: 15%;
+  }
+
+  table.admin-table tr > td:nth-child(1) {
+    padding: 6px 0 6px 10px;
+  }
+    table.admin-table tr > td:last-child {
+    padding-right: 5px;
+    padding-top: 5px;
+    text-align: right;
+  }
+  table.admin-table tr > td {
+    border-bottom: 1px solid rgba(84, 143, 211, 0.3);
+  }
+  table.admin-table tr:last-child > td {
+    border-bottom: none;
+  }
+  table.admin-table button {
+    padding: 7px 15px 3px;
+    font-weight: normal;
+    position: relative;
+    box-shadow: none;
+  }
+  span.tag{
+    background-color: #366a93;
+    padding: 3px 10px;
+    border-radius: 3px;
+    color: #ddd;
+    font-size: 0.7rem;
+  }
+  .row-showing {
+    display: table-row;
+  }
+</style>
+{% endblock %}

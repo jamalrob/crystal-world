@@ -1,4 +1,4 @@
-module CrystalWorld::AuthControllers
+module CrystalWorld::Controllers::Auth
   extend self
 
   def create_user(ctx)
@@ -6,7 +6,7 @@ module CrystalWorld::AuthControllers
     username = params["username"]
     first_name = params["first_name"]
     last_name = params["last_name"]
-    Data.create_user(
+    Data::Users.create_user(
       username: username,
       first_name: first_name,
       last_name: last_name
@@ -18,8 +18,8 @@ module CrystalWorld::AuthControllers
     invite_key = params["invite_key"]
     username = params["username"]
     password = params["password"]
-    if u = Data.get_user(username, invite_key)
-      Data.update_password u["id"].as(Int32), Argon2::Password.create(password)
+    if u = Data::Users.get_user(username, invite_key)
+      Data::Users.update_password u["id"].as(Int32), Argon2::Password.create(password)
       self.do_login(ctx)
     end
   end
@@ -28,7 +28,7 @@ module CrystalWorld::AuthControllers
     params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
     username = params["username"]
     password = params["password"]
-    if u = Data.get_user(username: username)
+    if u = Data::Users.get_user(username: username)
       begin
         res = Argon2::Password.verify_password(password, u["password"].to_s)
       rescue ex
@@ -56,7 +56,7 @@ module CrystalWorld::AuthControllers
           samesite: HTTP::Cookie::SameSite.new(1),
           http_only: true,
         )
-        Data.update_user_session(
+        Data::Users.update_user_session(
           id: u["id"],
           sessionid: sessionid,
           new_csrf_token: csrftoken,
@@ -79,7 +79,7 @@ module CrystalWorld::AuthControllers
   end
 
   def do_logout(ctx)
-    if u = AdminControllers.authenticated_user(ctx)
+    if u = Controllers::Admin.authenticated_user(ctx)
       #
       # SETTING A COOKIE'S EXPIRES IN THE PAST PROMPTS THE BROWSER TO DELETE IT
       # NOTE: These cookies still need the samesite parameter
@@ -102,7 +102,7 @@ module CrystalWorld::AuthControllers
         csrf_cookie.to_set_cookie_header,
       ]
       ctx.response.headers["HX-Location"] = %({"path": "/", "target": "body"})
-      Data.delete_user_session(
+      Data::Users.delete_user_session(
         sessionid: u["sessionid"]
       )
       return

@@ -2,9 +2,7 @@ module CrystalWorld::TemplateRenderer
   extend self
 
   def render_page(ctx : HTTP::Server::Context, data : Hash, template_path : String)
-    #
-    # CACHEBUSTER
-    #
+
     if LOCAL
       # In development, get a fresh string to append
       # to static file URLs on every request
@@ -16,18 +14,16 @@ module CrystalWorld::TemplateRenderer
       data.put("cachebust", CACHEBUST) { "update" }
     end
 
-    #
     # CSRF
     #
     if ctx.request.cookies.has_key?("csrftoken")
       data.put("csrftoken", ctx.request.cookies["csrftoken"].value) { "update" }
     end
 
-    #
     # USER
     #
     if !data.has_key?("user_authenticated")
-      if u = AdminControllers.authenticated_user(ctx)
+      if u = Controllers::Admin.authenticated_user(ctx)
         data.put("user_authenticated", "true") { "update" }
       end
     end

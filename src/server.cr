@@ -10,6 +10,7 @@ require "crinja"
 require "crystal-argon2"
 require "sanitize"
 require "./controllers/*"
+require "./data/*"
 require "./*"
 
 module CrystalWorld
@@ -37,101 +38,101 @@ module CrystalWorld
 
     case ctx.request.path
     when "/"
-      PublicControllers.home(ctx)
+      Controllers::Public.home(ctx)
 
     when "/tags"
-      PublicControllers.tags(ctx)
+      Controllers::Public.tags(ctx)
 
     when .match /\/tag\/#{SLUG_PATTERN}$/
-      PublicControllers.tag(ctx)
+      Controllers::Public.tag(ctx)
 
     when "/about"
-      PublicControllers.about(ctx)
+      Controllers::Public.about(ctx)
 
     when "/admin/login"
-      PublicControllers.login(ctx)
+      Controllers::Public.login(ctx)
 
     when "/admin/register"
-      PublicControllers.register(ctx)
+      Controllers::Public.register(ctx)
 
     when "/admin/logout"
-      AuthControllers.do_logout(ctx)
+      Controllers::Auth.do_logout(ctx)
 
     when "/admin/login/auth"
-      AuthControllers.do_login(ctx)
+      Controllers::Auth.do_login(ctx)
 
     when "/admin/register/auth"
-      AuthControllers.do_register(ctx)
+      Controllers::Auth.do_register(ctx)
 
     when "/admin", "/admin/articles"
-      AdminControllers.articles(ctx)
+      Controllers::Admin.articles(ctx)
 
     when "/admin/pages"
-      AdminControllers.pages(ctx)
+      Controllers::Admin.pages(ctx)
 
     when "/admin/customize"
-      AdminControllers.customize(ctx)
+      Controllers::Admin.customize(ctx)
 
     when "/admin/authors"
-      AdminControllers.authors(ctx)
+      Controllers::Admin.authors(ctx)
 
     when "/admin/settings"
-      AdminControllers.settings(ctx)
+      Controllers::Admin.settings(ctx)
 
     when "/admin/images"
-      AdminControllers.images(ctx)
+      Controllers::Admin.images(ctx)
 
     when "/admin/bin"
-      AdminControllers.bin(ctx)
+      Controllers::Admin.bin(ctx)
 
     when "/admin/markdown-cheatsheet"
-      AdminControllers.markdown_cheatsheet(ctx)
+      Controllers::Admin.markdown_cheatsheet(ctx)
 
     when .match /^\/api\/save_sidebar_state\/[a-z]*$/
-      AdminControllers.save_sidebar_state(ctx)
+      Controllers::Admin.save_sidebar_state(ctx)
 
     when .match /^\/admin\/articles\/new$/
-      AdminControllers.new_article_page(ctx)
+      Controllers::Admin.new_article_page(ctx)
 
     when .match /^\/admin\/articles\/#{ID_PATTERN}\/delete$/
-      AdminControllers.delete_article(ctx)
+      Controllers::Admin.delete_article(ctx)
 
     when .match /^\/api\/admin\/articles\/#{ID_PATTERN}\/publish$/
-      AdminControllers.publish_article(ctx)
+      Controllers::Admin.publish_article(ctx)
 
     when .match /^\/admin\/validate_date$/
-      AdminControllers.validate_date_inline(ctx)
+      Controllers::Admin.validate_date_inline(ctx)
 
     when .match /^\/admin\/validate_slug$/
-      AdminControllers.validate_slug_inline(ctx)
+      Controllers::Admin.validate_slug_inline(ctx)
 
     when .match /^\/admin\/articles\/#{ID_PATTERN}\/unpublish$/
-      AdminControllers.unpublish_article(ctx)
+      Controllers::Admin.unpublish_article(ctx)
 
     when .match /^\/admin\/articles\/#{ID_PATTERN}\/preview$/
-      AdminControllers.get_preview_html(ctx)
+      Controllers::Admin.get_preview_html(ctx)
 
     when .match /^\/admin\/articles\/#{ID_PATTERN}\/properties$/
-      AdminControllers.article_properties(ctx)
+      Controllers::Admin.article_properties(ctx)
 
     when .match /^\/admin\/articles\/#{ID_PATTERN}\/edit$/
-      AdminControllers.edit_article_page(ctx)
+      Controllers::Admin.edit_article_page(ctx)
 
     when .starts_with? "/admin/get_image"
       # Currently not used
-      AdminControllers.get_image(ctx)
+      Controllers::Admin.get_image(ctx)
 
     when "/admin/images/get"
-      AdminControllers.get_images(ctx)
+      Controllers::Admin.get_images(ctx)
 
     when "/admin/images/upload"
-      AdminControllers.upload_image(ctx)
+      Controllers::Admin.upload_image(ctx)
 
     when .match /^\/#{SLUG_PATTERN}$/
-      PublicControllers.article(ctx)
+      Controllers::Public.article(ctx)
 
     else
-      PublicControllers.error_404(ctx)
+      Controllers::Public.error_404(ctx)
 
     end
   end

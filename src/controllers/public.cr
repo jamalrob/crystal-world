@@ -1,9 +1,9 @@
-module CrystalWorld::PublicControllers
+module CrystalWorld::Controllers::Public
   extend self
 
   def home(ctx)
-    articles = Data.get_articles
-    #header_pages = Data.get_header_pages
+    articles = Data::Articles.get_articles
+    #header_pages = Data::Pages.get_header_pages
     TemplateRenderer.render_page(
       ctx: ctx,
       data: {
@@ -28,7 +28,7 @@ module CrystalWorld::PublicControllers
   def article(ctx)
     urlbits = ctx.request.path.split('/', remove_empty: true)
     slug = urlbits[0]
-    if article = Data.get_article(slug: slug, return_draft: false)
+    if article = Data::Articles.get_article(slug: slug, return_draft: false)
       options = Markd::Options.new(smart: true, safe: true)
       html = Markd.to_html(article["md"].as(String), options)
       article["html"] = html.gsub("/bucket/", IMGBUCKET)
@@ -42,11 +42,11 @@ module CrystalWorld::PublicControllers
       )
       return
     end
-    PublicControllers.error_404 ctx
+    Controllers::Public.error_404 ctx
   end
 
   def tags(ctx)
-    tags = Data.get_tags
+    tags = Data::Articles.get_tags
     TemplateRenderer.render_page(ctx: ctx,
       data: {
         "tags"  => tags,
@@ -59,7 +59,7 @@ module CrystalWorld::PublicControllers
   def tag(ctx)
     urlbits = ctx.request.path.split('/', remove_empty: true)
     tag = urlbits[1]?
-    articles = Data.get_articles_for_tag(tag)
+    articles = Data::Articles.get_articles_for_tag(tag)
     if articles
       TemplateRenderer.render_page(ctx: ctx,
         data: {
@@ -71,7 +71,7 @@ module CrystalWorld::PublicControllers
       )
       return
     end
-    PublicControllers.error_404 ctx
+    Controllers::Public.error_404 ctx
   end
 
   def login(ctx)

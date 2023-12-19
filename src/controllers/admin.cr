@@ -1,4 +1,4 @@
-module CrystalWorld::AdminControllers
+module CrystalWorld::Controllers::Admin
   extend self
 
   def get_image(ctx)
@@ -8,21 +8,6 @@ module CrystalWorld::AdminControllers
     html = "<img src=\"https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/#{file}\">"
     ctx.response.print html
   end
-
-
-  # KEMAL:
-  #
-  # @tempfile = File.tempfile
-  # ::File.open(@tempfile.path, "w") do |file|
-  #   IO.copy(upload.body, file)
-  # end
-  # @filename = upload.filename
-  # @headers = upload.headers
-  # @creation_time = upload.creation_time
-  # @modification_time = upload.modification_time
-  # @read_time = upload.read_time
-  # @size = upload.size
-
 
   def upload_image(ctx)
     #p! ctx.request.body
@@ -146,13 +131,13 @@ module CrystalWorld::AdminControllers
     if ctx.request.cookies.has_key?("sessionid") && ctx.request.cookies.has_key?("csrftoken")
       sessionid = ctx.request.cookies["sessionid"].value
       csrftoken = ctx.request.cookies["csrftoken"].value
-      return Data.get_authenticated_user(sessionid, csrftoken)
+      return Data::Users.get_authenticated_user(sessionid, csrftoken)
     end
   end
 
   def articles(ctx)
     if u = self.authenticated_user ctx
-      articles = Data.get_articles(
+      articles = Data::Articles.get_articles(
         include_drafts: true,
         order_by: "date_created DESC"
         )
@@ -175,7 +160,7 @@ module CrystalWorld::AdminControllers
 
   def bin(ctx)
     if u = self.authenticated_user ctx
-      articles = Data.get_deleted_articles(order_by: "date_created DESC")
+      articles = Data::Articles.get_deleted_articles(order_by: "date_created DESC")
       TemplateRenderer.render_page(
         ctx: ctx,
         data: {
@@ -212,11 +197,12 @@ module CrystalWorld::AdminControllers
 
   def authors(ctx)
     if u = self.authenticated_user ctx
+      users = Data::Users.get_users()
       TemplateRenderer.render_page(ctx: ctx,
         data: {
           "title"               => "Admin: articles",
           "admin_section"       => "Admin: articles",
-          # "authors"           => authors,
+          "authors"             => users,
           "user_authenticated"  => true,
           "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
           "admin"               => true,
@@ -269,7 +255,7 @@ module CrystalWorld::AdminControllers
       urlbits = ctx.request.path.split('/', remove_empty: true)
       id = urlbits[2]?
       begin
-        Data.delete_article(id)
+        Data::Articles.delete_article(id)
         self.articles(ctx)
       rescue e
         p! e
@@ -282,7 +268,7 @@ module CrystalWorld::AdminControllers
     if u = self.authenticated_user ctx
       urlbits = ctx.request.path.split('/', remove_empty: true)
       id = urlbits[2]
-      if article = Data.get_article(id: id.to_i)
+      if article = Data::Articles.get_article(id: id.to_i)
         options = Markd::Options.new(smart: true, safe: true)
         html = Markd.to_html(article["md"].as(String), options)
         article["html"] = html.gsub("/bucket/", IMGBUCKET)
@@ -302,7 +288,7 @@ module CrystalWorld::AdminControllers
         )
         return
       end
-      PublicControllers.error_404 ctx
+      Controllers::Public.error_404 ctx
       return
     end
     ctx.response.redirect "/"
@@ -311,7 +297,7 @@ module CrystalWorld::AdminControllers
   def article_properties(ctx)
     urlbits = ctx.request.path.split('/', remove_empty: true)
     id = urlbits[2]
-    article = Data.get_article(id: id.to_i)
+    article = Data::Articles.get_article(id: id.to_i)
     if article
       ctx.response.headers["HX-Trigger-After-Settle"] = "doSetupArticle"
       TemplateRenderer.render_page(ctx: ctx,
@@ -344,7 +330,7 @@ module CrystalWorld::AdminControllers
     if u = self.authenticated_user(ctx) && ctx.request.body
       urlbits = ctx.request.path.split('/', remove_empty: true)
       id = urlbits[2]
-      article = Data.get_article(id: id.to_i)
+      article = Data::Articles.get_article(id: id.to_i)
       if article
         params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
         if params.has_key?("markdown")
@@ -372,7 +358,7 @@ module CrystalWorld::AdminControllers
 
   def new_article_page(ctx)
     if u = self.authenticated_user ctx
-      newid = Data.create_draft()
+      newid = Data::Articles.create_draft()
       ctx.response.headers["HX-Location"] = %({"path": "/admin/articles/#{newid}/edit", "target": "body"})
     end
   end
@@ -431,7 +417,7 @@ module CrystalWorld::AdminControllers
           end
         end
 
-        publish = Data.publish_article(
+        publish = Data::Articles.publish_article(
           article_id: article_id,
           slug: params["slug"],
           title: params["title"],
@@ -448,7 +434,7 @@ module CrystalWorld::AdminControllers
         })
         return
       end
-      PublicControllers.error_404 ctx
+      Controllers::Public.error_404 ctx
     end
   end
 
@@ -461,7 +447,7 @@ module CrystalWorld::AdminControllers
     if u = self.authenticated_user ctx
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
       if article_id = params["article_id"].to_i?
-        Data.unpublish_article(article_id)
+        Data::Articles.unpublish_article(article_id)
         json_text = %({"result": "Unpublished"})
         ctx.response.print json_text
         return
