@@ -1,6 +1,7 @@
 require "http/server"
 require "base64"
 require "json"
+require "mime"
 require "sqlite3"
 require "markd"
 require "front_matter"

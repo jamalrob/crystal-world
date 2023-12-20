@@ -10,6 +10,75 @@ module CrystalWorld::Controllers::Admin
   end
 
   def upload_image(ctx)
+
+    #
+    # TODO: sanitize against malicious uploads
+    #
+
+    begin
+      HTTP::FormData.parse(ctx.request) do |part|
+        case part.name
+        when "imageUpload"
+          fname = part.filename.to_s
+          p! fname
+          temp_file_path = File.join(TEMP_IMAGES_FOLDER, fname)
+
+          File.write(temp_file_path, part.body)
+
+          # Ensure the file exists before proceeding
+          unless File.exists?(temp_file_path)
+            ctx.response.status_code = 500
+            ctx.response.print "Failed to save the uploaded file."
+            return
+          end
+
+          content_type = MIME.from_filename?(fname)
+          if content_type
+            puts "Content-Type: #{content_type}"
+          else
+            puts "Unknown content-type"
+          end
+
+          file = File.open(temp_file_path)
+
+          req = Crest::Request.new(
+            :post,
+            url: "https://upload.imagekit.io/api/v1/files/upload",
+            user: IMAGEKIT_PRIVATE_KEY,
+            password: "",
+            form: {
+              "file"      => file,
+              "fileName"  => fname,
+              "type"      => content_type,
+              "folder"    => "blog"
+            },
+            #headers: { "Content-Type" => content_type }
+          )
+          res = req.execute
+
+          # Check for errors from ImageKit API
+          if res.status_code != 200
+            ctx.response.status_code = res.status_code
+            ctx.response.print "Image upload to ImageKit failed."
+            return
+          end
+
+          # Ensure the temporary file is deleted after upload
+          File.delete(temp_file_path)
+
+          ctx.response.headers["HX-Trigger-After-Settle"] = "uploadComplete"
+        end
+      end
+
+      self.get_images(ctx)
+    rescue e
+      # Handle exceptions and log errors
+      ctx.response.status_code = 500
+      ctx.response.print "An error occurred during file upload: #{e.message}"
+    end
+  end
+
+  def upload_imageOLD(ctx)
     #p! ctx.request.body
     HTTP::FormData.parse(ctx.request) do |part|
       case part.name
@@ -17,7 +86,7 @@ module CrystalWorld::Controllers::Admin
         fname = part.filename.to_s
         p! fname
         File.write("#{TEMP_IMAGES_FOLDER}/#{fname}", part.body)
-        file = File.open("/home/user/Pictures/#{fname}")
+        file = File.open("#{TEMP_IMAGES_FOLDER}/#{fname}")
         req = Crest::Request.new(
           :post,
           url: "https://upload.imagekit.io/api/v1/files/upload",
