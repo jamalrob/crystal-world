@@ -172,6 +172,9 @@ document.querySelectorAll('[data-js-formatdate]').forEach(el => {
   el.innerHTML = new Intl.DateTimeFormat(navigator.language).format(thisDate);
 })
 
+
+
+
 /*
   IMAGE UPLOAD PROGRESS & IMAGE LIST UPDATE
 */

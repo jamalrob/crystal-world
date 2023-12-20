@@ -10,9 +10,6 @@ module CrystalWorld::Controllers::Admin
   end
 
   def get_image_item(ctx, imgkit_url, filename)
-    #urlbits = ctx.request.path.split('/', remove_empty: true)
-    #file = urlbits[-1]?
-    #html = "<img src=\"https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/#{file}\">"
     TemplateRenderer.render_partial(
       ctx: ctx,
       data: {
@@ -21,7 +18,6 @@ module CrystalWorld::Controllers::Admin
       },
       template_path: "admin/_image.html"
     )
-    #ctx.response.print html
   end
 
   def upload_image(ctx)
@@ -65,11 +61,9 @@ module CrystalWorld::Controllers::Admin
               "type"      => content_type,
               "folder"    => "blog"
             },
-            #headers: { "Content-Type" => content_type }
           )
           res = req.execute
 
-          # Check for errors from ImageKit API
           if res.status_code != 200
             ctx.response.status_code = res.status_code
             ctx.response.print "Image upload to ImageKit failed."
@@ -87,102 +81,25 @@ module CrystalWorld::Controllers::Admin
           self.get_image_item(ctx, imgkit_url, filename)
         end
       end
-      #self.get_images(ctx)
     rescue e
       ctx.response.status_code = 500
       ctx.response.print "An error occurred during file upload: #{e.message}"
     end
   end
 
-  def upload_imageOLD(ctx)
-    #p! ctx.request.body
-    HTTP::FormData.parse(ctx.request) do |part|
-      case part.name
-      when "imageUpload"
-        fname = part.filename.to_s
-        p! fname
-        File.write("#{TEMP_IMAGES_FOLDER}/#{fname}", part.body)
-        file = File.open("#{TEMP_IMAGES_FOLDER}/#{fname}")
-        req = Crest::Request.new(
-          :post,
-          url: "https://upload.imagekit.io/api/v1/files/upload",
-          user: IMAGEKIT_PRIVATE_KEY,
-          password: "",
-          form: {
-            "file" => file,
-            #"type" => "image/png",
-            "fileName" => fname,
-            "folder" => "blog"
-          },
-        )
-        res = req.execute
-        deleted = File.delete?("#{TEMP_IMAGES_FOLDER}/#{fname}")
-        ctx.response.headers["HX-Trigger-After-Settle"] = "uploadComplete"
-      end
-      #p! res
-    end
-    self.get_images(ctx)
-    #ctx.response.headers["HX-Trigger-After-Swap"] = "uploadComplete"
-  end
-
   def get_images(ctx)
-    img_arr = [] of String
-    if LOCAL
-      res = Crest.get(
-        "https://api.imagekit.io/v1/files?path=blog",
-        user: IMAGEKIT_PRIVATE_KEY,
-        password: "",
-        params: {
-          "sort" => "DESC_CREATED"
-        }
-      )
-      #
-      # TODO: find out how to do this parsing and looping properly
-      # --- cos `ims.each do |im|` doesn't work
-      #
-      ims = JSON.parse(res.body)
-      i = 0
-      array_has_ended = false
-      while !array_has_ended
-        begin
-          img_arr.push(ims[i]["name"].to_s)
-        rescue IndexError
-          array_has_ended = true
-        end
-        i += 1
-      end
-    else
-
-      # Use a fixture so as to avoid calling the
-      # ImageKit API
-      # https://ik.imagekit.io/alistairrobinson/blog
-      # https://ik.imagekit.io/alistairrobinson/blog/tr:w-150
-      img_arr = [
-        "crash-by-jg-ballard.jpg",
-        "mynah.png",
-        "logicomix-an-epic-search.jpg",
-        "profile.jpg",
-        "_House-of-New-Life.jpg",
-        "great-moscow-state-circus.jpg",
-        "me-in-kazakhstan.jpg",
-        "metro-ulitsa-1905.jpg",
-        "post-war-soviet-modernist-architecture.jpg",
-        "jg-ballards-crash-is-it-science-fiction.jpg",
-        "nova-by-samuel-r-delany-1968.jpg",
-        "_Gorky-Art-Theatre-A-Savin-WikiCommons.jpg",
-        "profile2_J9se4LBCU.jpg",
-        "mynah3.png",
-        "logomynah3_W9qR2Ve9Z.png",
-        "duckrabbit_large.png",
-        "perceptual-constancy_large.jpg",
-        "bird1.png",
-        "trouble-on-triton-samuel-r-delany-1976.jpg",
-      ]
-    end
-
+    res = Crest.get(
+      "https://api.imagekit.io/v1/files?path=blog",
+      user: IMAGEKIT_PRIVATE_KEY,
+      password: "",
+      params: {
+        "sort" => "DESC_CREATED"
+      }
+    )
+    images = JSON.parse(res.body)
     TemplateRenderer.render_partial(ctx: ctx,
       data: {
-        "images" => img_arr,
+        "images" => images,
       },
       template_path: "admin/_images.html"
     )
@@ -192,7 +109,7 @@ module CrystalWorld::Controllers::Admin
     if u = self.authenticated_user ctx
       TemplateRenderer.render_page(ctx: ctx,
         data: {
-          #"images"              => img_arr,
+          "title"               => "Admin: images",
           "admin_section"       => "Admin: images",
           "user_authenticated"  => true,
           "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
