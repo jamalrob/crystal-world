@@ -9,12 +9,25 @@ module CrystalWorld::Controllers::Admin
     ctx.response.print html
   end
 
-  def upload_image(ctx)
+  def get_image_item(ctx, imgkit_url, filename)
+    #urlbits = ctx.request.path.split('/', remove_empty: true)
+    #file = urlbits[-1]?
+    #html = "<img src=\"https://ik.imagekit.io/alistairrobinson/blog/tr:w-150/#{file}\">"
+    TemplateRenderer.render_partial(
+      ctx: ctx,
+      data: {
+        "img_url"   => imgkit_url,
+        "filename"  => filename
+      },
+      template_path: "admin/_image.html"
+    )
+    #ctx.response.print html
+  end
 
+  def upload_image(ctx)
     #
     # TODO: sanitize against malicious uploads
     #
-
     begin
       HTTP::FormData.parse(ctx.request) do |part|
         case part.name
@@ -63,16 +76,19 @@ module CrystalWorld::Controllers::Admin
             return
           end
 
+          res_parsed = JSON.parse(res.body)
+          imgkit_url = res_parsed["url"]
+          filename = res_parsed["name"]
+
           # Ensure the temporary file is deleted after upload
           File.delete(temp_file_path)
 
-          ctx.response.headers["HX-Trigger-After-Settle"] = "uploadComplete"
+          #ctx.response.headers["HX-Trigger-After-Settle"] = "uploadComplete"
+          self.get_image_item(ctx, imgkit_url, filename)
         end
       end
-
-      self.get_images(ctx)
+      #self.get_images(ctx)
     rescue e
-      # Handle exceptions and log errors
       ctx.response.status_code = 500
       ctx.response.print "An error occurred during file upload: #{e.message}"
     end

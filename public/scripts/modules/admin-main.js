@@ -172,6 +172,26 @@ document.querySelectorAll('[data-js-formatdate]').forEach(el => {
   el.innerHTML = new Intl.DateTimeFormat(navigator.language).format(thisDate);
 })
 
+/*
+  IMAGE UPLOAD PROGRESS & IMAGE LIST UPDATE
+*/
+document.body.addEventListener('htmx:beforeRequest', ev => {
+  let imgUpload = document.getElementById("imageUpload");
+  if (ev.target === imgUpload) {
+    const template = document.querySelector("#empty-item"); // HTML template
+    const clone = template.content.cloneNode(true);
+    const imageList = document.getElementById("imagelist")
+    imageList.prepend(clone);
+  }
+})
+document.body.addEventListener('htmx:afterRequest', ev => {
+  let imgUpload = document.getElementById("imageUpload");
+  if (ev.target === imgUpload) {
+    const li = document.querySelector(".empty-item");
+    li.remove();
+  }
+})
+
 
 /*
   HELPERS

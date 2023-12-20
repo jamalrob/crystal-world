@@ -5,9 +5,8 @@
     id="frm-upload"
     enctype="multipart/form-data"
     hx-encoding="multipart/form-data"
-  >
-  <!--_="on htmx:xhr:progress(loaded, total) set #progress.value to (loaded/total)*100"-->
-  <div id="uploadSpinner" class="spinner spinner--hidden"></div>
+    >
+    <!--_="on htmx:xhr:progress(loaded, total) set #progress.value to (loaded/total)*100"-->
       <label for="imageUpload" class="upload">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         New image
@@ -19,15 +18,29 @@
         accept=".png, .jpg, .jpeg"
         hx-post="/admin/images/upload"
         hx-target="#imagelist"
+        hx-swap="afterbegin"
         hx-indicator="#uploadSpinner"
       />
     <!--<progress id='progress' value='0' max='100'></progress>-->
   </form>
 </div>
 
-<ul id="imagelist" hx-trigger="load, uploadComplete from:body" hx-get="/admin/images/get">
+<!-- hx-trigger="load, uploadComplete from:body" -->
+<ul id="imagelist" hx-trigger="load" hx-get="/admin/images/get">
   <div class="spinner imgLoading nonabsolute"></div>
 </ul>
+
+<!--  Following template used to prepend an empty
+      item to the list with a spinner in it, triggered
+      by the upload request
+-->
+<template id="empty-item">
+  <li class="empty-item">
+    <a href="javascript:void(0)" class="imglink">
+      <div id="uploadSpinner" class="spinner"></div>
+    </a>
+  </li>
+</template>
 
 <div class="modal-container"
 _="on click
@@ -49,7 +62,6 @@ _="on click
       <div class="modal-inner">
       </div>
   </div>
-
 </div>
 
 <style>
