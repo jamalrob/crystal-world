@@ -1,26 +1,27 @@
 module CrystalWorld::Controllers::Auth
   extend self
 
-  def create_user(ctx)
-    params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
-    username = params["username"]
-    first_name = params["first_name"]
-    last_name = params["last_name"]
-    Data::Users.create_user(
-      username: username,
-      first_name: first_name,
-      last_name: last_name
-    )
-  end
+  # BYPASSED IN ADMIN CONTROLLER new_author_form
+  #def create_user(ctx)
+  #  params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
+  #  username = params["username"]
+  #  first_name = params["first_name"]
+  #  last_name = params["last_name"]
+  #  Data::Users.create_user(
+  #    username: username,
+  #    first_name: first_name,
+  #    last_name: last_name
+  #  )
+  #end
 
   def do_register(ctx)
     params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
-    invite_key = params["invite_key"]
+    invite_key = params["inviteKey"]
     username = params["username"]
     password = params["password"]
     if u = Data::Users.get_user(username, invite_key)
       Data::Users.update_password u["id"].as(Int32), Argon2::Password.create(password)
-      self.do_login(ctx)
+      ctx.response.headers["HX-Location"] = %({"path": "/admin/login", "target": "body"})
     end
   end
 

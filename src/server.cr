@@ -9,6 +9,8 @@ require "crest"
 require "crinja"
 require "crystal-argon2"
 require "sanitize"
+require "email"
+
 require "./controllers/*"
 require "./data/*"
 require "./*"
@@ -127,6 +129,9 @@ module CrystalWorld
 
     when "/admin/images/upload"
       Controllers::Admin.upload_image(ctx)
+
+    when "/admin/authors/new"
+      Controllers::Admin.new_author_form(ctx)
 
     when .match /^\/#{SLUG_PATTERN}$/
       Controllers::Public.article(ctx)

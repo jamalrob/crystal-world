@@ -14,6 +14,7 @@
   New article
 </button>
 <table
+  id="admin-table-articles"
   class="admin-table"
   hx-boost="true"
 >
@@ -79,92 +80,26 @@
   end
 </script>
 <style>
-  table.admin-table {
-    font-size: 0.8rem;
-    width: 100%;
-    min-width: 980px;
-    /*border: 1px solid rgba(84, 143, 211, 0.3);*/
-    table-layout: fixed;
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #165a8f34;
-    overflow: hidden;
-    border-radius: 2px;
-    box-shadow: 0 0 3px #0b2a42;
-    /*background-color: #f1f1e6;*/
-    /*color: #222;*/
-  }
-  thead > tr > th {
-    text-align: left;
-  }
-  table.admin-table tr.row-showing:nth-child(odd) {
-    background-color: #08416d;
-  }
-  .oddrow {
-    background-color: #08416d;
-    /*background-color: #f3faff;*/
-  }
-  table.admin-table caption {
-    color: #e3dfd4;
-    text-align: left;
-    font-size: 1.3rem;
-    margin-bottom: 15px;
-    font-family: 'Roboto Condensed', Ubuntu, Helvetica, Arial, sans-serif;
-  }
-  table.admin-table tr > th > button {
-    padding: 0;
-    background-color: unset;
-  }
-  table.admin-table tr > th:nth-child(1) {
+  table#admin-table-articles tr > th:nth-child(1) {
     width: 65%;
     padding: 5px 0 10px 10px;
   }
-  table.admin-table tr > th:nth-child(1) svg {
+  table#admin-table-articles tr > th:nth-child(1) svg {
     vertical-align: bottom;
   }
-  table.admin-table tr > th:nth-child(1) input {
+  table#admin-table-articles tr > th:nth-child(1) input {
     padding: 3px 8px;
     height: 30px;
     margin-left: 5px;
   }
-  table.admin-table tr > th:nth-child(2) {
+  table#admin-table-articles tr > th:nth-child(2) {
     width: 10%;
   }
-  table.admin-table tr > th:nth-child(3) {
+  table#admin-table-articles tr > th:nth-child(3) {
     width: 10%;
   }
-  table.admin-table tr > th:last-child {
+  table#admin-table-articles tr > th:last-child {
     width: 15%;
-  }
-
-  table.admin-table tr > td:nth-child(1) {
-    padding: 6px 0 6px 10px;
-  }
-    table.admin-table tr > td:last-child {
-    padding-right: 5px;
-    text-align: right;
-  }
-  table.admin-table tr > td {
-    border-bottom: 1px solid rgba(84, 143, 211, 0.3);
-  }
-  table.admin-table tr:last-child > td {
-    border-bottom: none;
-  }
-  table.admin-table button {
-    padding: 7px 15px 3px;
-    font-weight: normal;
-    position: relative;
-    box-shadow: none;
-  }
-  span.tag{
-    background-color: #366a93;
-    padding: 3px 10px;
-    border-radius: 3px;
-    color: #ddd;
-    font-size: 0.7rem;
-  }
-  .row-showing {
-    display: table-row;
   }
 </style>
 {% endblock %}

@@ -18,3 +18,5 @@ dependencies:
     github: straight-shoota/sanitize
   crest:
     github: mamantoha/crest
+  email:
+    github: arcage/crystal-email

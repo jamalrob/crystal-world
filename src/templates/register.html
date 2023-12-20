@@ -7,10 +7,11 @@
   hx-post="/admin/register/auth"
   hx-indicator="#regSpinner"
 >
-  <label>Email</label>
-  <input type="text" name="username" placeholder="Email address">
-  <label>Password</label>
-  <input type="password" name="password" placeholder="Create a password">
+  <input type="hidden" name="inviteKey" id="inpInviteKey" value="{{ invite_key }}">
+  <label for="inpUsername">Email</label>
+  <input type="text" id="inpUsername" name="username" placeholder="Email address">
+  <label for="inpPassword">Password</label>
+  <input type="password" id="inpPassword" name="password" placeholder="Create a password">
   <div class="button-row">
     <button class="halfwidth">
       Register

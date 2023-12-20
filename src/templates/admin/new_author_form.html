@@ -1,0 +1,23 @@
+<form id="frm-new-user" hx-post="/admin/authors/new" hx-target=".result">
+  <label for="inpEmail">Email address</label>
+  <input type="email" id="inpUsername" name="username">
+  <label for="inpFirstName">First name</label>
+  <input type="text" id="inpFirstName" name="firstName">
+  <label for="inpLastName">Last name</label>
+  <input type="text" id="inpLastName" name="lastName">
+  <div class="button-row">
+    <button class="green">Send invitation</button>
+  </div>
+  <div class="result"></div>
+</form>
+
+<style>
+  #frm-new-user {
+    padding: 40px;
+    font-size: 0.9rem;
+  }
+  .result {
+    margin-top: 20px;
+    color: greenyellow;
+  }
+</style>

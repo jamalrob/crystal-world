@@ -34,3 +34,6 @@ shards:
   crest:
     git: https://github.com/mamantoha/crest.git
     version: 1.3.12
+  email:
+    git: https://github.com/arcage/crystal-email.git
+    version: 0.7.0

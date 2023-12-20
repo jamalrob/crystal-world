@@ -84,9 +84,11 @@ module CrystalWorld::Controllers::Public
   end
 
   def register(ctx)
+    params = URI::Params.parse(ctx.request.query.not_nil!)
     TemplateRenderer.render_page(ctx: ctx,
       data: {
-        "title" => "Sign up",
+        "title"       => "Sign up",
+        "invite_key"  => params["invite_key"]
       },
       template_path: "register.html"
     )

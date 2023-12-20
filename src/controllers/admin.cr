@@ -200,8 +200,8 @@ module CrystalWorld::Controllers::Admin
       users = Data::Users.get_users()
       TemplateRenderer.render_page(ctx: ctx,
         data: {
-          "title"               => "Admin: articles",
-          "admin_section"       => "Admin: articles",
+          "title"               => "Admin: authors",
+          "admin_section"       => "Admin: authors",
           "authors"             => users,
           "user_authenticated"  => true,
           "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
@@ -212,6 +212,54 @@ module CrystalWorld::Controllers::Admin
       return
     end
     ctx.response.redirect "/"
+  end
+
+  def new_author_form(ctx)
+    if ctx.request.method == "POST"
+      params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
+      invite_key = Random::Secure.hex(16)
+      result = Data::Users.create_user(
+        username: params["username"],
+        first_name: params["firstName"],
+        last_name: params["lastName"],
+        invite_key: invite_key
+      )
+      p! result
+
+      # Send email to params["username"] with a link to
+      # "#{HOST}/admin/register?invite_key=#{invite_key}"
+      #email = EMail::Message.new
+      #email.from    "your_addr@example.com"
+      #email.to      "to@example.com"
+      #email.subject "Subject of the mail"
+      #email.message <<-EOM
+      #  Message body of the mail.
+      #  --
+      #  Your Signature
+      #  EOM
+      #config = EMail::Client::Config.new("your.mx.example.com", 25, helo_domain: "your.host.example.com")
+      #client = EMail::Client.new(config)
+      #client.start do
+      #  send(email)
+      #end
+
+      ctx.response.print %(An email has been sent to #{params["username"]})
+    else
+      TemplateRenderer.render_page(ctx: ctx,
+        data: {
+          "title"               => "Admin: authors",
+          "admin_section"       => "Admin: authors",
+          "user_authenticated"  => true,
+          "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
+          "admin"               => true,
+        },
+        template_path: "admin/new_author_form.html"
+      )
+    end
+  end
+
+  def do_create_author(username, first_name, last_name)
+
   end
 
   def customize(ctx)

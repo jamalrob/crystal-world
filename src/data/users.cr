@@ -1,11 +1,16 @@
 module CrystalWorld::Data::Users
   extend self
 
-  def create_user(username : String, first_name : String, last_name : String)
+  def create_user(
+    username : String,
+    first_name : String,
+    last_name : String,
+    invite_key : String
+    )
     DB.open "sqlite3://./crw.db" do |db|
-      db.exec "INSERT INTO users (username, first_name, last_name)" \
-              "VALUES (?, ?, ?);",
-              username, first_name, last_name
+      return  db.exec "INSERT INTO users (username, first_name, last_name, invite_key)" \
+                      "VALUES (?, ?, ?, ?);",
+                      username, first_name, last_name, invite_key
     end
   end
 
@@ -26,7 +31,7 @@ module CrystalWorld::Data::Users
           "SELECT id, password, first_name, last_name, sessionid, csrftoken " \
           "FROM users WHERE username = ? AND invite_key = ?;",
           username, invite_key,
-          as: {Int32, String, String?, String?, String?, String?}
+          as: {Int32, String?, String?, String?, String?, String?}
         )
       rescue DB::NoResultsError
         puts "No results"
