@@ -33,20 +33,24 @@ The main objectives here are:
 
 ![Home page](./screenshots/home-page.png)
 
-![Home page](./screenshots/article-page.png)
+![Article page](./screenshots/article-page.png)
 
-![Home page](./screenshots/article-page-glassmorphism.png)
+![Glassmorphism](./screenshots/article-page-glassmorphism.png)
 
-![Home page](./screenshots/admin-articles.png)
+![Admin: articles](./screenshots/admin-articles.png)
 
-![Home page](./screenshots/admin-articles-2.png)
+![Admin: articles 2](./screenshots/admin-articles-2.png)
 
-![Home page](./screenshots/admin-edit-article.png)
+![Admin: edit article](./screenshots/admin-edit-article.png)
 
-![Home page](./screenshots/admin-article-preview.png)
+![Admin: article preview](./screenshots/admin-article-preview.png)
 
-![Home page](./screenshots/admin-article-properties.png)
+![Admin: article properties](./screenshots/admin-article-properties.png)
 
-![Home page](./screenshots/admin-article-properties-2.png)
+![Admin: article properties 2](./screenshots/admin-article-properties-2.png)
 
-![Home page](./screenshots/admin-article-properties-4.png)
+![Admin: article properties 3](./screenshots/admin-article-properties-4.png)
+
+![Admin: image gallery](./screenshots/admin-images.png)
+
+![Admin: authors](./screenshots/admin-authors.png)
