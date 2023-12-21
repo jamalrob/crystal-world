@@ -167,6 +167,7 @@ function setupArticle() {
 /*
   FORMAT DATES ACCORDING TO LOCALE
 */
+
 document.querySelectorAll('[data-js-formatdate]').forEach(el => {
   let thisDate = new Date(el.innerHTML);
   el.innerHTML = new Intl.DateTimeFormat(navigator.language).format(thisDate);
@@ -176,38 +177,41 @@ document.querySelectorAll('[data-js-formatdate]').forEach(el => {
 /*
   IMAGE UPLOAD PROGRESS & IMAGE LIST UPDATE
 */
-document.body.addEventListener('htmx:beforeRequest', ev => {
-  let imgUpload = document.getElementById("imageUpload");
-  if (ev.target === imgUpload) {
+
+const imageUpload = document.getElementById("imageUpload");
+
+if (imageUpload) {
+  imageUpload.addEventListener('htmx:beforeRequest', () => {
     const template = document.querySelector("#empty-item"); // HTML template
     const clone = template.content.cloneNode(true);
     const imageList = document.getElementById("imagelist")
     imageList.prepend(clone);
-  }
-})
-document.body.addEventListener('htmx:afterRequest', ev => {
-  let imgUpload = document.getElementById("imageUpload");
-  if (ev.target === imgUpload) {
-    const li = document.querySelector(".empty-item");
-    li.remove();
-  }
-})
+  })
+  imageUpload.addEventListener('htmx:afterRequest', () => {
+    document.querySelector(".empty-item").remove();
+  })
+}
+
 
 /*
-  PRELOAD BIG IMAGES
+PRELOAD BIG IMAGES
 */
-document.body.addEventListener('htmx:afterRequest', (ev) => loadBigImages(ev))
 
-async function loadBigImages(ev) {
-  const imageList = document.getElementById("imagelist");
-  if (ev.target === imageList) {
-    const templates = document.querySelectorAll(".bigimg");
-    templates.forEach(template => {
-      let clone = template.content.cloneNode(true);
-      const img = new Image(960);
-      img.src = clone.firstElementChild.src;
-    })
-  }
+const imageList = document.getElementById("imagelist");
+
+if (imageList) {
+  imagelist.addEventListener('htmx:afterRequest', () => {
+    loadBigImages();
+  })
+}
+
+async function loadBigImages() {
+  const templates = document.querySelectorAll(".bigimg");
+  templates.forEach(template => {
+    let clone = template.content.cloneNode(true);
+    const img = new Image(960);
+    img.src = clone.firstElementChild.src;
+  })
 }
 
 /*
