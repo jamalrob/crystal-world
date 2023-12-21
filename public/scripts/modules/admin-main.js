@@ -173,8 +173,6 @@ document.querySelectorAll('[data-js-formatdate]').forEach(el => {
 })
 
 
-
-
 /*
   IMAGE UPLOAD PROGRESS & IMAGE LIST UPDATE
 */
@@ -195,6 +193,22 @@ document.body.addEventListener('htmx:afterRequest', ev => {
   }
 })
 
+/*
+  PRELOAD BIG IMAGES
+*/
+document.body.addEventListener('htmx:afterRequest', (ev) => loadBigImages(ev))
+
+async function loadBigImages(ev) {
+  const imageList = document.getElementById("imagelist");
+  if (ev.target === imageList) {
+    const templates = document.querySelectorAll(".bigimg");
+    templates.forEach(template => {
+      let clone = template.content.cloneNode(true);
+      const img = new Image(960);
+      img.src = clone.firstElementChild.src;
+    })
+  }
+}
 
 /*
   HELPERS

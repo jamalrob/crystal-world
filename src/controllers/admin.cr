@@ -24,6 +24,16 @@ module CrystalWorld::Controllers::Admin
     #
     # TODO: sanitize against malicious uploads
     #
+    # - Don't allow any other file types apart from images.
+    #   (For example: only accept files with content-type: image/png, image/jpg, image/jpeg, image/gif)
+    # - Always, save the file using an appropriate extension, never allow the user to control the extension of the filename.
+    #   (You can save the file using a completely randomname to mitigate this, use GUID/UUID to generate a random name for the image)
+    # - Set the HTTP Response's content type to image/<type>.
+    #   (Browsers won't execute any javascript if the content type is image/*)
+    # - Only use <img src="[path-to-img]"> tag to render the image and don't allow the user to control any values of HTML here.
+    # - Use CSP to prevent XSS (Optional, better if you can implement)
+    #
+    #
     begin
       HTTP::FormData.parse(ctx.request) do |part|
         case part.name

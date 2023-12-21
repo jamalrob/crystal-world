@@ -11,11 +11,9 @@
             add .visible to .modal-container
         "
     >
-      <!-- Preload big image -->
-      <link rel="preload" as="image" href="https://ik.imagekit.io/alistairrobinson/blog/tr:w-960,q-80/{{ img.name }}" />
 
       <!-- Temp store for the big image HTML, used by hyperscript click handler above -->
-      <template id="bigimg_{{ img.fileId }}">
+      <template class="bigimg" id="bigimg_{{ img.fileId }}">
         <img src="https://ik.imagekit.io/alistairrobinson/blog/tr:w-960,q-80/{{ img.name }}">
       </template>
 
