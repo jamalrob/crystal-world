@@ -194,8 +194,8 @@ module CrystalWorld::Controllers::Admin
     if u = self.authenticated_user ctx
       TemplateRenderer.render_page(ctx: ctx,
         data: {
-          "title"               => "Admin: articles",
-          "admin_section"       => "Admin: articles",
+          "title"               => "Admin: settings",
+          "admin_section"       => "Admin: settings",
           "user_authenticated"  => true,
           "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
           "admin"               => true,
@@ -271,19 +271,20 @@ module CrystalWorld::Controllers::Admin
   end
 
   def do_create_author(username, first_name, last_name)
-
   end
 
   def customize(ctx)
     if u = self.authenticated_user ctx
+      settings = Data.get_settings
       TemplateRenderer.render_page(
         ctx: ctx,
         data: {
-          "title"               => "Admin: articles",
-          "admin_section"       => "Admin: articles",
+          "title"               => "Admin: customize",
+          "admin_section"       => "Admin: customize",
           "user_authenticated"  => true,
           "sidebar_collapsed"   => self.sidebar_collapsed_classname(ctx),
           "admin"               => true,
+          "settings"            => settings
         },
         template_path: "admin/customize.html"
       )

@@ -1,0 +1,31 @@
+{% extends "admin/layouts/base.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="col">
+    <h3 class="top">Colour themes</h3>
+    <input type="color" id="bg" value="{{ settings.bg_color }}">
+    <input type="color" id="fg" value="{{ settings.fg_color }}">
+    <input type="color" id="link_color" value="{{ settings.link_color }}">
+
+    <h3>Logo</h3>
+
+  </div>
+  <div class="col">
+    <p>Something</p>
+  </div>
+</div>
+
+<style>
+  .top {
+    margin-top: 0;
+  }
+  .container {
+    display: flex;
+  }
+  .col {
+    width: 50%;
+    margin-right: 40px;
+  }
+</style>
+{% endblock %}
