@@ -14,10 +14,11 @@ The main objectives here are:
   - Database access
   - CSRF and XSS prevention
   - Reactive UI, with no full page loads
+  - Image uploading and hosting
 - Testing different patterns and architectures
 - Learning a new programming language that's as nice to read as Python or Ruby, but _fast_
 - Building a usable groundwork for small real-world projects which is enjoyable to use
-- On the client-side, replacing all (self-written) JavaScript with HTMX and Hyperscript while retaining a fast, SPA-like user experience
+- On the client-side, using HTMX, Hyperscript, and vanilla JS to make a fast, SPA-like user experience
 
 ### Features
 
@@ -25,9 +26,6 @@ The main objectives here are:
 - Edit articles in Markdown, with instant previews
 - CRUD for articles, authors, pages, customization, and settings
 - Cloud API-based image management for CMS
-- Choose from two separate modes of operation:
-  - File-based (Markdown files with frontmatter)
-  - Or data-based (SQLite3 database)
 
 ### Screenshots
 
