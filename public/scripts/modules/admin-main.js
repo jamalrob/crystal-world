@@ -157,25 +157,21 @@ function setupArticle() {
     });
   })
 
-
-
 } // setupArticle()
 
 
 /*
   FORMAT DATES ACCORDING TO LOCALE
 */
-function formatDates() {
-  document.querySelectorAll('[data-js-formatdate]').forEach(el => {
+document.querySelectorAll('[data-js-formatdate]').forEach(el => {
+  try {
     let thisDate = new Date(el.innerHTML);
     el.innerHTML = new Intl.DateTimeFormat(navigator.language).format(thisDate);
-  })
-}
-document.addEventListener('htmx:afterRequest', ev => {
-  formatDates();
+  } catch (ex) {
+    console.log("Can't format date " + el.innerHTML)
+    console.log(ex)
+  }
 })
-formatDates();
-
 
 /*
   IMAGE UPLOAD PROGRESS & IMAGE LIST UPDATE
