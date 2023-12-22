@@ -132,7 +132,6 @@ function setupArticle() {
     Form submission response
   */
   document.querySelectorAll("[data-js-articlesubmit]").forEach(el => {
-
     el.addEventListener('htmx:afterRequest', ev => {
       const myTarget = ev.detail.target;
       switch (myTarget.id) {
@@ -176,7 +175,6 @@ document.querySelectorAll('[data-js-formatdate]').forEach(el => {
 /*
   IMAGE UPLOAD PROGRESS & IMAGE LIST UPDATE
 */
-
 document.getElementById("imageUpload")?.addEventListener('htmx:beforeRequest', () => {
   const template = document.querySelector("#empty-item"); // HTML template
   const clone = template.content.cloneNode(true);
@@ -191,11 +189,9 @@ document.getElementById("imageUpload")?.addEventListener('htmx:afterRequest', ()
 /*
 PRELOAD BIG IMAGES
 */
-
 document.getElementById("imagelist")?.addEventListener('htmx:afterRequest', () => {
   loadBigImages();
 })
-
 async function loadBigImages() {
   const templates = document.querySelectorAll(".bigimg");
   templates.forEach(template => {
