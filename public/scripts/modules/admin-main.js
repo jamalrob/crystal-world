@@ -177,32 +177,24 @@ document.querySelectorAll('[data-js-formatdate]').forEach(el => {
   IMAGE UPLOAD PROGRESS & IMAGE LIST UPDATE
 */
 
-const imageUpload = document.getElementById("imageUpload");
-
-if (imageUpload) {
-  imageUpload.addEventListener('htmx:beforeRequest', () => {
-    const template = document.querySelector("#empty-item"); // HTML template
-    const clone = template.content.cloneNode(true);
-    const imageList = document.getElementById("imagelist")
-    imageList.prepend(clone);
-  })
-  imageUpload.addEventListener('htmx:afterRequest', () => {
-    document.querySelector(".empty-item").remove();
-  })
-}
+document.getElementById("imageUpload")?.addEventListener('htmx:beforeRequest', () => {
+  const template = document.querySelector("#empty-item"); // HTML template
+  const clone = template.content.cloneNode(true);
+  const imageList = document.getElementById("imagelist")
+  imageList.prepend(clone);
+})
+document.getElementById("imageUpload")?.addEventListener('htmx:afterRequest', () => {
+  document.querySelector(".empty-item").remove();
+})
 
 
 /*
 PRELOAD BIG IMAGES
 */
 
-const imageList = document.getElementById("imagelist");
-
-if (imageList) {
-  imagelist.addEventListener('htmx:afterRequest', () => {
-    loadBigImages();
-  })
-}
+document.getElementById("imagelist")?.addEventListener('htmx:afterRequest', () => {
+  loadBigImages();
+})
 
 async function loadBigImages() {
   const templates = document.querySelectorAll(".bigimg");
