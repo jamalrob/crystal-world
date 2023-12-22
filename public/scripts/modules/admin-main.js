@@ -131,35 +131,33 @@ function setupArticle() {
   /*
     Form submission response
   */
+  document.querySelectorAll("[data-js-articlesubmit]").forEach(el => {
 
-  document.body.addEventListener('htmx:afterRequest', ev => {
-    const myTarget = ev.detail.target;
-    switch (myTarget.id) {
-      case "publish":
-        let res = JSON.parse(ev.detail.xhr.response);
-        let errors = false;
-        for(const inp of res.validation_results) {
-          if (inp.hasOwnProperty("error")) {
-            errors = true;
+    el.addEventListener('htmx:afterRequest', ev => {
+      const myTarget = ev.detail.target;
+      switch (myTarget.id) {
+        case "publish":
+          let res = JSON.parse(ev.detail.xhr.response);
+          let errors = false;
+          for(const inp of res.validation_results) {
+            if (inp.hasOwnProperty("error")) {
+              errors = true;
+            }
           }
-        }
-        if(errors) {
-          article.events.receivePublishError(res.validation_results)
-        } else {
-          article.events.publish();
-        }
-        break;
-      case "unpublish":
-        article.events.unpublish();
-        break;
-    }
-  });
+          if(errors) {
+            article.events.receivePublishError(res.validation_results)
+          } else {
+            article.events.publish();
+          }
+          break;
+        case "unpublish":
+          article.events.unpublish();
+          break;
+      }
+    });
+  })
 
-  //const filepicker = document.getElementById("inpMainImage");
-  //filepicker.addEventListener("change", (event) => {
-  //  const files = event.target.files;
-  //  filepicker.value = files[0].name;
-  //});
+
 
 } // setupArticle()
 
@@ -167,11 +165,16 @@ function setupArticle() {
 /*
   FORMAT DATES ACCORDING TO LOCALE
 */
-
-document.querySelectorAll('[data-js-formatdate]').forEach(el => {
-  let thisDate = new Date(el.innerHTML);
-  el.innerHTML = new Intl.DateTimeFormat(navigator.language).format(thisDate);
+function formatDates() {
+  document.querySelectorAll('[data-js-formatdate]').forEach(el => {
+    let thisDate = new Date(el.innerHTML);
+    el.innerHTML = new Intl.DateTimeFormat(navigator.language).format(thisDate);
+  })
+}
+document.addEventListener('htmx:afterRequest', ev => {
+  formatDates();
 })
+formatDates();
 
 
 /*

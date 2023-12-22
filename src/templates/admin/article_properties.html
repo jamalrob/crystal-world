@@ -102,6 +102,7 @@
               a hidden form input above
         -->
         <button
+          data-js-articlesubmit="true"
           data-articleid="{{ article.id }}"
           class="fullwidth {% if article.draft %}hidden{% endif %} has-icon"
           id="unpublish"
@@ -120,6 +121,7 @@
         </button>
 
         <button
+          data-js-articlesubmit="true"
           data-articleid="{{ article.id }}"
           class="fullwidth has-icon green"
           id="publish"

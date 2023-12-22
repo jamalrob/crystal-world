@@ -125,7 +125,8 @@ select {
 }
 
 input[type='color'] {
-  padding: 0;
+  padding: 2px;
+  box-shadow: none;
 }
 
 input, textarea, #editBox, select {
