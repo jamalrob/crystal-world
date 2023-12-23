@@ -171,7 +171,9 @@ module CrystalWorld::Data::Articles
       articles = [] of Hash(String, String | Int32)
       begin
         results = db.query_all("SELECT id, slug, title, date, tags FROM articles " \
-                               "WHERE deleted = 0 AND draft = 0 " \
+                               "WHERE deleted = 0 " \
+                               "AND draft = 0 " \
+                               "AND date <= DATETIME('now') " \
                                "AND tags LIKE '%' || ? || '%' " \
                                "ORDER BY date DESC;",
           tag,
