@@ -7,7 +7,7 @@
     hx-encoding="multipart/form-data"
     >
     <!--_="on htmx:xhr:progress(loaded, total) set #progress.value to (loaded/total)*100"-->
-      <label for="imageUpload" class="upload">
+      <label for="imageUpload" class="upload green">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         New image
       </label>
@@ -80,19 +80,13 @@ _="on click
   input[type='file'] {
     display: none;
   }
-  /*label[for='imageUpload'] {
-    display: inline-block;
-    padding: 5px 20px 7px;
-    cursor: pointer;
-    line-height: 1rem;
-  }*/
   label.upload {
     box-shadow: 0 0 3px #0b2a4287;
     position: relative;
     color: #fff;
     border: none;
     border-radius: 2px;
-    padding: 8px 25px 5px;
+    padding: 8px 23px 5px;
     font-size: 16px;
     font-weight: bold;
     font-family: -apple-system,BlinkMacSystemFont,'avenir next',avenir,'helvetica neue',helvetica,ubuntu,roboto,noto,'segoe ui',arial,sans-serif;

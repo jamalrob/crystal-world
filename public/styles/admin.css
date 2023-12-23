@@ -32,10 +32,10 @@ button.has-icon {
   /*padding-top: 5px;
   padding-left: 22px;*/
 }
-button.green {
+button.green, label.green {
   background-color: #2f71bc;
 }
-button.green:hover {
+button.green:hover, label.green:hover {
   background-color: #2889f8
 }
 button.push-right{
