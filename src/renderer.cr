@@ -1,8 +1,21 @@
 module CrystalWorld::TemplateRenderer
   extend self
 
-  def render_page(ctx : HTTP::Server::Context, data : Hash, template_path : String)
+  private def _render(data, template_path)
+    tengine = Crinja.new
+    tengine.loader = Crinja::Loader::FileSystemLoader.new(TEMPLATE_FOLDER)
+    template = tengine.get_template(template_path)
+    template.render(data)
+  end
 
+  def render_page(
+    ctx : HTTP::Server::Context,
+    data : Hash,
+    template_path : String
+    )
+
+    # CACHEBUSTER
+    #
     if LOCAL
       # In development, get a fresh string to append
       # to static file URLs on every request
@@ -28,27 +41,18 @@ module CrystalWorld::TemplateRenderer
       end
     end
 
-    tengine = Crinja.new
-    tengine.loader = Crinja::Loader::FileSystemLoader.new(TEMPLATE_FOLDER)
-    template = tengine.get_template(template_path)
-    final_html = template.render(data)
-    ctx.response.print final_html
+    ctx.response.print self._render(data, template_path)
+
   end
 
-  def render_partial(ctx : HTTP::Server::Context, data : Hash, template_path : String)
-    tengine = Crinja.new
-    tengine.loader = Crinja::Loader::FileSystemLoader.new(TEMPLATE_FOLDER)
-    template = tengine.get_template(template_path)
-    final_html = template.render(data)
-    ctx.response.print final_html
-  end
+  def render_basic(
+    ctx : HTTP::Server::Context,
+    data = nil,
+    template_path : String = ""
+    )
+    # FOR PARTIALS, ERRORS, ETC
 
-  def render_basic(ctx : HTTP::Server::Context, template_path : String)
-    tengine = Crinja.new
-    tengine.loader = Crinja::Loader::FileSystemLoader.new(TEMPLATE_FOLDER)
-    template = tengine.get_template(template_path)
-    final_html = template.render
-    ctx.response.print final_html
+    ctx.response.print self._render(data, template_path)
   end
 
 end

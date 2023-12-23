@@ -10,7 +10,7 @@ module CrystalWorld::Controllers::Admin
   end
 
   def get_image_item(ctx, imgkit_url, filename)
-    TemplateRenderer.render_partial(
+    TemplateRenderer.render_basic(
       ctx: ctx,
       data: {
         "img_url"   => imgkit_url,
@@ -107,7 +107,7 @@ module CrystalWorld::Controllers::Admin
       }
     )
     images = JSON.parse(res.body)
-    TemplateRenderer.render_partial(ctx: ctx,
+    TemplateRenderer.render_basic(ctx: ctx,
       data: {
         "images" => images,
       },
@@ -427,7 +427,7 @@ module CrystalWorld::Controllers::Admin
   def validate_slug_inline(ctx)
     if u = self.authenticated_user ctx
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
-      TemplateRenderer.render_partial(
+      TemplateRenderer.render_basic(
         ctx: ctx,
         data: Validators.validate_slug(params["slug"], params["article_id"]),
         template_path: "admin/_validate_slug.html"
@@ -438,7 +438,7 @@ module CrystalWorld::Controllers::Admin
   def validate_date_inline(ctx)
     if u = self.authenticated_user ctx
       params = URI::Params.parse(ctx.request.body.not_nil!.gets_to_end)
-      TemplateRenderer.render_partial(
+      TemplateRenderer.render_basic(
         ctx: ctx,
         data: Validators.validate_date(params["date"], params["article_id"]),
         template_path: "admin/_validate_date.html"
