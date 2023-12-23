@@ -49,7 +49,7 @@ module CrystalWorld::Data::Articles
         as: {String}
       )
       tag_vals.each do |row|
-        all_tags |= row.delete(' ').split(",")
+        all_tags |= row.delete(' ').split(",", remove_empty: true)
       end
     end
     return all_tags
