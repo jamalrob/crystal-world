@@ -146,7 +146,7 @@ pre code {
 /* header */
 header {
     font-size: 0.7rem;
-    padding: 6px 15px;
+    padding: 10px 15px;
     display: flex;
     justify-content: right;
     position: fixed;
