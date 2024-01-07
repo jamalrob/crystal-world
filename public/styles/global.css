@@ -168,7 +168,6 @@ header .logo {
     background-color: #ffff97; /*#dcf2ff;*/
     background-color: #f36999;
     border-radius: 50%;
-    margin-top: 2px;
     position: absolute;
     left: 10px;
     margin-left: 0;
@@ -179,7 +178,6 @@ header nav a {
 header nav button {
   margin-left: 0.6rem;
   position: relative;
-  top: -2px;
   width: 100px;
 }
 
